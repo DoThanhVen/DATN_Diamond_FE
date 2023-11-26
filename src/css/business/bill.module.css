@@ -1,0 +1,326 @@
+.card {
+    padding: 20px 0;
+    background-color: white;
+    box-shadow: 0 1px 5px lightgrey;
+    border-radius: 10px;
+}
+
+/*NAV*/
+.card nav {
+    display: flex;
+    border-bottom: 1px solid black;
+}
+
+.navItem {
+    font-size: 15px;
+    color: black;
+}
+
+.navItem:hover {
+    color: orangered;
+}
+
+.navItem.active {
+    color: red;
+}
+
+.filterStatus {
+    display: flex;
+    justify-content: end;
+}
+
+/*ALL BILL*/
+.cardBillAll {
+    display: flex;
+    flex-direction: column;
+}
+
+.cardHeading {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.cardTitle {
+    font-size: 14px;
+    color: grey;
+    font-weight: bold;
+    opacity: .6;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: whitesmoke;
+}
+
+thead th {
+    font-size: 14px;
+    text-align: center;
+}
+
+tbody tr {
+    line-height: 30px;
+}
+
+tbody td,
+tbody th {
+    font-size: 14px;
+    text-align: center;
+}
+
+tbody td:last-child {
+    width: 100px;
+    color: blue;
+    cursor: pointer;
+}
+
+.buttonPage {
+    display: flex;
+    justify-content: center;
+}
+
+.buttonPage a {
+    background-color: lightgrey;
+    color: black;
+    margin: 0 5px;
+}
+
+/*MODEL*/
+.formCardModel {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background-color: rgba(196, 196, 196, 0.5);
+    z-index: 999;
+}
+
+.cardModel {
+    position: absolute;
+    width: 800px;
+    height: auto;
+    padding: 20px;
+    background-color: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 3px 5px lightgrey;
+}
+
+.cardHeadingModel {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.closeModal {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: red;
+    display: grid;
+    place-items: center;
+    top: 0px;
+    right: 0px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.cardModelListProducts {
+    max-height: 300px;
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid lightgrey;
+}
+
+.cardModelProduct:nth-child(1) {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: white;
+    height: 60px;
+    border-bottom: 1px solid black;
+    display: flex;
+    align-items: center;
+}
+
+.cardModelProduct:nth-child(1) div:nth-child(2) {
+    width: 100px;
+    text-align: center;
+}
+
+.cardModelProduct {
+    width: 100%;
+    display: flex;
+    padding: 10px 0;
+}
+
+.cardModelProduct:not(:nth-child(1)) div:nth-child(2) {
+    width: 100px;
+    height: 100px;
+}
+
+.cardModelProduct:not(:nth-child(1)) div:nth-child(2) img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.cardModelProduct * {
+    font-size: 15px;
+}
+
+.cardModelProduct div:nth-child(3) {
+    width: 30%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10px;
+}
+
+.cardModelProduct span,
+.cardModelProduct div:nth-child(6) {
+    width: 50px;
+    text-align: center;
+}
+
+.cardModelProduct div:nth-child(4),
+.cardModelProduct div:nth-child(5),
+.cardModelProduct span:last-child {
+    width: calc((100% - 30% - 200px)/3);
+    text-align: center;
+}
+
+.cardModelProduct:not(:nth-child(1)) * {
+    line-height: 100px;
+}
+
+.cardModelListProducts::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cardModelListProducts::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+}
+
+.cardModelListProducts::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.cardModelListProducts::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+}
+
+.cardModelStatus {
+    width: 200px;
+    height: 40px;
+    margin-bottom: 2px;
+    border: 1px solid lightgrey;
+}
+
+.cardModelStatus:focus {
+    outline: none;
+}
+
+option {
+    padding: 10px;
+}
+
+/*FORM SEARCH*/
+.formSearch {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.optionSelect {
+    width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+}
+
+
+.optionSelect:focus {
+    outline: none;
+}
+
+.inputSearch {
+    height: 50px;
+    width: calc(100% - 150px - 100px);
+    padding: 5px 10px;
+    margin-left: -1px;
+    border: 1px solid lightgrey;
+}
+
+.inputSearch:focus {
+    outline: none;
+}
+
+.buttonSearch {
+    width: 100px;
+    height: 50px;
+    border: none;
+    color: white;
+    background-color: orangered;
+    font-size: 15px;
+}
+
+/*GIAO HÀNG LOẠT*/
+.updateStatusAll {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttonChangeStatus {
+    width: auto;
+    padding: 14px 20px;
+    background-color: orangered;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/*TABLE RETURN*/
+.tableReturn th:nth-child(1) {
+    width: 20px;
+}
+
+.tableReturn th:nth-child(2),
+.tableReturn th:nth-child(3) {
+    width: 120px;
+}
+
+.tableReturn th:nth-child(4) {
+    width: calc(100% - 240px);
+}
+
+.tableReturn th:last-child {
+    width: 100px;
+}
+
+.tableReturn td:nth-child(5),
+.tableReturn td:nth-child(6) {
+    width: 50px;
+}
+
+/*TABLE UNPAID*/
+.tableUnpaid td:nth-child(4) {
+    color: blue;
+    cursor: pointer;
+}
+
+.buttonSubmit {
+    width: 100px;
+    padding: 5px 10px;
+    border: none;
+    background-color: orangered;
+    color: white;
+}

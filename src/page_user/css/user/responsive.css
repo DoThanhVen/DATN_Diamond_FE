@@ -1,0 +1,110 @@
+@media (min-width: 768px) {
+  .col-md-9 {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
+@media screen and (min-width:767px) and (max-width:1023px) {
+  .col-md-3 {
+    flex: 0 0 auto;
+    width: 70%;
+    padding-bottom: 20px;
+  }
+
+  .navbar-expand-md {
+    flex-wrap: wrap;
+  }
+
+  .header .navbar {
+    padding-top: 60px;
+  }
+
+  .input-group {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+    padding-top: 90px;
+  }
+
+  header.shop .right-bar {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    top: 20px;
+    padding-bottom: 30px;
+    position: relative;
+  }
+
+  .col-md-3 {
+    flex: 0 0 auto;
+    width: 70%;
+    padding-bottom: 40px;
+  }
+}
+
+/* Responsive styles for small screens (phones) */
+@media screen and (max-width: 767px) {
+  /* Add your existing styles here */
+
+  .breadcrumb-section {
+    background-size: contain;
+    /* Adjust background size for small screens */
+  }
+
+  .logo {
+    margin-left: 0;
+    /* Reset margin if necessary */
+  }
+
+  .search-top {
+    display: none;
+    /* Hide search bar on small screens */
+  }
+}
+
+/* Responsive styles for medium-sized screens (tablets) */
+@media screen and (max-width: 991px) {
+  .sidebar {
+    width: 100%;
+    /* Make the sidebar full-width on medium-sized screens */
+  }
+
+  /* Add more styles as needed for responsiveness on tablets */
+}
+
+/* Common responsive styles for all small screens */
+@media (max-width: 768px) {
+  .navbar-toggler {
+    display: block;
+    /* Show toggle button on small screens */
+  }
+
+  .navbar-collapse {
+    padding-top: 10px;
+    /* Adjust spacing between toggle button and links */
+  }
+
+  .header.shop .right-bar {
+    top: 0;
+  }
+
+  .topbar {
+    padding: 5px;
+    /* Adjust spacing between items in the topbar */
+  }
+
+  .top-left {
+    text-align: center;
+    margin-bottom: 10px;
+    /* Adjust spacing between top-left and top-right */
+  }
+
+  .right-content {
+    text-align: center;
+    /* Center-align text in top-right on small screens */
+  }
+
+}

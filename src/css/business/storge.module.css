@@ -1,0 +1,235 @@
+.card {
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 20px;
+
+    .listProduct {
+        .table {
+            .tableHeading {
+                background-color: rgba(240, 240, 240, .8);
+
+                .column {
+                    padding: 10px 0;
+                }
+            }
+
+            .tableBody {
+                &:not(:last-child) {
+                    border-bottom: 2px solid rgba(240, 240, 240, .8);
+                }
+
+                .column {
+                    padding: 10px 0;
+
+                    .statusAccount {
+                        padding: 7px 10px;
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: white;
+                        border-radius: 10px;
+                    }
+                }
+            }
+
+            .tableBody,
+            .tableHeading {
+                display: flex;
+                align-items: center;
+                padding: 5px;
+
+                .column {
+                    text-align: center;
+
+                    &:nth-child(1) {
+                        width: 40px;
+                    }
+
+                    &:nth-child(2) {
+                        width: 150px;
+                    }
+
+                    &:nth-child(3) {
+                        width: 80px;
+                    }
+
+                    &:nth-child(4) {
+                        width: 250px;
+                    }
+
+                    &:nth-child(5) {
+                        width: 100px;
+                    }
+
+                    &:nth-child(6) {
+                        width: 100px;
+                    }
+
+                    &:nth-child(7) {
+                        width: 140px;
+                    }
+
+                    &:nth-child(8) {
+                        width: 150px;
+                    }
+
+                    &:nth-child(9) {}
+
+                    .image {
+                        width: 70px;
+                        height: 70px;
+                        object-fit: cover;
+                        border-radius: 10px;
+                    }
+
+                    .buttonEdit {
+                        color: blue;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .tableBody {
+
+                .column {
+                    font-size: 14px;
+
+                    &:nth-child(4),
+                    &:nth-child(3) {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    &:nth-child(7),
+                    &:nth-child(6),
+                    &:nth-child(5) {
+                        display: flex;
+                        justify-content: center;
+                    }
+
+                    .status {
+                        width: 85%;
+                        padding: 3px 0;
+                        border-radius: 20px;
+                        color: white;
+                        font-size: 14px;
+                    }
+
+                    .updateStatus {
+                        width: 90%;
+                        font-size: 14px;
+                        padding: 5px 0;
+                        color: white;
+                        border-radius: 0;
+                    }
+
+                }
+            }
+        }
+
+        .buttonPage {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .buttonPage a {
+            background-color: lightgrey;
+            color: black;
+            margin: 0 5px;
+        }
+    }
+}
+
+.header {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+    .formSearch {
+        width: 93%;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .input {
+            width: calc(100% - 30px);
+            border: none;
+            padding: 5px 10px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .iconUser {
+        font-size: 18px;
+    }
+}
+
+#addProduct {
+    background-color: white;
+    padding: 30px 20px;
+    border-radius: 10px;
+
+    .heading {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .quantity,
+    .product {
+        display: flex;
+        margin-bottom: 10px;
+        .label {
+            min-width: 200px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .input {
+            width: 300px;
+            height: 40px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid lightgrey;
+            &:focus{
+                outline: none;
+            }
+        }
+    }
+
+    .formButton {
+        margin-top: 20px;
+
+        .button {
+            width: 100px;
+            font-size: 14px;
+            padding: 8px 5px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            margin-right: 5px;
+
+            &:nth-child(1),
+            &:nth-child(2) {
+                background-color: #0FA958;
+            }
+
+            &:last-child {
+                background-color: lightgrey;
+                color: grey;
+            }
+        }
+    }
+}

@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#footer {
+    padding: 20px 0;
+    position: relative;
+   
+}
+
+#footer .certificate::after,
+#footer::after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 1px;
+    background-color: lightgrey;
+    top: 0;
+    left: 0;
+}
+
+#footer .contact {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#footer .contact .column {
+    padding: 20px;
+    width: 25%;
+}
+
+#footer .header {
+    font-weight: bold;
+    font-size: 13px;
+    margin: 10px 0 20px 0;
+}
+
+
+#footer .column .content .menu {
+    padding: 0;
+}
+
+#footer .column:nth-child(4) .content .menu li {
+    display: inline-block;
+}
+
+#footer .column .content li {
+    list-style: none;
+}
+
+#footer .column:not(:nth-child(4)) .content li:hover a {
+    color: black;
+    opacity: .3;
+}
+
+#footer .column .content img {
+    padding: 0 2px !important;
+    width: 30px;
+    height: auto;
+    margin-right: 10px;
+}
+
+@media screen and (max-width:925px) {
+    #footer .contact .column {
+        width: 50% !important;
+    }
+
+    #footer .contact .column:nth-child(4) {
+        margin: 0;
+    }
+}
+
+@media screen and (max-width:575px) {
+    #footer .contact .column {
+        width: 100% !important;
+        text-align: center;
+    }
+
+    #footer .contact .column .header {
+        margin: 10px 0 0 0;
+    }
+
+    #footer .certificate {
+        flex-direction: column;
+    }
+
+    #footer .certificate .column {
+        width: 100% !important;
+        justify-content: center;
+    }
+    #footer .certificate .column .heading{
+        text-align: center;
+    }
+}
+
+#footer .certificate {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    height: auto;
+    margin: 20px 0;
+    padding: 20px 0;
+   
+}
+
+#footer .certificate .column {
+    display: flex;
+    align-items: center;
+    width: 50%;
+}
+
+#footer .certificate .column .heading {
+    width: 100%;
+    font-weight: bold;
+}
+
+#footer .certificate .column:first-child {
+    flex-direction: column;
+    justify-content: left;
+    padding: 0 20px;
+}
+
+#footer .certificate .column img {
+    width: 300px;
+    height: auto;
+}
+#footer .certificate .column:last-child{
+    display: flex;
+    justify-content: end;
+}
+
+ul>li>a {
+    text-decoration: none;
+    color: black;
+}
+
+ul>li>a:hover{
+    color: #7fad39;
+}

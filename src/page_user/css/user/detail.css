@@ -1,0 +1,13 @@
+.rating-section {
+  margin-bottom: 20px;
+}
+
+.average-rating-section {
+  margin-top: 20px;
+}
+
+.user-review {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+}

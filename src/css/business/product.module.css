@@ -1,0 +1,450 @@
+.card {
+    background-color: white;
+    box-shadow: 0 1px 5px lightgrey;
+    border-radius: 10px;
+}
+
+.action {
+    border-bottom: 1px solid black;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/*FORM SEARCH*/
+.formSearch {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.optionSelect {
+    width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    border-radius: 5px 0 0 5px;
+}
+
+.optionSelectType {
+    min-width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+}
+
+.optionSelectType:nth-child(2) {
+    margin-left: 20px;
+}
+
+.optionSelectType:focus,
+.optionSelect:focus {
+    outline: none;
+}
+
+.inputSearch {
+    height: 50px;
+    width: calc(100% - 150px);
+    padding: 5px 10px;
+    margin-left: -1px;
+    border: 1px solid lightgrey;
+    border-radius: 0 5px 5px 0;
+}
+
+.inputSearch:focus {
+    outline: none;
+}
+
+.buttonSearch {
+    height: 45px;
+    margin: 10px 0;
+    width: 100px;
+    border: none;
+    background-color: orangered;
+    color: white;
+    font-size: 15px;
+}
+
+.storge {
+    padding: 10px 0;
+}
+
+.storge span {
+    color: grey;
+}
+
+.inputNumber {
+    width: 150px;
+    height: 40px;
+    padding: 10px 15px;
+    border: 1px solid rgba(196, 196, 196, 0.5);
+    font-size: 15px;
+    border-radius: 6px;
+}
+
+.inputNumber:focus {
+    outline: none;
+}
+
+/*PRODUCT*/
+.cardHeading {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.addImage {
+    display: flex;
+    position: relative;
+}
+
+.description,
+.category,
+.productName,
+.addImage,
+.quantity,
+.price {
+    padding: 10px;
+}
+
+.price>label,
+.quantity>label,
+.description>label,
+.category>label,
+.productName>label,
+.addImage>label {
+    width: 230px;
+    padding: 0 20px;
+    text-align: right;
+}
+
+.addImage i {
+    font-size: 30px;
+}
+
+.addImage .infoImages {
+    width: calc(100% - 230px);
+}
+
+.addImage .infoImages div {
+    display: flex;
+}
+
+.addImage .infoImages div span {
+    color: orangered;
+}
+
+.addImage .infoImages label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.addImage .infoImages label span {
+    text-align: center;
+}
+
+.labelSelected {
+    width: 100px;
+    height: 100px;
+    border: 1px dashed lightgrey;
+    margin: 5px;
+    border-radius: 5px;
+    color: orangered;
+    cursor: pointer;
+}
+
+.listImage {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.selectedImages {
+    display: flex;
+    position: relative;
+}
+
+.selectedImages img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.selectedImages label {
+    position: absolute;
+    width: calc(100% - 10px);
+    padding: 5px;
+    background-color: lightgrey;
+    bottom: 5px;
+    left: 5px;
+    border-radius: 0 0 5px 5px;
+    cursor: pointer;
+}
+
+.selectedImages label i {
+    color: white;
+    font-size: 25px;
+}
+
+/*PRODUCT NAME*/
+.quantity input,
+.price input,
+.productName input {
+    width: calc(100% - 230px);
+    border: 1px solid lightgrey;
+    border-radius: 7px;
+    padding: 10px 10px;
+}
+
+.quantity input:focus,
+.price input:focus,
+.productName input:focus {
+    outline: none;
+}
+
+.category .optionSelectType {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+/*DESCRIPTION*/
+.addImage,
+.category,
+.productName,
+.description,
+.quantity {
+    display: flex;
+    font-size: 15px;
+}
+
+.description textarea {
+    width: calc(100% - 230px);
+    border: 1px solid lightgrey;
+    border-radius: 7px;
+    padding: 5px 10px;
+    min-height: 200px;
+}
+
+.description textarea:focus {
+    outline: none;
+}
+
+.buttonCreateProduct {
+    background-color: orangered;
+    padding: 10px;
+    color: white;
+    border: none;
+    font-size: 15px;
+    margin-right: 0;
+}
+
+/*MODEL*/
+.formCardModel {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background-color: rgba(196, 196, 196, 0.5);
+    z-index: 999;
+}
+
+.cardModel {
+    position: absolute;
+    width: 800px;
+    max-height: 600px;
+    padding: 20px;
+    background-color: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 3px 5px lightgrey;
+    overflow: auto;
+}
+
+.cardHeadingModel {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.closeModal {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: red;
+    display: grid;
+    place-items: center;
+    top: 0px;
+    right: 0px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.cardModel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cardModel::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+}
+
+.cardModel::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.cardModel::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+}
+
+
+/*SCSS*/
+.listProduct {
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 20px;
+
+    .table {
+        .tableHeading {
+            background-color: rgba(240, 240, 240, .8);
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody {
+            &:not(:last-child) {
+                border-bottom: 2px solid rgba(240, 240, 240, .8);
+            }
+
+            .column {
+                padding: 10px 0;
+
+                .statusAccount {
+                    padding: 7px 10px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: white;
+                    border-radius: 10px;
+                }
+            }
+        }
+
+        .tableBody,
+        .tableHeading {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+
+            .column {
+                text-align: center;
+
+                &:nth-child(1) {
+                    width: 40px;
+                }
+
+                &:nth-child(2) {
+                    width: 100px;
+                }
+
+                &:nth-child(3) {
+                    width: 80px;
+                }
+
+                &:nth-child(4) {
+                    width: 200px;
+                }
+
+                &:nth-child(5) {
+                    width: 100px;
+                }
+
+                &:nth-child(6) {
+                    width: 100px;
+                }
+
+                &:nth-child(7) {
+                    width: 140px;
+                }
+
+                &:nth-child(8) {
+                    width: 150px;
+                }
+
+                .image {
+                    width: 70px;
+                    height: 70px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                }
+
+                .buttonEdit {
+                    color: blue;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .tableBody {
+
+            .column {
+                font-size: 14px;
+
+                &:nth-child(4),
+                &:nth-child(3) {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(7),
+                &:nth-child(6),
+                &:nth-child(5) {
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .status {
+                    width: 85%;
+                    padding: 3px 0;
+                    border-radius: 20px;
+                    color: white;
+                    font-size: 14px;
+                }
+
+                .updateStatus {
+                    width: 90%;
+                    font-size: 14px;
+                    padding: 5px 0;
+                    color: white;
+                    border-radius: 0;
+                }
+
+            }
+        }
+    }
+
+    .buttonPage {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        .btnActivePage{
+            background-color: blue;
+            color:white
+        }
+    }
+
+    .buttonPage a {
+        background-color: lightgrey;
+        color: black;
+        margin: 0 5px;
+    }
+
+}
