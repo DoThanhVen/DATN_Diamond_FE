@@ -13,10 +13,12 @@ function ListStorge() {
   const [products, setProducts] = useState([]);
   const numberPage = 10;
   const navigate = new useNavigate();
-  
+  const [valueOption, setValueOption] = useState("");
+  const [textInput, setTextInput] = useState("");
+
   useEffect(() => {
     getData();
-  }, [reload, currentPage]);
+  }, [reload, currentPage,textInput]);
 
   const getData = async () => {
     try {
@@ -29,13 +31,12 @@ function ListStorge() {
     } catch (error) {
       console.log(error)
     }
-
   }
 
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/getByShop?shop=${idShop}&offset=${(page - 1) * numberPage
+        `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${(page - 1) * numberPage
         }&sizePage=${numberPage}`,
         "GET"
       );
@@ -51,6 +52,23 @@ function ListStorge() {
   return (
     <React.Fragment>
       <div className={`${style.listProduct}`}>
+      <div className={`${style.formSearch}`}>
+          <select
+            value={valueOption}
+            onChange={(e) => {
+              setValueOption(e.target.value);
+            }}
+            className={`${style.optionSelect}`}
+          >
+            <option value="id">Mã Sản Phẩm</option>
+            <option value="product_name">Tên Sản Phẩm</option>
+          </select>
+          <input
+            className={`${style.inputSearch}`}
+            type="text"
+            onChange={(e) => setTextInput(e.target.value)}
+          />
+        </div>
         <div className={style.table}>
           <div className={style.tableHeading}>
             <label className={style.column}>STT</label>

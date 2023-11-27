@@ -14,7 +14,7 @@ const SidebarM = () => {
     axios
       .get(`${API_BASE_URL}/api/category`)
       .then((response) => {
-        setCategories(response.data);
+        setCategories(response.data.content);
         console.log(response.data);
       })
       .catch((error) => {

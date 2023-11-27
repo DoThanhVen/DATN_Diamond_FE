@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
-import getAccountFromCookie from "../../service/getAccountLogin";
+import Cookies from "js-cookie";
 const numberPage = 10;
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -21,8 +21,27 @@ function formatDate(date) {
 }
 
 export default function ListProduct() {
+  const [accountLogin, setAccountLogin] = useState(null);
 
   const navigate = useNavigate();
+  const getAccountFromCookie = () => {
+    const accountCookie = Cookies.get("accountLogin");
+
+    if (accountCookie !== undefined) {
+      try {
+        const data = JSON.parse(
+          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
+        );
+        setAccountLogin(data);
+        getdataProduct(currentPage, data.shop.id);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+
   const reload = useSelector((state) => state.getreloadPage);
   //MODEL EDIT
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,7 +59,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getData();
+    getAccountFromCookie();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {
@@ -59,23 +78,10 @@ export default function ListProduct() {
     setModalData({});
   };
 
-  const getData = async () => {
-    try {
-      const accountData = await getAccountFromCookie();
-      if (accountData) {
-        getdataProduct(currentPage, accountData.shop.id);
-      } else {
-        navigate('/login')
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/search?key=${valueOption}&keyword=${textInput}&status=active&category=${valueCategoryItem}&shop=${idShop}&offset=${
+        `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&status=active&shop=${idShop}&offset=${
           (page - 1) * numberPage
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
         "GET"

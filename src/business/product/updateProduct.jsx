@@ -38,10 +38,21 @@ export default function ModelEdit({ onReload, data, closeModal }) {
 
   //SELECT IMAGE
   const handleImageChange = (e) => {
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
     const files = e.target.files;
-    const filesave = e.target.files[0]
+    const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
+    if (imageFiles.length === 0) {
+      ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
+      return;
+    }
+    if (imageFiles[0].size > 1000 * 1024) {
+      ThongBao(
+        "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB.",
+        "info"
+      );
+    }
     const listsave = [...imagesave]
-    listsave.push(filesave)
+    listsave.push(imageFiles[0])
     setimagesave(listsave);
     const selectedImagesArray = Array.from(files)
       .filter((file) => file.type.startsWith("image/"))
@@ -82,18 +93,21 @@ export default function ModelEdit({ onReload, data, closeModal }) {
   };
 
   const handleSubmit = async () => {
-    if (!name || !price || !description || !valueCategoryItem || !selectedImages) {
+    if (name.trim() === "" || !price || !description || !valueCategoryItem || !selectedImages) {
       ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
       return;
     }
 
-    if (name.length > MAX_NAME_LENGTH) {
-      ThongBao(`Tên sản phẩm không được vượt quá ${MAX_NAME_LENGTH} ký tự.`, "error");
+    const isValidName = /^[a-zA-Z0-9\s]+$/u.test(name);
+    if (!isValidName || name.length > MAX_NAME_LENGTH) {
+      ThongBao(`Tên sản phẩm không hợp lệ hoặc vượt quá ${MAX_NAME_LENGTH} ký tự.`, "error");
       return;
     }
 
-    if (isNaN(price) || price <= 0) {
-      ThongBao("Giá phải là số và lớn hơn 0.", "error");
+    const isValidPrice = /^\d+(\.\d{1,2})?$/u.test(price);
+
+    if (!isValidPrice || parseFloat(price) <= 0) {
+      ThongBao("Giá phải là số dương.", "error");
       return;
     }
 
@@ -101,127 +115,127 @@ export default function ModelEdit({ onReload, data, closeModal }) {
       ThongBao(`Mô tả sản phẩm không được vượt quá ${MAX_DESCRIPTION_LENGTH} ký tự.`, "error");
       return;
     }
-  
 
-  const response = await ProductService.updateProduct(product.id, name, price, description, 0, valueCategoryItem, selectedImages, imagesave);
-  dispatch(reloadPage(reloadold + 1));
-  setproduct(response)
-  ThongBao(response.message, response.status);
-  closeModal();
-};
 
-return (
-  <React.Fragment>
-    <div className={`${style.formCardModel}`}>
-      <div className={`${style.cardModel}`}>
-        <div className={`${style.cardHeadingModel}`}>Cập nhật thông tin</div>
-        <label className={`${style.heading}`}>
-          Mã sản phẩm: <b>{product.id}</b>
-        </label>
-        <div className={`${style.addImage}`}>
-          <label>Hình ảnh sản phẩm</label>
-          <div className={`${style.infoImages}`}>
-            <div>
-              <span>* </span>
-              <label> Hình ảnh tỷ lệ 1:1</label>
-            </div>
-            <div className={`${style.listImage}`}>
-              {product?.image_product?.map((image, index) => (
-                <div key={index} className={`${style.selectedImages}`}>
-                  <img src={`http://localhost:8080/api/uploadImageProduct/${image.url}`} alt={`Selected ${index}`} />
-                  <label onClick={() => handleDeleteImageById(image.id)}>
-                    <i className="bx bx-trash"></i>
-                  </label>
-                </div>
-              ))}
-              {product?.image_product?.length < 9 ? (
-                selectedImages.map((image, index) => (
-                  <div className={`${style.selectedImages}`} key={index}>
-                    <img src={image} alt={`Selected ${index}`} />
-                    <label onClick={() => handleDeleteImage(index)}>
+    const response = await ProductService.updateProduct(product.id, name, price, description, 0, valueCategoryItem, selectedImages, imagesave);
+    dispatch(reloadPage(reloadold + 1));
+    setproduct(response)
+    ThongBao(response.message, response.status);
+    closeModal();
+  };
+
+  return (
+    <React.Fragment>
+      <div className={`${style.formCardModel}`}>
+        <div className={`${style.cardModel}`}>
+          <div className={`${style.cardHeadingModel}`}>Cập nhật thông tin</div>
+          <label className={`${style.heading}`}>
+            Mã sản phẩm: <b>{product.id}</b>
+          </label>
+          <div className={`${style.addImage}`}>
+            <label>Hình ảnh sản phẩm</label>
+            <div className={`${style.infoImages}`}>
+              <div>
+                <span>* </span>
+                <label> Hình ảnh tỷ lệ 1:1</label>
+              </div>
+              <div className={`${style.listImage}`}>
+                {product?.image_product?.map((image, index) => (
+                  <div key={index} className={`${style.selectedImages}`}>
+                    <img src={`http://localhost:8080/api/uploadImageProduct/${image.url}`} alt={`Selected ${index}`} />
+                    <label onClick={() => handleDeleteImageById(image.id)}>
                       <i className="bx bx-trash"></i>
                     </label>
                   </div>
-                ))
-              ) : null}
-              <input
-                id="selectedImage"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "none" }}
-              />
-              {selectedImages?.length + product?.image_product?.length < 9 ? (
-                <label
-                  htmlFor="selectedImage"
-                  className={`${style.labelSelected}`}
-                >
-                  <i class="bx bx-image-add"></i>
-                  <span>Thêm hình ảnh ({selectedImages?.length + product?.image_product?.length}/9)</span>
-                </label>
-              ) : null}
+                ))}
+                {product?.image_product?.length < 9 ? (
+                  selectedImages.map((image, index) => (
+                    <div className={`${style.selectedImages}`} key={index}>
+                      <img src={image} alt={`Selected ${index}`} />
+                      <label onClick={() => handleDeleteImage(index)}>
+                        <i className="bx bx-trash"></i>
+                      </label>
+                    </div>
+                  ))
+                ) : null}
+                <input
+                  id="selectedImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
+                {selectedImages?.length + product?.image_product?.length < 9 ? (
+                  <label
+                    htmlFor="selectedImage"
+                    className={`${style.labelSelected}`}
+                  >
+                    <i class="bx bx-image-add"></i>
+                    <span>Thêm hình ảnh ({selectedImages?.length + product?.image_product?.length}/9)</span>
+                  </label>
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
-        <div className={`${style.productName}`}>
-          <label>Tên sản phẩm</label>
-          <input type="text" defaultValue={product.product_name} onChange={(e) => { setname(e.target.value) }} name="product_name"></input>
-        </div>
-        <div className={`${style.productName}`}>
-          <label>Giá sản phẩm</label>
-          <input type="number" defaultValue={product.price} onChange={(e) => { setprice(e.target.value) }} name="price"></input>
-        </div>
-        <div className={`${style.category}`}>
-          <label>Ngành hàng</label>
-          <select
-            value={valueCategory}
-            onChange={handleChangeCategory}
-            className={`${style.optionSelectType}`}
-
-          >
-            <option value="">Loại Sản Phẩm...</option>
-            {data.datacategory.map((value, index) => {
-              return (
-                <option key={index} value={value.id}>{value.type_category}</option>)
-            })}
-          </select>
-          {valueCategory !== "" ? (
+          <div className={`${style.productName}`}>
+            <label>Tên sản phẩm</label>
+            <input type="text" defaultValue={product.product_name} onChange={(e) => { setname(e.target.value) }} name="product_name"></input>
+          </div>
+          <div className={`${style.productName}`}>
+            <label>Giá sản phẩm</label>
+            <input type="number" defaultValue={product.price} onChange={(e) => { setprice(e.target.value) }} name="price"></input>
+          </div>
+          <div className={`${style.category}`}>
+            <label>Ngành hàng</label>
             <select
-              value={valueCategoryItem}
-              onChange={handleChangeCategoryItem}
+              value={valueCategory}
+              onChange={handleChangeCategory}
               className={`${style.optionSelectType}`}
-              name="categoryItem_product"
+
             >
-              <option value="">Phân Loại Sản Phẩm...</option>
-              {categoryItemData.map((value, index) => {
-
+              <option value="">Loại Sản Phẩm...</option>
+              {data.datacategory.map((value, index) => {
                 return (
-                  <option key={index} value={value.id}>
-                    {value.type_category_item}
-                  </option>)
-
+                  <option key={index} value={value.id}>{value.type_category}</option>)
               })}
             </select>
-          ) : null}
-        </div>
-        <div className={`${style.description}`}>
-          <label>Mô tả sản phẩm</label>
-          <CKEditor
-            editor={ClassicEditor}
-            data={product.description}
-            onChange={(event, editor) => {
-              setdescription(editor.getData());
+            {valueCategory !== "" ? (
+              <select
+                value={valueCategoryItem}
+                onChange={handleChangeCategoryItem}
+                className={`${style.optionSelectType}`}
+                name="categoryItem_product"
+              >
+                <option value="">Phân Loại Sản Phẩm...</option>
+                {categoryItemData.map((value, index) => {
 
-            }}
+                  return (
+                    <option key={index} value={value.id}>
+                      {value.type_category_item}
+                    </option>)
 
-          />
+                })}
+              </select>
+            ) : null}
+          </div>
+          <div className={`${style.description}`}>
+            <label>Mô tả sản phẩm</label>
+            <CKEditor
+              editor={ClassicEditor}
+              data={product.description}
+              onChange={(event, editor) => {
+                setdescription(editor.getData());
+
+              }}
+
+            />
+          </div>
+          <button className={`btn btn-primary mt-3`} onClick={handleSubmit}>LƯU THAY ĐỔI</button>
+          <span onClick={closeModal} className={`${style.closeModal}`}>
+            X
+          </span>
         </div>
-        <button className={`btn btn-primary mt-3`} onClick={handleSubmit}>LƯU THAY ĐỔI</button>
-        <span onClick={closeModal} className={`${style.closeModal}`}>
-          X
-        </span>
       </div>
-    </div>
-  </React.Fragment>
-);
+    </React.Fragment>
+  );
 }

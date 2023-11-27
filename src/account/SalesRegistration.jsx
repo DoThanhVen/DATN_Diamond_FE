@@ -14,45 +14,45 @@ import { callAPI } from "../service/API";
 export default function SalesRegistration() {
   const listDataAddress = DataAddress;
   const [accountLogin, setAccountLogin] = useState(null);
+const [reload,setreload]=useState(0)
 
   const getAccountFromCookie = () => {
     const accountCookie = Cookies.get("accountLogin");
-
-    if (accountCookie !== undefined) {
+    if (accountCookie === undefined|| accountCookie===null) {
+      navigate("/login");
+    } else {
       try {
         const data = JSON.parse(
           decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
         );
-        if(data){
+        if (data) {
           setAccountLogin(data);
-          getDataShop(data.username)
+          getDataShop(data.username);
         }
       } catch (error) {
         console.log(error);
       }
-    } else {
-      navigate("/login");
+      
     }
   };
 
-  const getDataShop = async (username) => {
-    const response = await callAPI(
-      `/api/account/shop/${username}`,
-      "GET"
-    );
+  const getDataShop = async username => {
+    const response = await callAPI(`/api/account/shop/${username}`, "GET");
     if (response.data) {
       setSelectedImage(response.data.image);
       setShop_name(response.data.shop_name);
-      setCity(response.data.addressShop.city)
-      setDistrict(response.data.addressShop.district)
-      setWard(response.data.addressShop.ward)
-      setAddress(response.data.addressShop.address)
+      setCity(response.data.addressShop.city);
+      setDistrict(response.data.addressShop.district);
+      setWard(response.data.addressShop.ward);
+      setAddress(response.data.addressShop.address);
     }
   };
-  useEffect(() => {
-    getAccountFromCookie();
-    getDataShop();
-  }, []);
+  useEffect(
+    () => {
+      getAccountFromCookie();
+    },
+    [Cookies.get("accountLogin"),reload]
+  );
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
@@ -67,13 +67,13 @@ export default function SalesRegistration() {
   const [ward, setWard] = useState("");
   const [address, setAddress] = useState("");
 
-  const handleChangeCity = (value) => {
+  const handleChangeCity = value => {
     setCity(value);
     setDistrict("");
     setWard("");
   };
 
-  const handleChangeDistrict = (value) => {
+  const handleChangeDistrict = value => {
     setDistrict(value);
     setWard("");
   };
@@ -89,7 +89,7 @@ export default function SalesRegistration() {
     ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      axios
+      await axios
         .post(
           domain +
             "/api/account/saleregis/" +
@@ -103,16 +103,19 @@ export default function SalesRegistration() {
             address
           }
         )
-        .then((response) => {
+        .then(response => {
           ThongBao(response.data.message, response.data.status);
+          accountLogin.shop = response.data.data;
+          Cookies.set("accountLogin", accountLogin)
+          setreload(reload+1)
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     }
   };
 
-  const handleFileChange = async (event) => {
+  const handleFileChange = async event => {
     const file = event.target.files[0];
     if (file) {
       // Xử lý tệp ảnh đã chọn ở đây
@@ -146,6 +149,7 @@ export default function SalesRegistration() {
     }
   };
 
+  
   return (
     <React.Fragment>
       <div>
@@ -163,11 +167,12 @@ export default function SalesRegistration() {
                         className="user-avatar"
                         style={{ cursor: "pointer" }}
                       >
-                       <img src={
-                          selectedImage
-                            ? `http://localhost:8080/api/uploadImageProduct/${selectedImage}`
-                            : "https://bootdey.com/img/Content/avatar/avatar7.png"
-                        }
+                        <img
+                          src={
+                            selectedImage
+                              ? `http://localhost:8080/api/uploadImageProduct/${selectedImage}`
+                              : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                          }
                           alt="user"
                           onClick={handleImageClick}
                         />
@@ -190,135 +195,135 @@ export default function SalesRegistration() {
                 </div>
               </div>
             </div>
-            <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-              <div className="card-profile h-100">
-                <div className="card-body">
-                  <div className="row gutters">
-                    <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                      <h6 className="mt-3 mb-2 text-primary">
-                        Thông tin cửa hàng
-                      </h6>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input
-                          type="name"
-                          className={`form-control ${style.input}`}
-                          id="ciTy"
-                          value={shop_name}
-                          onChange={(e) => setShop_name(e.target.value)}
-                          placeholder="Tên Cửa Hàng"
-                          readOnly
-                        />
-                      </div>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <select
-                          value={city}
-                          onChange={(e) => handleChangeCity(e.target.value)}
-                          className={style.input}
-                        >
-                          <option value="">Tỉnh/Thành Phố</option>
-                          {listDataAddress.map((valueCity, index) => (
-                            <option
-                              key={valueCity.codename}
-                              value={valueCity.codename}
+            {accountLogin&& accountLogin.shop
+              ? null
+              : <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                  <div className="card-profile h-100">
+                    <div className="card-body">
+                      <div className="row gutters">
+                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                          <h6 className="mt-3 mb-2 text-primary">
+                            Thông tin cửa hàng
+                          </h6>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <input
+                              type="name"
+                              className={`form-control ${style.input}`}
+                              id="ciTy"
+                              value={shop_name}
+                              onChange={e => setShop_name(e.target.value)}
+                              placeholder="Tên Cửa Hàng"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={city}
+                              onChange={e => handleChangeCity(e.target.value)}
+                              className={style.input}
                             >
-                              {valueCity.name}
-                            </option>
-                          ))}
-                        </select>
+                              <option value="">Tỉnh/Thành Phố</option>
+                              {listDataAddress.map((valueCity, index) =>
+                                <option
+                                  key={valueCity.codename}
+                                  value={valueCity.codename}
+                                >
+                                  {valueCity.name}
+                                </option>
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={district}
+                              onChange={e =>
+                                handleChangeDistrict(e.target.value)}
+                              className={style.input}
+                            >
+                              <option value="">Quận/Huyện</option>
+                              {listDataAddress.map(
+                                (valueCity, index) =>
+                                  valueCity.codename === city
+                                    ? valueCity.districts.map(
+                                        (valueDistrict, index) =>
+                                          <option
+                                            key={valueDistrict.codename}
+                                            value={valueDistrict.codename}
+                                          >
+                                            {valueDistrict.name}
+                                          </option>
+                                      )
+                                    : null
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={ward}
+                              onChange={e => setWard(e.target.value)}
+                              className={style.input}
+                            >
+                              <option value="">Phường/Xã/Trị Trấn</option>
+                              {listDataAddress.map(
+                                (valueCity, index) =>
+                                  valueCity.codename === city
+                                    ? valueCity.districts.map(
+                                        (valueDistrict, index) =>
+                                          valueDistrict.codename === district
+                                            ? valueDistrict.wards.map(
+                                                (valueWard, index) =>
+                                                  <option
+                                                    key={valueWard.codename}
+                                                    value={valueWard.codename}
+                                                  >
+                                                    {valueWard.name}
+                                                  </option>
+                                              )
+                                            : null
+                                      )
+                                    : null
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <input
+                              type="text"
+                              className={`form-control ${style.input}`}
+                              id="adress"
+                              value={address}
+                              onChange={e => setAddress(e.target.value)}
+                              placeholder="Số Nhà"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <select
-                          value={district}
-                          onChange={(e) => handleChangeDistrict(e.target.value)}
-                          className={style.input}
-                        >
-                          <option value="">Quận/Huyện</option>
-                          {listDataAddress.map((valueCity, index) =>
-                            valueCity.codename === city
-                              ? valueCity.districts.map(
-                                  (valueDistrict, index) => (
-                                    <option
-                                      key={valueDistrict.codename}
-                                      value={valueDistrict.codename}
-                                    >
-                                      {valueDistrict.name}
-                                    </option>
-                                  )
-                                )
-                              : null
-                          )}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <select
-                          value={ward}
-                          onChange={(e) => setWard(e.target.value)}
-                          className={style.input}
-                        >
-                          <option value="">Phường/Xã/Trị Trấn</option>
-                          {listDataAddress.map((valueCity, index) =>
-                            valueCity.codename === city
-                              ? valueCity.districts.map(
-                                  (valueDistrict, index) =>
-                                    valueDistrict.codename === district
-                                      ? valueDistrict.wards.map(
-                                          (valueWard, index) => (
-                                            <option
-                                              key={valueWard.codename}
-                                              value={valueWard.codename}
-                                            >
-                                              {valueWard.name}
-                                            </option>
-                                          )
-                                        )
-                                      : null
-                                )
-                              : null
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          className={`form-control ${style.input}`}
-                          id="adress"
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          placeholder="Số Nhà"
-                          readOnly
-                        />
+                      <div className="row gutters mt-4">
+                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                          <div className="text-right">
+                            <button
+                              type="button"
+                              id="submit"
+                              name="submit"
+                              className="btn btn-success"
+                              onClick={handleSaleRegis}
+                            >
+                              Đăng ký
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="row gutters mt-4">
-                    <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                      <div className="text-right">
-                        <button
-                          type="button"
-                          id="submit"
-                          name="submit"
-                          className="btn btn-success"
-                          onClick={handleSaleRegis}
-                        >
-                          Đăng ký
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </div>}
           </div>
         </div>
         <div id="footer">

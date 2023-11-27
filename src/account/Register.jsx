@@ -215,8 +215,7 @@ export default function Register() {
                               className="form-check-input"
                               type="checkbox"
                               id="checkBox"
-                              value={true}
-                              onChange={(e) => setCheckbox(e.target.value)}
+                              onChange={() => setCheckbox(!checkbox)}
                             />
                             <label
                               className="form-check-label"

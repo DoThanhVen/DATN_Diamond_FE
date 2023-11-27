@@ -24,19 +24,26 @@ function ListProduct() {
   const [keyword, setkeyword] = useState('');
   const [keyfind, setkeyfind] = useState('');
   const [reload, setreload] = useState(0)
-  const [sortBy,setsortBy]=useState('')
-  const [sortType,setsortType]=useState('')
-
+  const [sortBy, setsortBy] = useState('')
+  const [sortType, setsortType] = useState('')
+  const [filterbyStatus, setFilterStatus] = useState("")
   useEffect(() => {
     getdata(currentPage);
-  }, [data, currentPage, reload,sortType]);
+  }, [data, currentPage, reload, sortType]);
 
-  const getdata = async (page) => {
+  const getdata = async (page, filterStatus) => {
     try {
       const response = await callAPI(`/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`, "GET");
       const responseData = response.data;
-      setProducts(responseData || []);
-      setTotalPages(responseData.totalPages || 1);
+      if (filterStatus === undefined || filterStatus === "") {
+        setProducts(responseData.content || []);
+        setTotalPages(responseData.totalPages || 1);
+      } else {
+        const newData = responseData.content.filter((product) => product.status === Number(filterStatus));
+        setProducts(newData || []);
+        setTotalPages(responseData.totalPages || 1);
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -61,7 +68,7 @@ function ListProduct() {
       const formData = new FormData();
       formData.append('status', status);
       const res = await callAPI(`/api/product/adminupdatestatus/${id}`, 'PUT', formData)
-      setreload(reload + 1)
+      getdata(currentPage, filterbyStatus)
     } catch (error) {
       console.log(error)
     }
@@ -109,29 +116,29 @@ function ListProduct() {
           <label>Sắp xếp</label>
           <select
             value={sortBy}
-            onChange={(e)=>{
+            onChange={(e) => {
               setsortBy(e.target.value)
             }}
             className={`${style.optionSelectType}`}
           >
             <option value="">Lựa chọn...</option>
-                <option value={'id'}>
-                    Mã sản phẩm
-                </option>
-                <option value={'product_name'}>
-                    Tên sản phẩm
-                </option>
-                <option value={'price'}>
-                    Giá
-                </option>
-                <option value={'create_date'}>
-                    Ngày tạo
-                </option>
+            <option value={'id'}>
+              Mã sản phẩm
+            </option>
+            <option value={'product_name'}>
+              Tên sản phẩm
+            </option>
+            <option value={'price'}>
+              Giá
+            </option>
+            <option value={'create_date'}>
+              Ngày tạo
+            </option>
           </select>
           {sortBy !== ''
             ? <select
               value={sortType}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setsortType(e.target.value)
               }}
               className={`${style.optionSelectType}`}
@@ -140,6 +147,23 @@ function ListProduct() {
               <option value="desc">Giảm dần</option>
             </select>
             : null}
+        </div>
+        <div className={style.typeProduct}>
+          <label>Lọc sản phẩm theo trạng thái:</label>
+          <select
+            value={filterbyStatus}
+            onChange={(e) => {
+              setFilterStatus(e.target.value)
+              // You can also call getdata function here directly
+              getdata(currentPage, e.target.value);
+            }}
+            className={`${style.optionSelectType}`}
+          >
+            <option value="">Tất cả</option>
+            <option value="0">Chờ Phê Duyệt</option>
+            <option value="1">Đang Hoạt Động</option>
+            <option value="2">Cấm Hoạt Động</option>
+          </select>
         </div>
 
         <div className={style.table}>
@@ -155,7 +179,7 @@ function ListProduct() {
             <label className={style.column} />
             <label className={style.column} />
           </div>
-          {products?.content?.map((value, index) => (
+          {products.map((value, index) => (
             <div key={index} className={style.tableBody}>
               <label className={style.column}>
                 {index}
@@ -164,11 +188,11 @@ function ListProduct() {
                 {value.id}
               </label>
               <label className={style.column}>
-                {value.image_product == null ? value.image_product?.map((item, index) =>
+                {value.image_product != null ? value.image_product?.map((item, index) =>
                   <img
                     key={index}
                     className={style.image}
-                    src={`http://localhost:8080/api/uploadImageProduct/${item}`}
+                    src={`http://localhost:8080/api/uploadImageProduct/${item.url}`}
                     alt="Hình Ảnh"
                   />
                 )
@@ -185,7 +209,7 @@ function ListProduct() {
                 {value.categoryItem_product?.type_category_item}
               </label>
               <label className={style.column}>
-              {formatCurrency(value.price, 0)}
+                {formatCurrency(value.price, 0)}
               </label>
               <label className={style.column}>
                 {formatDate(value.create_date)}

@@ -15,31 +15,38 @@ function ListAccount() {
   const data = useSelector((state) => state.idAccountAdmin);
   const [accounts, setAccounts] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const numberPage = 10; 
+  const numberPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [keyword, setkeyword] = useState('');
   const [keyfind, setkeyfind] = useState('');
   const [reload, setreload] = useState(0)
-  const [sortBy,setsortBy]=useState('')
-  const [sortType,setsortType]=useState('')
-
+  const [sortBy, setsortBy] = useState('')
+  const [sortType, setsortType] = useState('')
+  const [filterbyStatus, setFilterStatus] = useState("")
 
   useEffect(() => {
     getdata(currentPage);
-  }, [data, currentPage, reload,sortType]);
+  }, [data, currentPage, reload, sortType]);
 
 
-  const getdata = async (page) => {
+  const getdata = async (page, filterStatus) => {
     try {
       const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
       const responseData = response.data;
-      setAccounts(responseData || []);
-      setTotalPages(responseData.totalPages || 1);
+      if (filterStatus === undefined || filterStatus === "") {
+        setAccounts(responseData.content || []);
+        setTotalPages(responseData.totalPages || 1);
+      } else {
+        const newData = responseData.content.filter((account) => account.status === (filterStatus === 'true'));
+        setAccounts(newData || []);
+        setTotalPages(responseData.totalPages || 1);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  
 
 
   const openModal = () => {
@@ -89,26 +96,26 @@ function ListAccount() {
           <label>Sắp xếp</label>
           <select
             value={sortBy}
-            onChange={(e)=>{
+            onChange={(e) => {
               setsortBy(e.target.value)
             }}
             className={`${style.optionSelectType}`}
           >
             <option value="">Lựa chọn...</option>
-                <option value={'id'}>
-                    Mã tài khoản
-                </option>
-                <option value={'username'}>
-                    Tên đăng nhập
-                </option>
-                <option value={'create_date'}>
-                    Ngày tạo
-                </option>
+            <option value={'id'}>
+              Mã tài khoản
+            </option>
+            <option value={'username'}>
+              Tên đăng nhập
+            </option>
+            <option value={'create_date'}>
+              Ngày tạo
+            </option>
           </select>
           {sortBy !== ''
             ? <select
               value={sortType}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setsortType(e.target.value)
               }}
               className={`${style.optionSelectType}`}
@@ -118,7 +125,22 @@ function ListAccount() {
             </select>
             : null}
         </div>
-
+        <div className={style.typeProduct}>
+          <label>Lọc sản phẩm theo trạng thái:</label>
+          <select
+            value={filterbyStatus}
+            onChange={(e) => {
+              setFilterStatus(e.target.value)
+              // You can also call getdata function here directly
+              getdata(currentPage, e.target.value);
+            }}
+            className={`${style.optionSelectType}`}
+          >
+            <option value="">Tất cả</option>
+            <option value={true}> Đang Hoạt Động</option>
+            <option value={false}>Cấm Hoạt Động</option>
+          </select>
+        </div>
         <label className={style.heading}>Danh sách tài khoản</label>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -135,7 +157,7 @@ function ListAccount() {
             <label className={style.column}>Trạng thái</label>
             <label className={style.column}></label>
           </div>
-          {accounts?.content?.map((value, index) => (
+          {accounts.map((value, index) => (
             <div key={index} className={style.tableBody}>
               <label className={style.column}>
                 {index + 1}

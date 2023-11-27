@@ -54,7 +54,8 @@ function ListShop() {
       const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`, "GET");
       const responseData = response.data;
       const listShop = responseData.content.map((value) => value.shop);
-      setListShop(listShop || []);
+      const newData = listShop.filter((shop) => shop.status === Number(1)||shop.status === Number(2));
+      setListShop(newData || []);
       setTotalPages(responseData.totalPages || 1);
       dispatch(getAllShop(responseData.content));
     } catch (error) {
@@ -240,5 +241,6 @@ function ListShop() {
     </React.Fragment>
   );
 }
+
 
 export default ListShop;

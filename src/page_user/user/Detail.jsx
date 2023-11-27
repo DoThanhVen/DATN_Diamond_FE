@@ -4,15 +4,16 @@ import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { products } from "./data";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
 import swal from "sweetalert";
-
+import Cookies from "js-cookie";
+import listDataAddress from "../../service/AddressVietNam.json";
+import style from "../css/user/detail.module.css";
 const API_BASE_URL = "http://localhost:8080";
-const ACCOUNT_ID = 6;
 
 function localStateReducer(state, action) {
   switch (action.type) {
@@ -38,6 +39,30 @@ function localStateReducer(state, action) {
 }
 
 function ProductPage() {
+  const navigate = useNavigate();
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
+  const [ward, setWard] = useState("");
+  const [address, setAddress] = useState("");
+
+  const [accountLogin, setAccountLogin] = useState(null);
+  const getAccountFromCookie = () => {
+    const accountCookie = Cookies.get("accountLogin");
+    if (accountCookie !== undefined) {
+      try {
+        const data = JSON.parse(
+          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
+        );
+        setAccountLogin(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getAccountFromCookie();
+  }, []);
   const { productId } = useParams();
   const [localState, dispatch] = useReducer(localStateReducer, {
     product: null,
@@ -46,18 +71,11 @@ function ProductPage() {
     shopAddress: null,
     city: "",
     count: parseInt(localStorage.getItem("count")) || 14,
-    showAllComments: false,
+    showAllComments: false
   });
 
-  const {
-    product,
-    shopName,
-    shopData,
-    shopAddress,
-    city,
-    count,
-    showAllComments,
-  } = localState;
+  const { product, shopName, shopData, shopAddress, count, showAllComments } =
+    localState;
 
   const increaseCount = () => {
     dispatch({ type: "SET_COUNT", payload: count + 1 });
@@ -97,7 +115,6 @@ function ProductPage() {
         console.log(response.data.data);
         dispatch({ type: "SET_SHOP_DATA", payload: shopData });
         dispatch({ type: "SET_SHOP_NAME", payload: shopData[1] });
-        dispatch({ type: "SET_CITY", payload: shopData[2].city });
       })
       .catch((error) => {
         console.error("Error loading shop data:", error);
@@ -119,7 +136,7 @@ function ProductPage() {
 
           dispatch({
             type: "SET_SIMILAR_PRODUCTS",
-            payload: similarProducts,
+            payload: similarProducts
           });
         } else {
           // Xử lý khi API trả về lỗi
@@ -137,7 +154,7 @@ function ProductPage() {
   const handleLikeProduct = (productId) => {
     axios
       .post(
-        `${API_BASE_URL}/api/like_Products?accountId=${ACCOUNT_ID}&productId=${productId}`
+        `${API_BASE_URL}/api/like_Products?accountId=${accountLogin.id_account}&productId=${productId}`
       )
       .then((response) => {
         if (response.data === "Sản phẩm đã được like.") {
@@ -171,9 +188,9 @@ function ProductPage() {
     if (isValidRating()) {
       const ratingData = {
         productId: parseInt(productId),
-        accountId: parseInt(ACCOUNT_ID),
+        accountId: parseInt(accountLogin.id),
         start: parseInt(value),
-        description: description,
+        description: description
       };
 
       console.log("Rating Payload:", ratingData);
@@ -211,41 +228,64 @@ function ProductPage() {
   };
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/ratings/${productId}`)
-      .then((response) => {
-        setReviews(response.data);
-        setUserReviews(
-          response.data.filter(
-            (review) => review.account_rate.id === ACCOUNT_ID
-          )
-        );
-      })
-      .catch((error) => {
-        console.error("Error fetching reviews:", error);
-      });
+    if (accountLogin) {
+      axios
+        .get(`${API_BASE_URL}/api/ratings/${productId}`)
+        .then((response) => {
+          setReviews(response.data);
+          setUserReviews(
+            response.data.filter(
+              (review) => review.account_rate.id === accountLogin.id
+            )
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching reviews:", error);
+        });
+    }
   }, [productId]);
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/ratings/${productId}`)
-      .then((response) => {
-        setReviews(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching reviews:", error);
-      });
+    if (accountLogin) {
+      axios
+        .get(`${API_BASE_URL}/api/ratings/${productId}`)
+        .then((response) => {
+          setReviews(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching reviews:", error);
+        });
+    }
   }, [productId]);
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/ratings/avg/${productId}`)
-      .then((response) => {
-        setAvg(response.data);
-        console.log("AVG: ", response.data);
-      });
-  });
+    if (accountLogin) {
+      axios
+        .get(`${API_BASE_URL}/api/ratings/avg/${productId}`)
+        .then((response) => {
+          setAvg(response.data);
+          console.log("AVG: ", response.data);
+        });
+    }
+  }, []);
 
+  const handleSelectUseAddress = async (city, district, ward, address) => {
+    setCity(city);
+    setDistrict(district);
+    setWard(ward);
+    setAddress(address);
+  };
+
+  const handleChangeCity = (value) => {
+    setCity(value);
+    setDistrict("");
+    setWard("");
+  };
+
+  const handleChangeDistrict = (value) => {
+    setDistrict(value);
+    setWard("");
+  };
   return (
     <>
       <nav>
@@ -272,7 +312,7 @@ function ProductPage() {
                           height: "700px",
                           display: "flex",
                           justifyContent: "center",
-                          alignItems: "center",
+                          alignItems: "center"
                         }}
                       >
                         <img
@@ -294,9 +334,7 @@ function ProductPage() {
                 <div className="ps-lg-3">
                   {product && shopName !== null ? (
                     <h4 className="title text-dark">{product.product_name}</h4>
-                  ) : (
-                    <p>Loading...</p>
-                  )}
+                  ) : null}
 
                   <div className="d-flex flex-row my-3">
                     <div className="text-warning mb-1 me-2">
@@ -328,10 +366,160 @@ function ProductPage() {
                       <span className="title ">ĐỊA CHỈ GIAO HÀNG</span>
                     </b>
                     <br />
-                    <span>Tô Ký, Quận 12, TP Hồ Chí Minh</span>
-                    <a href="#" style={{ color: "blue", marginLeft: "10px" }}>
-                      Thay đổi
-                    </a>
+                    {accountLogin ? (
+                      <div className={style.listAddress}>
+                        {accountLogin.address.map((value, index) =>
+                          listDataAddress.map((valueCity, index) =>
+                            valueCity.codename === value.city
+                              ? valueCity.districts.map(
+                                  (valueDistrict, index) =>
+                                    valueDistrict.codename === value.district
+                                      ? valueDistrict.wards.map(
+                                          (valueWard, index) =>
+                                            valueWard.codename ===
+                                            value.ward ? (
+                                              <div
+                                                key={valueCity.codename}
+                                                className={`${style.address} ${
+                                                  value.status
+                                                    ? style.active
+                                                    : ""
+                                                }`}
+                                              >
+                                                <div className={style.value}>
+                                                  {valueCity.name},{" "}
+                                                  {valueDistrict.name},{" "}
+                                                  {valueWard.name},{" "}
+                                                  {value.address}
+                                                </div>
+                                                <div
+                                                  className={style.groupButton}
+                                                >
+                                                  <span
+                                                    className={`${
+                                                      style.status
+                                                    } ${
+                                                      value.status
+                                                        ? style.active
+                                                        : ""
+                                                    } ms-2`}
+                                                    onClick={() =>
+                                                      handleSelectUseAddress(
+                                                        valueCity.name,
+                                                        valueDistrict.name,
+                                                        valueWard.name,
+                                                        value.address
+                                                      )
+                                                    }
+                                                  >
+                                                    Dùng
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            ) : null
+                                        )
+                                      : null
+                                )
+                              : null
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <div className="row gutters">
+                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                          <h6 className="mt-3 text-primary">Địa chỉ</h6>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={city}
+                              onChange={(e) => handleChangeCity(e.target.value)}
+                              className={style.input}
+                            >
+                              <option value="">Tỉnh/Thành Phố</option>
+                              {listDataAddress.map((valueCity, index) => (
+                                <option
+                                  key={valueCity.codename}
+                                  value={valueCity.codename}
+                                >
+                                  {valueCity.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={district}
+                              onChange={(e) =>
+                                handleChangeDistrict(e.target.value)
+                              }
+                              className={style.input}
+                            >
+                              <option value="">Quận/Huyện</option>
+                              {listDataAddress.map((valueCity, index) =>
+                                valueCity.codename === city
+                                  ? valueCity.districts.map(
+                                      (valueDistrict, index) => (
+                                        <option
+                                          key={valueDistrict.codename}
+                                          value={valueDistrict.codename}
+                                        >
+                                          {valueDistrict.name}
+                                        </option>
+                                      )
+                                    )
+                                  : null
+                              )}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <select
+                              value={ward}
+                              onChange={(e) => setWard(e.target.value)}
+                              className={style.input}
+                            >
+                              <option value="">Phường/Xã/Trị Trấn</option>
+                              {listDataAddress.map((valueCity, index) =>
+                                valueCity.codename === city
+                                  ? valueCity.districts.map(
+                                      (valueDistrict, index) =>
+                                        valueDistrict.codename === district
+                                          ? valueDistrict.wards.map(
+                                              (valueWard, index) => (
+                                                <option
+                                                  key={valueWard.codename}
+                                                  value={valueWard.codename}
+                                                >
+                                                  {valueWard.name}
+                                                </option>
+                                              )
+                                            )
+                                          : null
+                                    )
+                                  : null
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <input
+                              type="text"
+                              className={`form-control ${style.input}`}
+                              id="adress"
+                              placeholder="Số nhà"
+                              defaultValue={address}
+                              onChange={(e) => setAddress(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <hr />
@@ -370,17 +558,19 @@ function ProductPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="row mb-4">
-                    <div className="col-md-4 col-6">
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={() => handleLikeProduct(product.id)}
-                      >
-                        Thích
-                      </button>
+                  {accountLogin ? (
+                    <div className="row mb-4">
+                      <div className="col-md-4 col-6">
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          onClick={() => handleLikeProduct(product.id)}
+                        >
+                          Thích
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <button
                       className="btn shadow-0 "
@@ -388,7 +578,7 @@ function ProductPage() {
                         padding: "10px 50px",
                         fontSize: "16px",
                         backgroundColor: "#ffc801",
-                        color: "#fff",
+                        color: "#fff"
                       }}
                     >
                       <i className="bi bi-bag-plus mx-2"></i>
@@ -414,27 +604,33 @@ function ProductPage() {
               {product && shopName !== null && shopData ? (
                 <>
                   <img
-                    src={`/images/${shopData[4]}`}
+                    src={
+                      shopData[4]
+                        ? `http://localhost:8080/api/uploadImageProduct/${shopData[4]}`
+                        : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                    }
                     className="rounded-circle shop-image"
                     alt={shopData[4]}
                     style={{
                       width: "50px",
                       height: "50px",
-                      borderRadius: "50%",
+                      borderRadius: "50%"
                     }}
                   />
                   <Link to={`/shops/${productId}/shop`}>
                     <div className="shop-name ms-4">
                       <div>
                         <b>{shopName}</b> <br />
-                        {city}
+                        {listDataAddress.map((valueCity, index) =>
+                          valueCity.codename === shopData[2].city
+                            ? valueCity.name
+                            : null
+                        )}
                       </div>
                     </div>
                   </Link>
                 </>
-              ) : (
-                <p>Loading...</p>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -457,28 +653,7 @@ function ProductPage() {
                       role="tabpanel"
                       aria-labelledby="ex1-tab-1"
                     >
-                      <p>{product ? `${product.description}` : "Loading"}</p>
-
-                      <b>
-                        <span className="title">THÔNG TIN BỔ SUNG</span>
-                      </b>
-                      <table className="table border mt-3 mb-2">
-                        <tbody>
-                          <tr>
-                            <th scope="row ">Loại sản phẩm</th>
-                            <td>Áo thun</td>
-                          </tr>
-
-                          <tr>
-                            <th scope="row ">Màu sắc</th>
-                            <td>Đen, Trắng, Xanh lá</td>
-                          </tr>
-                          <tr>
-                            <th scope="row ">Kích cỡ</th>
-                            <td>XS, S, M, L, XL</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <p dangerouslySetInnerHTML={{ __html: product ? product.description : '' }} />
                     </div>
                   </div>
                   <div className="shipping-info ">
@@ -497,46 +672,7 @@ function ProductPage() {
                         </li>
                         <li>
                           Thời gian giao hàng dự kiến: từ{" "}
-                          <strong>3-7 ngày làm việc</strong>.
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="payment-options ">
-                    <b>
-                      <span className="title ">PHƯƠNG THỨC THANH TOÁN</span>
-                    </b>
-                    <div className="pt-2 ">
-                      <ul>
-                        <li>
-                          <img
-                            src="/images/cash.png "
-                            alt="Thanh toán khi nhận hàng "
-                            style={{ width: "50px" }}
-                          />
-                          <span>Thanh toán khi nhận hàng</span>
-                        </li>
-                        <li>
-                          <img
-                            src="/images/momo.png "
-                            alt="Momo "
-                            width="60px "
-                            style={{ width: "30px" }}
-                          />
-                          <img
-                            src="/images/mastercard.png "
-                            alt="E-bank "
-                            width="60px "
-                            className="ms-2 "
-                            style={{ width: "40px" }}
-                          />
-                          <img
-                            src="/images/paypal.png "
-                            alt="Paypal "
-                            width="60px "
-                            className="ms-2 "
-                            style={{ width: "80px" }}
-                          />
+                          <strong>3 - 7 ngày làm việc</strong>.
                         </li>
                       </ul>
                     </div>
@@ -552,7 +688,7 @@ function ProductPage() {
                           kể từ ngày nhận hàng.
                         </li>
                         <li>
-                          Sản phẩm phải còn
+                          Sản phẩm phải còn{" "}
                           <strong>nguyên vẹn và không bị hỏng hóc</strong>.
                         </li>
                         <li>

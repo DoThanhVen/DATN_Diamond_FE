@@ -30,7 +30,7 @@ function EditCategory() {
       navigate("/login");
     }
   };
-  
+
   useEffect(() => {
     getAccountFromCookie();
   }, []);
@@ -45,6 +45,7 @@ function EditCategory() {
   const [listCategory, setListcategory] = useState([]);
   const [reload, setreload] = useState(0);
   const [imageload, setimageload] = useState("");
+  const [category, setcategory] = useState({});
   const navigate = useNavigate();
   //GET DATA REDUX
   const data = useSelector(state => state.allDataCategory);
@@ -99,6 +100,7 @@ function EditCategory() {
       dispatch(getIdcategoryUpdate(data.id));
       setTypeCate(data.type_category);
       setimageload(data.image);
+      setcategory(data)
     } catch (error) {
       ThongBao("Có lỗi xảy ra. Thử lại", "error");
     }
@@ -106,8 +108,13 @@ function EditCategory() {
 
   //Category
   const handleAddCategory = async () => {
-    if (type_category === "" || image === null) {
+    const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
+    if (type_category.trim() === "" || image === null) {
       ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
+    } else if (type_category.length > 24) {
+      ThongBao("Độ dài của loại sản phẩm không được quá 24 ký tự.", "error");
+    } else if (!isAlphaWithSpace(type_category)) {
+      ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
     } else {
       try {
         const response = await CategoryService.addCategory(
@@ -122,7 +129,17 @@ function EditCategory() {
           setTypeCate('');
           setimage(null);
           setSelectedImage(null);
-          setimageload("")
+          setimageload("");
+          setcategory({})
+        } else {
+          ThongBao(response.message, response.status);
+          dispatch(getIdcategoryUpdate(0));
+          dispatch(reloadPage(reloadold + 1));
+          setTypeCate('');
+          setimage(null);
+          setSelectedImage(null);
+          setimageload("");
+          setcategory({})
         }
       } catch (error) {
         ThongBao("Thêm loại sản phẩm thất bại!", "error");
@@ -130,25 +147,78 @@ function EditCategory() {
     }
   };
 
+
   const handleUpdateCategory = async () => {
-    try {
-      const result = await CategoryService.updateCategory(
-        idCategory,
-        type_category,
-        image
-      );
-      if (result.status === "success") {
-        ThongBao(result.message, result.status);
+    const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
+    if (type_category !== category.type_category) {
+      if (type_category.trim() === "") {
+        ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
+      } else if (type_category.length > 24) {
+        ThongBao("Độ dài của loại sản phẩm không được quá 24 ký tự.", "error");
+      } else if (!isAlphaWithSpace(type_category)) {
+        ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
+      } else {
+        try {
+          const result = await CategoryService.updateCategory(
+            idCategory,
+            type_category,
+            image
+          );
+          if (result.status === "success") {
+            ThongBao(result.message, result.status);
+            dispatch(getIdcategoryUpdate(0));
+            dispatch(reloadPage(reloadold + 1));
+            setTypeCate('');
+            setimage(null);
+            setSelectedImage(null);
+            setimageload("")
+            setcategory({})
+          } else {
+            ThongBao(result.message, result.status);
+            dispatch(getIdcategoryUpdate(0));
+            dispatch(reloadPage(reloadold + 1));
+            setTypeCate('');
+            setimage(null);
+            setSelectedImage(null);
+            setimageload("")
+            setcategory({})
+          }
+        } catch (error) {
+          ThongBao("Có lỗi xảy ra. Thử lại", "error");
+        }
+      }
+    } else {
+      try {
+        const result = await CategoryService.updateCategory(
+          idCategory,
+          type_category,
+          image
+        );
+        if (result.status === "success") {
+          ThongBao(result.message, result.status);
           dispatch(getIdcategoryUpdate(0));
           dispatch(reloadPage(reloadold + 1));
           setTypeCate('');
           setimage(null);
           setSelectedImage(null);
           setimageload("")
+          setcategory({})
+        } else {
+          ThongBao(result.message, result.status);
+          dispatch(getIdcategoryUpdate(0));
+          dispatch(reloadPage(reloadold + 1));
+          setTypeCate('');
+          setimage(null);
+          setSelectedImage(null);
+          setimageload("")
+          setcategory({})
+        }
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
-    } catch (error) {
-      ThongBao("Có lỗi xảy ra. Thử lại", "error");
     }
+
+
   };
 
   const handleDeleteCategory = async () => {
@@ -162,6 +232,7 @@ function EditCategory() {
         setimage(null);
         setSelectedImage(null);
         setimageload("")
+        setcategory({})
       } else {
         ThongBao(reponse.message, reponse.status);
       }
@@ -172,8 +243,13 @@ function EditCategory() {
 
   //CategoryItem
   const handleAddCategoryItem = async () => {
-    if (valueCategory === "" || type_categoryItem === "") {
+    const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
+    if (valueCategory === "" || type_categoryItem.trim() === "") {
       ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
+    } else if (type_categoryItem.length > 24) {
+      ThongBao("Độ dài của phân loại sản phẩm không được quá 24 ký tự.", "error");
+    } else if (!isAlphaWithSpace(type_categoryItem)) {
+      ThongBao("Tên phân loại sản phẩm chứa kí tự không hợp lệ.", "error");
     } else {
       try {
         const reponse = await CategoryService.addCategoryItem(
@@ -185,6 +261,9 @@ function EditCategory() {
           ThongBao(reponse.message, reponse.status);
           dispatch(reloadPage(reloadold + 1));
           dispatch(getIdcategoryItemUpdate(reponse.data.id));
+        } else {
+          ThongBao(reponse.message, reponse.status);
+          dispatch(reloadPage(reloadold + 1));
         }
       } catch (error) {
         ThongBao("Có lỗi xảy ra. Thử lại", "error");
@@ -215,22 +294,53 @@ function EditCategory() {
   };
 
   const handleUpdateCategoryItem = async () => {
-    try {
-      const result = await CategoryService.updateCategoryItem(
-        categoryItem.id,
-        valueCategory,
-        type_categoryItem,
-        accountLogin.id_account
-      );
-      if (result.status === "success") {
-        ThongBao(result.message, result.status);
-        dispatch(reloadPage(reloadold + 1));
+    if (categoryItem.type_category_item !== type_categoryItem) {
+      const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
+      if (valueCategory === "" || type_categoryItem.trim() === "") {
+        ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
+      } else if (type_categoryItem.length > 24) {
+        ThongBao("Độ dài của phân loại sản phẩm không được quá 24 ký tự.", "error");
+      } else if (!isAlphaWithSpace(type_categoryItem)) {
+        ThongBao("Tên phân loại sản phẩm chứa kí tự không hợp lệ.", "error");
+      } else {
+        try {
+          const result = await CategoryService.updateCategoryItem(
+            categoryItem.id,
+            valueCategory,
+            type_categoryItem,
+            accountLogin.id_account
+          );
+          if (result.status === "success") {
+            ThongBao(result.message, result.status);
+            setTypeCateItem(result.data.type_category_item)
+            dispatch(reloadPage(reloadold + 1));
+          } else {
+            ThongBao(result.message, result.status);
+          }
+        } catch (error) {
+          ThongBao("Có lỗi xảy ra. Thử lại", "error");
+        }
+      };
+    } else {
+      try {
+        const result = await CategoryService.updateCategoryItem(
+          categoryItem.id,
+          valueCategory,
+          type_categoryItem,
+          accountLogin.id_account
+        );
+        if (result.status === "success") {
+          ThongBao(result.message, result.status);
+          setTypeCateItem(result.data.type_category_item)
+          dispatch(reloadPage(reloadold + 1));
+        } else {
+          ThongBao(result.message, result.status);
+        }
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
-    } catch (error) {
-      ThongBao("Có lỗi xảy ra. Thử lại", "error");
     }
-  };
-
+  }
   const handleDeleteCategoryItem = async () => {
     try {
       const reponse = await CategoryService.deleteCategoryItem(idCategoryItem);
@@ -266,16 +376,16 @@ function EditCategory() {
             <div className={style.formImage}>
               {selectedImage !== null
                 ? <img
-                    className={style.image}
-                    src={selectedImage}
-                    alt="Hình Ảnh"
-                  />
+                  className={style.image}
+                  src={selectedImage}
+                  alt="Hình Ảnh"
+                />
                 : imageload !== ""
                   ? <img
-                      className={style.image}
-                      src={`http://localhost:8080/api/uploadImageProduct/${imageload}`}
-                      alt="Hình Ảnh"
-                    />
+                    className={style.image}
+                    src={`http://localhost:8080/api/uploadImageProduct/${imageload}`}
+                    alt="Hình Ảnh"
+                  />
                   : null}
               <div className={style.action}>
                 <input
@@ -320,7 +430,14 @@ function EditCategory() {
               <button className={style.button} onClick={handleDeleteCategory}>
                 <i className="bi bi-x-lg" /> XÓA
               </button>
-              <button className={style.button}>
+              <button className={style.button} onClick={() => {
+                dispatch(getIdcategoryUpdate(0));
+                setTypeCate('');
+                setimage(null);
+                setSelectedImage(null);
+                setimageload("");
+                setcategory({})
+              }}>
                 <i className="bi bi-arrow-clockwise" /> LÀM MỚI
               </button>
             </div>
@@ -355,6 +472,7 @@ function EditCategory() {
               <button
                 className={style.button}
                 onClick={() => handleAddCategoryItem()}
+                disabled={idCategoryItem !== 0}
               >
                 <i className="bi bi-plus-lg" /> THÊM
               </button>
@@ -370,7 +488,12 @@ function EditCategory() {
               >
                 <i className="bi bi-x-lg" /> XÓA
               </button>
-              <button className={style.button}>
+              <button className={style.button} onClick={() => {
+                dispatch(getIdcategoryItemUpdate(0));
+                setTypeCateItem('');
+                setcategory({})
+                setValueCategory('')
+              }}>
                 <i className="bi bi-arrow-clockwise" /> LÀM MỚI
               </button>
             </div>
