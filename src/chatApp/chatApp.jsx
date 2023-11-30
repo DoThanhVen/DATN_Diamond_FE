@@ -183,10 +183,13 @@ const ChatApp = () => {
       };
 
       setListMess(prevMessages => [...prevMessages, newMessage]);
-      setHistorySender(prevParticipants => [...prevParticipants, payloadData.sender]);
-      console.log(payloadData.sender)
-      setHistoryReceiver(prevParticipants => [...prevParticipants, payloadData.receiver]);
-      console.log(payloadData.receiver)
+      const newSender = { sender: selectedRecipient };
+      setHistorySender(prevSenders => prevSenders ? [newSender, ...prevSenders] : [newSender]);
+      
+      // Tương tự cho historyReceiver
+      const newReceiver = { receiver: selectedRecipient };
+      setHistoryReceiver(prevReceivers => prevReceivers ? [newReceiver, ...prevReceivers] : [newReceiver]);
+      
     }
 
   };
@@ -226,6 +229,13 @@ const ChatApp = () => {
       setListMess(prevMessages => [...prevMessages, newMessage]);
       setUserData({ ...userData, message: '', file: '' });
       setfile(null)
+      const newSender = { sender: userData.username };
+      setHistorySender(prevSenders => prevSenders ? [newSender, ...prevSenders] : [newSender]);
+  
+      // Cập nhật người nhận trong historyReceiver
+      const newReceiver = { receiver: selectedRecipient };
+      setHistoryReceiver(prevReceivers => prevReceivers ? [newReceiver, ...prevReceivers] : [newReceiver]);
+    
     }
   };
 
@@ -275,7 +285,7 @@ const ChatApp = () => {
               <li onClick={() => setTab('CHATROOM')} className={`member ${tab === 'CHATROOM' && 'active'}`} style={{ fontSize: '27px' }}>
                 {userData.username}
               </li>
-              {historySender.map((name, index) => (
+              {historySender&&historySender.map((name, index) => (
                 name.receiver && name.receiver.username !== receiverData[0] && name.receiver.username !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name.receiver.username); setSelectedRecipient(name.receiver.username); }}
@@ -286,7 +296,7 @@ const ChatApp = () => {
                   </li>
                 )
               ))}
-              {historyReceiver.map((name, index) => (
+              {historyReceiver&&historyReceiver.map((name, index) => (
                 name.sender && name.receiver.username !== receiverData[0] && name.sender.username !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name.sender.username); setSelectedRecipient(name.sender.username); }}
@@ -296,7 +306,7 @@ const ChatApp = () => {
                     {name.sender.username}
                   </li>)
               ))}
-              {receiverData.map((name, index) => (
+              {receiverData&&receiverData.map((name, index) => (
                 name !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name); setSelectedRecipient(name); }}
