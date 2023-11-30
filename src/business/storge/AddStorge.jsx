@@ -7,17 +7,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { reloadPage } from "../../service/Actions";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
 
 export default function AddStorge() {
   const navigate = useNavigate();
   const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
-    if (accountCookie !== undefined) {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        getdataProduct(data.shop.id);
+        getdataProduct(accountLogin.shop.id);
       } catch (error) {
         console.log(error);
       }

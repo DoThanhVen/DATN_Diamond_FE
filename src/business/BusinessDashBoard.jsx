@@ -4,11 +4,32 @@ import Bill from "./bill/Bill";
 import Product from "./product/Product";
 import Storge from "./storge/Storge";
 import Shop from "./shop/Shop";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import style from "../css/business/nav.module.css";
 import Nav from "react-bootstrap/Nav";
+import { GetDataLogin } from "../service/DataLogin";
 
 function Navbar() {
+  const [accountLogin, setAccountLogin] = useState(null);
+  const navigate = useNavigate();
+
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
+      try {
+        setAccountLogin(accountLogin);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+  useEffect(() => {
+    getAccountFromSession();
+  }, []);
+
   const location = useLocation();
   const isActiveHome = location.pathname === "/business";
   const isActiveBill = location.pathname === "/business/bill";
@@ -56,13 +77,6 @@ function Navbar() {
       icon: "bi bi-pencil-square",
       mapping: "/business/shop",
       active: isActiveEditShop
-    },
-    {
-      id: 5,
-      label: "Đăng Xuất",
-      icon: "bi bi-door-open",
-      mapping: "/business",
-      active: null
     }
   ];
 
@@ -72,13 +86,17 @@ function Navbar() {
     borderRadius: "10px"
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("accountLogin");
+    const delay = setTimeout(() => {
+      navigate("/");
+    }, 800);
+    return () => clearTimeout(delay);
+  };
+
   return (
     <React.Fragment>
       <div id={style.businessDashBoard}>
-        <i
-          className={`bx bx-list-ul ${style.showNav}`}
-          onClick={() => setActiveMenu(!activeMenu)}
-        />
         <div className={`${style.header}`}>
           <div className={`${style.logo}`}>
             <img src="/images/diamond.png" alt="Hình Ảnh" />
@@ -88,10 +106,19 @@ function Navbar() {
             <div className={`${style.account}`}>
               <img
                 className={style.image}
-                src="/images/banner-left.jpg"
+                src={
+                  accountLogin &&
+                  accountLogin.infoAccount &&
+                  accountLogin.infoAccount.image
+                    ? `http://localhost:8080/api/uploadImageProduct/${accountLogin
+                        .infoAccount.image}`
+                    : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                }
                 alt="Hình Ảnh"
               />
-              <label className={style.label}>Tên Người Dùng</label>
+              <label className={`${style.label} ms-2`}>
+                {accountLogin && accountLogin.fullname}
+              </label>
             </div>
             <div
               className={`${style.notifycation}`}
@@ -135,6 +162,13 @@ function Navbar() {
                 </div>
                 <div className={`${style.cardFooter}`}>THÔNG BÁO</div>
               </div>
+            </div>
+            <div
+              className={`${style.logout} ms-2 me-2`}
+              onClick={() => handleLogout()}
+            >
+              <i className="bi bi-door-open"></i>
+              Đăng xuất
             </div>
           </div>
         </div>

@@ -2,8 +2,19 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
+import style from "../css/user/home.module.css";
+import LazyLoad from "react-lazy-load";
 
 const API_BASE_URL = "http://localhost:8080";
+
+function formatCurrency(price, promotion) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0
+  });
+  return formatter.format(price - price * (promotion / 100));
+}
 
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
@@ -34,68 +45,53 @@ function NewProducts() {
   useEffect(() => {
     axios
       .get(`${API_BASE_URL}/api/product/top10`)
-      .then((response) => {
+      .then(response => {
         setTop10Products(response.data);
-        console.log(response.data);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error fetching top 10 products:", error);
       });
   }, []);
+
   const settings = {
     dots: true,
     infinite: true,
     slidesToShow: 4,
     slidesToScroll: 1,
     nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
+    prevArrow: <SamplePrevArrow />
   };
 
   return (
-    <div>
-      <Slider {...settings}>
-        {top10Products && top10Products.map((product, index) => (
-          <div
-            key={index}
-            className="d-flex flex-column align-items-center justify-content-around product-item my-3 px-2"
-          >
-            <div className="product">
+    <div className={style.list_item_new}>
+      {top10Products &&
+        top10Products.map((product, index) =>
+          <LazyLoad once={true} key={index} className={style.item_new_product}>
+            <Link to={`/product/${product[0]}`}>
               {typeof product[5] === "string"
-                ? JSON.parse(product[5]).map((image, subIndex) => (
+                ? JSON.parse(product[5]).map((image, subIndex) =>
                     <img
-                      key={subIndex}
+                      key={image.id}
                       src={`${API_BASE_URL}/api/uploadImageProduct/${image.url}`}
                       alt={`Image ${subIndex}`}
+                      className={style.image}
                     />
-                  ))
+                  )
                 : null}
-              {/* <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                <li className="icon">
-                  <span className="fas fa-expand-arrows-alt"></span>
-                </li>
-                <li className="icon mx-3">
-                  <span className="far fa-heart"></span>
-                </li>
-                <li className="icon">
-                  <span className="fas fa-shopping-bag"></span>
-                </li>
-              </ul> */}
-            </div>
-            <div className="tag bg-green mt-2">new</div>
-            <Link to={`/product/${product[0]}`}>
-              <div className="title pt-4 pb-1">{product[2]}</div>
+              <div className={style.status}>new</div>
+              <div className={style.name}>
+                {product[2]}
+              </div>
+              <div className={style.info}>
+                <label className={style.price}>
+                  {formatCurrency(product[3], 0)}
+                </label>
+                <label className={style.amount_sell}>Đã bán 999</label>
+              </div>
+              <div className={style.show_detail}>Xem chi tiết</div>
             </Link>
-            <div className="d-flex align-content-center justify-content-center">
-              <span className="fas fa-star"></span>
-              <span className="fas fa-star"></span>
-              <span className="fas fa-star"></span>
-              <span className="fas fa-star"></span>
-              <span className="fas fa-star"></span>
-            </div>
-            <div className="price">{product[3]}</div>
-          </div>
-        ))}
-      </Slider>
+          </LazyLoad>
+        )}
     </div>
   );
 }

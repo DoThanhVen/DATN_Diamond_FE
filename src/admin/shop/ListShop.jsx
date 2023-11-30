@@ -9,39 +9,37 @@ import listDataAddress from "../../service/AddressVietNam";
 import { useNavigate } from "react-router";
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
+import { GetDataLogin } from "../../service/DataLogin";
 
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
 }
 function ListShop() {
-  const numberPage = 10; 
+  const numberPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [keyword, setkeyword] = useState('');
-  const [keyfind, setkeyfind] = useState('');
-  const [reload, setreload] = useState(0)
-  const [sortBy,setsortBy]=useState('')
-  const [sortType,setsortType]=useState('')
+  const [keyword, setkeyword] = useState("");
+  const [keyfind, setkeyfind] = useState("");
+  const [reload, setreload] = useState(0);
+  const [sortBy, setsortBy] = useState("");
+  const [sortType, setsortType] = useState("");
   const [listShop, setListShop] = useState([]);
   const [accountLogin, setAccountLogin] = useState(null);
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const data = useSelector((state) => state.idShop);
+
   useEffect(() => {
-    getAccountFromCookie();
     getdata(currentPage);
-  }, [reload,currentPage,sortType,data]);
+  }, [reload, currentPage, sortType, data]);
 
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
 
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
-    if (accountCookie !== undefined) {
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
+        setAccountLogin(accountLogin);
       } catch (error) {
         console.log(error);
       }
@@ -49,9 +47,18 @@ function ListShop() {
       navigate("/login");
     }
   };
+  useEffect(() => {
+    getAccountFromSession();
+  }, []);
+
   const getdata = async (page) => {
     try {
-      const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`, "GET");
+      const response = await callAPI(
+        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${
+          (page - 1) * numberPage
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
+        "GET"
+      );
       const responseData = response.data;
       const listShop = responseData.content.map((value) => value.shop);
       const newData = listShop.filter((shop) => shop.status === Number(1)||shop.status === Number(2));
@@ -78,39 +85,49 @@ function ListShop() {
   return (
     <React.Fragment>
       <div className={style.heading}>
-          <div className={style.column}>
-            <label className={style.title}>Danh sách cửa hàng</label>
-            <div className={`${style.formSearch}`}>
-              <select
-                className={`${style.optionSelect}`}
-                value={keyfind}
-                onChange={(e) => {
-                  setkeyfind(e.target.value)
-                }}
-              >
-                <option value="shop_name">Tên cửa hàng</option>
-                <option value="username">Tên đăng nhập</option>
-              </select>
-              <input
-                className={`${style.inputSearch}`}
-                type="text"
-                onChange={(e) => {
-                  setkeyword(e.target.value)
-                }}
-              />
-              <button className={`${style.buttonSearch}`} onClick={() => { setreload(reload + 1) }}>Tìm Kiếm</button>
-            </div>
+        <div className={style.column}>
+          <label className={style.title}>Danh sách cửa hàng</label>
+          <div className={`${style.formSearch}`}>
+            <select
+              className={`${style.optionSelect}`}
+              value={keyfind}
+              onChange={(e) => {
+                setkeyfind(e.target.value);
+              }}
+            >
+              <option value="shop_name">Tên cửa hàng</option>
+              <option value="username">Tên đăng nhập</option>
+            </select>
+            <input
+              className={`${style.inputSearch}`}
+              type="text"
+              onChange={(e) => {
+                setkeyword(e.target.value);
+              }}
+            />
+            <button
+              className={`${style.buttonSearch}`}
+              onClick={() => {
+                setreload(reload + 1);
+              }}
+            >
+              Tìm Kiếm
+            </button>
           </div>
         </div>
+      </div>
 
-       
       <div className={style.listShop}>
         {listShop?.map((value, index) => (
           <div className={style.cardShop} key={index}>
             <div className={style.heading}>
               <img
                 className={style.image}
-                src={`http://localhost:8080/api/uploadImageProduct/${value.image}`}
+                src={
+                  value.image
+                    ? `http://localhost:8080/api/uploadImageProduct/${value.image}`
+                    : "/images/image_shop.jpg"
+                }
                 alt="Hình Ảnh"
               ></img>
               <div className={style.content}>
@@ -124,75 +141,43 @@ function ListShop() {
               <div className={style.title}>Địa chỉ:</div>
               <div className={style.content}>
                 <label>
-                  Thành phố:{" "}
-                  {accountLogin &&
-                    accountLogin.address.map((value, index) =>
-                      listDataAddress.map((valueCity, index) =>
-                        valueCity.codename === value.addressShop?.city
-                          ? valueCity.name
-                          : null
-                      )
-                    )}
+                  Thành Phố:{" "}
+                  {listDataAddress.map((valueCity, index) =>
+                    valueCity.codename === value.addressShop?.city
+                      ? valueCity.name
+                      : null
+                  )}
                 </label>
                 <label>
                   Quận:{" "}
-                  {accountLogin &&
-                    accountLogin.address.map((value, index) =>
-                      listDataAddress.map((valueCity, index) =>
-                        valueCity.codename === value.city
-                          ? valueCity.districts.map((valueDistrict, index) =>
-                              valueDistrict.codename === value.district
-                                ? valueDistrict.wards.map((valueWard, index) =>
-                                    valueWard.codename === value.ward ? (
-                                      <div
-                                        key={valueCity.codename}
-                                        className={`${style.address} ${
-                                          value.status ? style.active : ""
-                                        }`}
-                                      >
-                                        <div className={style.value}>
-                                          {valueCity.name}, {valueDistrict.name}
-                                          , {valueWard.name}, {value.address}
-                                        </div>
-                                      </div>
-                                    ) : null
-                                  )
-                                : null
-                            )
-                          : null
-                      )
-                    )}{" "}
-                  {value.addressShop?.district}
+                  {listDataAddress.map((valueCity, index) =>
+                    valueCity.codename === value.addressShop?.city
+                      ? valueCity.districts.map((valueDistrict, index) =>
+                          valueDistrict.codename === value.addressShop?.district
+                            ? valueDistrict.name
+                            : null
+                        )
+                      : null
+                  )}
                 </label>
                 <label>
                   Đường:{" "}
-                  {accountLogin &&
-                    accountLogin.address.map((value, index) =>
+                  {
                       listDataAddress.map((valueCity, index) =>
-                        valueCity.codename === value.city
+                        valueCity.codename === value.addressShop?.city
                           ? valueCity.districts.map((valueDistrict, index) =>
-                              valueDistrict.codename === value.district
+                              valueDistrict.codename ===
+                              value.addressShop?.district
                                 ? valueDistrict.wards.map((valueWard, index) =>
-                                    valueWard.codename === value.ward ? (
-                                      <div
-                                        key={valueCity.codename}
-                                        className={`${style.address} ${
-                                          value.status ? style.active : ""
-                                        }`}
-                                      >
-                                        <div className={style.value}>
-                                          {valueCity.name}, {valueDistrict.name}
-                                          , {valueWard.name}, {value.address}
-                                        </div>
-                                      </div>
-                                    ) : null
+                                    valueWard.codename ===
+                                    value.addressShop?.ward
+                                      ? valueWard.name
+                                      : null
                                   )
                                 : null
                             )
                           : null
-                      )
-                    )}{" "}
-                  {value.addressShop?.ward}
+                    )}
                 </label>
                 <label>Số nhà: {value.addressShop?.address}</label>
               </div>
@@ -201,7 +186,7 @@ function ListShop() {
               <span
                 className={style.statusShop}
                 style={{
-                  backgroundColor: value.status === 2 ? "red" : "green"
+                  backgroundColor: value.status === 0 ? "blue" : value.status === 1 ? "green" : "red"
                 }}
                 onClick={() => {
                   dispatch(getIdShop(value.id));
@@ -219,28 +204,30 @@ function ListShop() {
             </div>
           </div>
         ))}
-         <div className={style.paginationContainer} style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '20px'
-        }}>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            boundaryCount={2}
-            variant="outlined"
-            shape="rounded"
-            size="large"
-            showFirstButton
-            showLastButton
-          />
-        </div>
+      </div>
+      <div
+        className={style.paginationContainer}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "20px"
+        }}
+      >
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          boundaryCount={2}
+          variant="outlined"
+          shape="rounded"
+          size="large"
+          showFirstButton
+          showLastButton
+        />
       </div>
       {showModal && <ModelAccess status={showModal} toggleShow={closeModal} />}
     </React.Fragment>
   );
 }
-
 
 export default ListShop;

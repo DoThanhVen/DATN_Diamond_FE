@@ -9,27 +9,13 @@ import "../css/user/responsive.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
 
 const MainNavbar = () => {
   const [accountLogin, setAccountLogin] = useState(null);
 
   useEffect(() => {
-    const getAccountFromCookie = () => {
-      const accountCookie = Cookies.get("accountLogin");
-
-      if (accountCookie !== undefined) {
-        try {
-          const decodedCookie = decodeURIComponent(accountCookie);
-          const decodedString = window.atob(decodedCookie);
-          const parsedAccount = JSON.parse(decodedString);
-          setAccountLogin(parsedAccount);
-        } catch (error) {
-          setAccountLogin(null);
-        }
-      }
-    };
-
-    getAccountFromCookie();
+    setAccountLogin(GetDataLogin());
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +27,7 @@ const MainNavbar = () => {
   };
 
   const handleLogout = () => {
-    Cookies.remove("accountLogin");
+    sessionStorage.removeItem("accountLogin");
     const delay = setTimeout(() => {
       navigate("/");
     }, 800);
@@ -72,10 +58,19 @@ const MainNavbar = () => {
                 {/* Top Right */}
                 <div className="right-content">
                   <ul className="list-main">
-                    <li>
-                      <i className="ti-location-pin"></i>{" "}
-                      <a href="/salesRegistration">Đăng ký bán hàng</a>
-                    </li>
+                    {accountLogin &&
+                    accountLogin.shop &&
+                    accountLogin.shop.status === 1 ? (
+                      <li>
+                        <i className="ti-location-pin"></i>{" "}
+                        <a href="/business">Kênh bán hàng</a>
+                      </li>
+                    ) : (
+                      <li>
+                        <i className="ti-location-pin"></i>
+                        <a href="/salesRegistration">Đăng ký bán hàng</a>
+                      </li>
+                    )}
                     <li>
                       <i className="ti-user"></i>{" "}
                       <a href="/profile">Tài khoản của tôi</a>
@@ -93,7 +88,7 @@ const MainNavbar = () => {
                     {accountLogin !== null ? (
                       <li>
                         <div>
-                        <i className="bi bi-door-open"></i>
+                          <i className="bi bi-door-open"></i>
                           <a href="" onClick={() => handleLogout()}>
                             Đăng xuất
                           </a>
@@ -289,23 +284,6 @@ const MainNavbar = () => {
           </div>
         </div>
       </header>
-      {/* <div className=" main-navbar ">
-      <Navbar expand="lg" >
-          <div className="container-fluid ">
-            <Link className="d-block d-sm-block d-md-none d-lg-none" to="/">
-              <img src="/images/Diamond.png" alt="Logo" style={{ width: '60px' }} />
-            </Link>
-            <Navbar.Toggle style={{ marginTop: '2px' }} aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav " >
-              <Nav className="me-auto  mb-lg-0 container  border-bottom" style={{ paddingTop: '5px' }}>
-                <Nav.Link href="/" style={{  fontSize: '14px' }}>Trang chủ</Nav.Link>
-                <Nav.Link href="#" style={{ fontSize: '14px' }}>Chính sách</Nav.Link>
-                <Nav.Link href="#" style={{ fontSize: '14px' }}>Thông tin liên hệ</Nav.Link>
-              </Nav>
-            </Navbar.Collapse>
-          </div>
-        </Navbar>
-      </div > */}
     </>
   );
 };

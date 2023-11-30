@@ -48,43 +48,7 @@ function Footer() {
             </ul>
           </div>
         </div>
-        <div className={`column`}>
-          <div className={`header`}>THEO DÕI CHÚNG TÔI TRÊN</div>
-          <div className={`content`}>
-            <ul className={`menu`}>
-              <li className={`menu-item`}>
-                <a href="/#">
-                  <img src="/images/facebook.jpg" alt="facebook"></img>
-                </a>
-              </li>
-              <li className={`menu-item`}>
-                <a href="/#">
-                  <img src="/images/instagram.jpg" alt="Instagram" />
-
-                </a>
-              </li>
-             
-              <li className={`menu-item`}>
-                <a href="/#">
-                  <img src="/images/tiktok.jpg" alt="Tiktok"></img>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
-      {/* <div className={`certificate`}>
-        <div className={`column`}>
-          <div className={`heading`}> © 2023 - DIAMOND FASHION</div>
-          <div className={`content`}>
-            Giấy CNĐKDN: 0310874914 – Ngày cấp: 25/11/2011 - Cơ quan cấp: Phòng
-            Đăng Ký Kinh Doanh – Sở Kế Hoạch và Đầu Tư TP.HCM
-          </div>
-        </div>
-        <div className={`column`}>
-          <img src="/images/bo-cong-thuong.jpg" alt=""></img>
-        </div>
-      </div> */}
     </React.Fragment>
   );
 }

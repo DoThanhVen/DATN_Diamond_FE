@@ -5,11 +5,34 @@ import { useSelector } from "react-redux";
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
+<<<<<<< HEAD
 import getAccountFromCookie from "../../service/getAccountLogin";
 
 function HistoryAdd() {
 
   const navigate = useNavigate();
+=======
+import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
+
+function HistoryAdd() {
+  const navigate = useNavigate();
+  const getAccountFromCookie = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
+      try {
+        getdataProducts(currentPage, accountLogin.shop.id);
+
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+
+>>>>>>> origin/main
   const [listProducts, setListProducts] = useState([]);
   const reload = useSelector((state) => state.getreloadPage);
   const [currentPage, setCurrentPage] = useState(1);

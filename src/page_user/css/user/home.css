@@ -1157,7 +1157,7 @@ section .content {
 }
 
 .product-offer:hover img {
-  transform: scale(1.2) rotate(5deg);
+  transform: scale(1.05) rotate(5deg);
 }
 
 .product-offer .offer-text {
@@ -1187,7 +1187,11 @@ section .content {
   margin-left: auto;
 }
 
-.container-fluid, .navbar .container-sm, .navbar .container-md, .navbar .container-lg, .navbar .container-xl {
+.container-fluid,
+.navbar .container-sm,
+.navbar .container-md,
+.navbar .container-lg,
+.navbar .container-xl {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1200,7 +1204,7 @@ section .content {
   justify-content: center;
   background-color: #354F90;
   border-radius: 4px;
-  transition: transform 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
   color: white;
 
   background-size: cover;
@@ -1208,22 +1212,22 @@ section .content {
   background-repeat: no-repeat;
 }
 
-.ejercico a {
+.ejercico label {
   opacity: 0;
-  gird-text-decoration: none;
-  cursor: none;
+  transform: translateY(-20px);
+  visibility: hidden;
+  transition: all .5s ease-in-out;
 }
 
-.gird-item:hover .ejercico a {
+.gird-item:hover .ejercico label {
   color: white;
-
   opacity: 1;
-
+  visibility: visible;
+  transform: translateY(0);
 }
 
-.gird-item:hover {
-  filter: opacity(0.9);
-  transform: scale(1.04);
+.gird-item:not(:hover) {
+  filter: grayscale(100%);
 }
 
 /*-------------Gird style----------*/
@@ -1259,9 +1263,3 @@ section .content {
     grid-row: span 2;
   }
 }
-
-@media screen and (min-width: 1024px) {}
-
-@media screen and (min-width:767px) and (max-width:1023px) {}
-
-@media screen and (max-width: 767px) {}

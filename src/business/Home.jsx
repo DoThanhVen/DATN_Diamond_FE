@@ -5,6 +5,7 @@ import { callAPI } from "../service/API";
 import Loading from "../admin/Loading";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../service/DataLogin";
 
 const numberPage = 10;
 //CHUYỂN ĐỔI TIỀN TỆ
@@ -18,18 +19,13 @@ function formatCurrency(price, promotion) {
 }
 
 function Home() {
-  const [accountLogin, setAccountLogin] = useState(null);
-
   const navigate = useNavigate();
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
-    if (accountCookie !== undefined) {
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
-        getAllBill(data.shop.id);
+        getAllBill(accountLogin.shop.id);
       } catch (error) {
         console.log(error);
       }
@@ -38,7 +34,7 @@ function Home() {
     }
   };
   useEffect(() => {
-    getAccountFromCookie();
+    getAccountFromSession();
   }, []);
   //LOADING
   const [loading, setLoading] = useState(true);
@@ -291,31 +287,31 @@ function Home() {
             )}
           </div>
           <div className={`${style.buttonPage}`}>
-            <Nav.Link className={`btn`} onClick={() => handlePageChange(1)}>
+            <Nav.Link className={style.button} onClick={() => handlePageChange(1)}>
               <i className="bi bi-chevron-bar-left" />
             </Nav.Link>
             {currentPage - 1 > 0
               ? <Nav.Link
-                  className={`btn`}
+                  className={style.button}
                   onClick={() => handlePageChange(currentPage - 1)}
                 >
                   {currentPage - 1}
                 </Nav.Link>
               : null}
 
-            <Nav.Link className={`btn ${style.btnActivePage}`}>
+            <Nav.Link className={`${style.button} ${style.btnActivePage}`}>
               {currentPage}
             </Nav.Link>
             {currentPage + 1 <= totalPages
               ? <Nav.Link
-                  className={`btn`}
+                  className={style.button}
                   onClick={() => handlePageChange(currentPage + 1)}
                 >
                   {currentPage + 1}
                 </Nav.Link>
               : null}
             <Nav.Link
-              className={`btn`}
+              className={style.button}
               onClick={() => handlePageChange(totalPages)}
             >
               <i className="bi bi-chevron-bar-right" />

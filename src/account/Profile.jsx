@@ -9,23 +9,22 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import { ThongBao } from "../service/ThongBao";
 import { callAPI } from "../service/API";
+import { GetDataLogin } from "../service/DataLogin";
 function utf8_to_b64(str) {
   return window.btoa(unescape(encodeURIComponent(str)));
 }
 
 function Profile_User() {
   const [accountLogin, setAccountLogin] = useState(null);
-
   const navigate = useNavigate();
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
 
-    if (accountCookie !== undefined) {
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
+        setAccountLogin(accountLogin);
+        setDataLogin(accountLogin)
       } catch (error) {
         console.log(error);
       }
@@ -34,12 +33,9 @@ function Profile_User() {
     }
   };
 
-  const setDataLogin = () => {
-    if (Cookies.get("accountLogin") !== undefined) {
+  const setDataLogin = (data) => {
+    if (data !== null) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
         setUsername(data.username);
         if (data.fullname) {
           setFullname(data.fullname);
@@ -78,8 +74,7 @@ function Profile_User() {
   };
 
   useEffect(() => {
-    getAccountFromCookie();
-    setDataLogin();
+    getAccountFromSession();
   }, []);
 
   //SELECT IMAGE
@@ -151,7 +146,7 @@ function Profile_User() {
 
             console.log(accountLogin);
             const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-            Cookies.set("accountLogin", base64String);
+            sessionStorage.setItem("accountLogin", base64String);
           } else {
             ThongBao(response.data.message, "error");
           }
@@ -206,7 +201,7 @@ function Profile_User() {
         console.log(response);
         accountLogin.image = response.data.image;
         const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        Cookies.set("accountLogin", base64String);
+        sessionStorage.setItem("accountLogin", base64String);
         const delay = setTimeout(() => {
           window.location.reload();
         }, 800);
@@ -230,7 +225,7 @@ function Profile_User() {
         ThongBao(response.message, "success");
         accountLogin.address = response.data;
         const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        Cookies.set("accountLogin", base64String);
+        sessionStorage.setItem("accountLogin", base64String);
         const delay = setTimeout(() => {
           window.location.reload();
         }, 800);
@@ -255,7 +250,7 @@ function Profile_User() {
         ThongBao(response.message, "success");
         accountLogin.address = response.data;
         const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        Cookies.set("accountLogin", base64String);
+        sessionStorage.setItem("accountLogin", base64String);
         const delay = setTimeout(() => {
           window.location.reload();
         }, 800);
@@ -277,7 +272,7 @@ function Profile_User() {
         ThongBao(response.message, "success");
         accountLogin.address = response.data;
         const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        Cookies.set("accountLogin", base64String);
+        sessionStorage.setItem("accountLogin", base64String);
         const delay = setTimeout(() => {
           window.location.reload();
         }, 800);
@@ -299,7 +294,7 @@ function Profile_User() {
       ThongBao(response.message, "success");
       accountLogin.address = response.data;
       const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-      Cookies.set("accountLogin", base64String);
+      sessionStorage.setItem("accountLogin", base64String);
       const delay = setTimeout(() => {
         window.location.reload();
       }, 800);

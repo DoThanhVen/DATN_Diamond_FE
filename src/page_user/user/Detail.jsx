@@ -13,6 +13,8 @@ import swal from "sweetalert";
 import Cookies from "js-cookie";
 import listDataAddress from "../../service/AddressVietNam.json";
 import style from "../css/user/detail.module.css";
+import {GetDataLogin} from "../../service/DataLogin.js"
+
 const API_BASE_URL = "http://localhost:8080";
 
 function localStateReducer(state, action) {
@@ -46,22 +48,23 @@ function ProductPage() {
   const [address, setAddress] = useState("");
 
   const [accountLogin, setAccountLogin] = useState(null);
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
-    if (accountCookie !== undefined) {
+
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
+        setAccountLogin(accountLogin);
       } catch (error) {
         console.log(error);
       }
+    } else {
+      navigate("/login");
     }
   };
-
+  
   useEffect(() => {
-    getAccountFromCookie();
+    getAccountFromSession();
   }, []);
   const { productId } = useParams();
   const [localState, dispatch] = useReducer(localStateReducer, {
@@ -132,8 +135,6 @@ function ProductPage() {
         if (data.status === "SUCCESS") {
           // Access the correct data structure
           const similarProducts = data.data[1];
-          console.log("Similar Products Data:", similarProducts);
-
           dispatch({
             type: "SET_SIMILAR_PRODUCTS",
             payload: similarProducts

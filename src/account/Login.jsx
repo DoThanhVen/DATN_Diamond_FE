@@ -70,16 +70,7 @@ function Login() {
           //ENCODE
           const base64String = utf8_to_b64(JSON.stringify(data));
   
-          const timeCookie = new Date();
-          timeCookie.setTime(timeCookie.getTime() + 60 * 60 * 1000);
-          try {
-            sessionStorage.setItem("accountLogin",base64String);
-            Cookies.set("accountLogin", base64String, { expires: timeCookie });
-            console.log("Ok setting cookie:");
-          } catch (error) {
-            console.log("Error setting cookie:", error);
-          }
-          
+          sessionStorage.setItem("accountLogin",base64String);
           navigate("/");
         }else{
           ThongBao(response.data.message,"error")

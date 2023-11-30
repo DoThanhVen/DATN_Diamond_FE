@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getIdShop } from "../../service/Actions";
 import { Nav } from "react-bootstrap";
-import moment from 'moment';
+import moment from "moment";
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
 function ListShopWait() {
@@ -15,11 +15,11 @@ function ListShopWait() {
   const numberPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [keyword, setkeyword] = useState('');
-  const [keyfind, setkeyfind] = useState('');
-  const [reload, setreload] = useState(0)
-  const [sortBy, setsortBy] = useState('')
-  const [sortType, setsortType] = useState('')
+  const [keyword, setkeyword] = useState("");
+  const [keyfind, setkeyfind] = useState("");
+  const [reload, setreload] = useState(0);
+  const [sortBy, setsortBy] = useState("");
+  const [sortType, setsortType] = useState("");
 
   useEffect(() => {
     getdata(currentPage);
@@ -31,12 +31,17 @@ function ListShopWait() {
 
   const getdata = async (page) => {
     try {
-      const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`, "GET");
+      const response = await callAPI(
+        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${
+          (page - 1) * numberPage
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
+        "GET"
+      );
       const responseData = response.data;
 
-      const listFilter = responseData.content.filter(a => {
-        return a.shop.status === 0
-      })
+      const listFilter = responseData.content.filter((a) => {
+        return a.shop.status === 0;
+      });
       setListShopwait(listFilter || []);
       setTotalPages(responseData.totalPages || 1);
     } catch (error) {
@@ -57,7 +62,7 @@ function ListShopWait() {
               className={`${style.optionSelect}`}
               value={keyfind}
               onChange={(e) => {
-                setkeyfind(e.target.value)
+                setkeyfind(e.target.value);
               }}
             >
               <option value="shop_name">Tên cửa hàng</option>
@@ -67,10 +72,17 @@ function ListShopWait() {
               className={`${style.inputSearch}`}
               type="text"
               onChange={(e) => {
-                setkeyword(e.target.value)
+                setkeyword(e.target.value);
               }}
             />
-            <button className={`${style.buttonSearch}`} onClick={() => { setreload(reload + 1) }}>Tìm Kiếm</button>
+            <button
+              className={`${style.buttonSearch}`}
+              onClick={() => {
+                setreload(reload + 1);
+              }}
+            >
+              Tìm Kiếm
+            </button>
           </div>
         </div>
       </div>
@@ -86,17 +98,11 @@ function ListShopWait() {
             <label className={style.column}>Hình ảnh</label>
             <label className={style.column} />
           </div>
-          {ListShopWait.map((value, index) =>
+          {ListShopWait.map((value, index) => (
             <div key={index} className={style.tableBody}>
-              <label className={style.column}>
-                {index}
-              </label>
-              <label className={style.column}>
-                {value.shop.shop_name}
-              </label>
-              <label className={style.column}>
-                {value.username}
-              </label>
+              <label className={style.column}>{index}</label>
+              <label className={style.column}>{value.shop.shop_name}</label>
+              <label className={style.column}>{value.username}</label>
               <label className={style.column}>
                 {formatDate(value.shop.create_date)}
               </label>
@@ -113,11 +119,10 @@ function ListShopWait() {
                 </span>
               </label>
               <label className={style.column}>
-                <img
-                  style={{ width: "100px" }}
-                  src={`http://localhost:8080/api/uploadImageProduct/${value.shop.image}`}
-                  alt="Hình Ảnh"
-                />
+                src=
+                {value.shop.image
+                  ? `http://localhost:8080/api/uploadImageProduct/${value.shop.image}`
+                  : "/images/image_shop.jpg"}
               </label>
 
               <label
@@ -129,13 +134,16 @@ function ListShopWait() {
                 <Link to="/admin/shop/shopdetail">Xem Chi Tiết</Link>
               </label>
             </div>
-          )}
+          ))}
         </div>
-        <div className={style.paginationContainer} style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '20px'
-        }}>
+        <div
+          className={style.paginationContainer}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px"
+          }}
+        >
           <Pagination
             count={totalPages}
             page={currentPage}

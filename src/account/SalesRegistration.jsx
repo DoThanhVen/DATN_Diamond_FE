@@ -10,29 +10,28 @@ import DataAddress from "../service/AddressVietNam.json";
 import style from "../page_user/css/user/saleRegistration.module.css";
 import { ThongBao } from "../service/ThongBao";
 import { callAPI } from "../service/API";
+import { GetDataLogin } from "../service/DataLogin";
+
+function utf8_to_b64(str) {
+  return window.btoa(unescape(encodeURIComponent(str)));
+}
 
 export default function SalesRegistration() {
   const listDataAddress = DataAddress;
   const [accountLogin, setAccountLogin] = useState(null);
-const [reload,setreload]=useState(0)
+  const [reload, setreload] = useState(0);
 
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
-    if (accountCookie === undefined|| accountCookie===null) {
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+    if (accountLogin === undefined || accountLogin === null) {
       navigate("/login");
     } else {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        if (data) {
-          setAccountLogin(data);
-          getDataShop(data.username);
-        }
+        setAccountLogin(accountLogin);
+        getDataShop(accountLogin.username);
       } catch (error) {
         console.log(error);
       }
-      
     }
   };
 
@@ -47,11 +46,12 @@ const [reload,setreload]=useState(0)
       setAddress(response.data.addressShop.address);
     }
   };
+
   useEffect(
     () => {
-      getAccountFromCookie();
+      getAccountFromSession();
     },
-    [Cookies.get("accountLogin"),reload]
+    [reload]
   );
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -106,8 +106,9 @@ const [reload,setreload]=useState(0)
         .then(response => {
           ThongBao(response.data.message, response.data.status);
           accountLogin.shop = response.data.data;
-          Cookies.set("accountLogin", accountLogin)
-          setreload(reload+1)
+          const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload + 1);
         })
         .catch(error => {
           console.log(error);
@@ -149,7 +150,6 @@ const [reload,setreload]=useState(0)
     }
   };
 
-  
   return (
     <React.Fragment>
       <div>
@@ -157,47 +157,42 @@ const [reload,setreload]=useState(0)
           <MainNavbar />
         </nav>
         <div className="container mt-4">
-          <div className="row gutters">
-            <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
-              <div className="card-profile h-100">
-                <div className="card-body">
-                  <div className="account-settings">
-                    <div className="user-profile">
-                      <div
-                        className="user-avatar"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <img
-                          src={
-                            selectedImage
-                              ? `http://localhost:8080/api/uploadImageProduct/${selectedImage}`
-                              : "https://bootdey.com/img/Content/avatar/avatar7.png"
-                          }
-                          alt="user"
-                          onClick={handleImageClick}
-                        />
-                        <input
-                          type="file"
-                          accept="/image/*"
-                          ref={fileInputRef}
-                          style={{ display: "none" }}
-                          onChange={handleFileChange}
-                        />
+          {accountLogin && accountLogin.shop
+            ? <div className={`text-danger p-4 text-center`}>Bạn đã đăng kí kênh bán hàng, vui lòng chờ phê duyệt!</div>
+            : <div className="row gutters">
+                <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                  <div className="card-profile h-100">
+                    <div className="card-body">
+                      <div className="account-settings">
+                        <div className="user-profile">
+                          <div
+                            className="user-avatar"
+                            style={{ cursor: "pointer" }}
+                          >
+                            <img
+                              src={
+                                selectedImage
+                                  ? `http://localhost:8080/api/uploadImageProduct/${selectedImage}`
+                                  : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                              }
+                              alt="user"
+                              onClick={handleImageClick}
+                            />
+                            <input
+                              type="file"
+                              accept="/image/*"
+                              ref={fileInputRef}
+                              style={{ display: "none" }}
+                              onChange={handleFileChange}
+                            />
+                          </div>
+                          <h5 className="user-name">Hình ảnh</h5>
+                        </div>
                       </div>
-                      <h5 className="user-name">Hình ảnh</h5>
-                      {/* <h6 className="user-date">Ngày tạo: 20/10/2023</h6> */}
                     </div>
-                    {/* <div className="about">
-
-                    
-                  </div> */}
                   </div>
                 </div>
-              </div>
-            </div>
-            {accountLogin&& accountLogin.shop
-              ? null
-              : <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
                   <div className="card-profile h-100">
                     <div className="card-body">
                       <div className="row gutters">
@@ -323,8 +318,8 @@ const [reload,setreload]=useState(0)
                       </div>
                     </div>
                   </div>
-                </div>}
-          </div>
+                </div>
+              </div>}
         </div>
         <div id="footer">
           <Footer />

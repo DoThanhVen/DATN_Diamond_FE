@@ -1,12 +1,3 @@
-.filter {
-
-    .heading {
-        font-size: 20px;
-        font-weight: bold;
-    }
-}
-
-
 .listShopActive {
     background-color: white;
     border-radius: 10px;
@@ -254,6 +245,11 @@
     }
 }
 
+.title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
 .buttonPage {
     display: flex;
     justify-content: center;
@@ -264,4 +260,45 @@
     background-color: lightgrey;
     color: black;
     margin: 0 5px;
+}
+
+.formSearch {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.optionSelect {
+    width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    font-size: 15px;
+}
+
+
+.optionSelect:focus {
+    outline: none;
+}
+
+.inputSearch {
+    height: 50px;
+    width: calc(100% - 150px - 100px);
+    padding: 5px 10px;
+    margin-left: -1px;
+    border: 1px solid lightgrey;
+}
+
+.inputSearch:focus {
+    outline: none;
+}
+
+.buttonSearch {
+    width: 100px;
+    height: 50px;
+    border: none;
+    color: white;
+    background-color: orangered;
+    font-size: 15px;
 }

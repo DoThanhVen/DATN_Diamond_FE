@@ -11,9 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import NewProducts from "./NewProducts";
 import SidebarM from "./SuggestedProducts";
 import RecommendedProducts from "./RecommendedProducts";
-import ProductSmall from "./ProductSmall";
-import ProductIntroduction from "./ProductIntroduction";
-import { useSelector, useDispatch } from "react-redux";
+import style from "../css/user/home.module.css";
 
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
@@ -44,108 +42,21 @@ function Home() {
     slidesToShow: 3,
     slidesToScroll: 1,
     nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
+    prevArrow: <SamplePrevArrow />
   };
 
-  const items = [
-    {
-      imgSrc: "images/best-saler-4.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: false,
-    },
-    {
-      imgSrc: "images/best-saler-3.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-2.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: false,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-    {
-      imgSrc: "images/best-saler-1.jpg",
-      discount: "-50%",
-      name: "HP Notebook",
-      price: "$999",
-      available: 6,
-      stars: 5,
-      isNew: true,
-    },
-  ];
   return (
     <>
       <nav>
         <MainNavbar />
       </nav>
-      <ProductSmall />
-      <ProductIntroduction />
       <div style={{ backgroundColor: "#f5f5fa" }}>
-        <div className="container pt-4 pb-4">
-          <div className=" row ">
-            <div className="col-xs-12 col-sm-12 col-md-3 ">
+        <div className="p-4">
+          <div className={style.container}>
               <SidebarM />
-            </div>
-            <div className="col-xs-12 col-sm-12 col-md-9 ">
+            <div className={style.content}>
               <div
-                className="container bg-white p-2 "
+                className="container bg-white"
                 style={{ borderRadius: "8px" }}
               >
                 <div className="gird-container">
@@ -154,7 +65,7 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn8.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/acrodeoncss/index.html">PHONG CÁCH</a>
+                      <label>PHONG CÁCH</label>
                     </div>
                   </div>
                   <div
@@ -162,7 +73,7 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn9.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/caja/index.html">CAJA 2</a>
+                      <label>LỊCH LÃM</label>
                     </div>
                   </div>
                   <div
@@ -170,7 +81,7 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn4.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/card.boostrap/index.html">CAJA 3</a>
+                      <label>HIỆN ĐẠI</label>
                     </div>
                   </div>
                   <div
@@ -178,22 +89,15 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn5.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/Flex.images/index.html">CAJA 4</a>
+                      <label>TIỆN NGHI</label>
                     </div>
                   </div>
-                  {/* <div className="gird-item wide" style={{ backgroundImage: "url('images/best-saler-4.jpg')" }}>
-                    <div className="ejercico">
-                      <a href="archivos/Form.boostrap/index.html">
-                        CAJA 5
-                      </a>
-                    </div>
-                  </div> */}
                   <div
                     className="gird-item tall"
                     style={{ backgroundImage: "url('images/bn2.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/form.parpadei/index.html">CAJA 6</a>
+                      <label>QUYẾN RŨ</label>
                     </div>
                   </div>
                   <div
@@ -201,7 +105,7 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn6.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/Flex.images/index.html">CAJA 4</a>
+                      <label>LÀM ĐẸP</label>
                     </div>
                   </div>
                   <div
@@ -209,56 +113,15 @@ function Home() {
                     style={{ backgroundImage: "url('images/bn7.jpg')" }}
                   >
                     <div className="ejercico">
-                      <a href="archivos/Flex.images/index.html">CAJA 4</a>
+                      <label>ĐA DẠNG</label>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="content mt-4" style={{ borderRadius: "8px" }}>
-                <div className="titile">
-                  <div className="container bg-white">
-                    <nav className="navbar navbar-expand-md navbar-light bg-white">
-                      <div className="container-fluid p-0">
-                        {" "}
-                        <a
-                          className="navbar-brand text-uppercase fw-800"
-                          href="#"
-                        >
-                          <span className="border-red pe-2">
-                            SẢN PHẨM MỚI NHẤT
-                          </span>
-                        </a>{" "}
-                        <button
-                          className="navbar-toggler"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#myNav"
-                          aria-controls="myNav"
-                          aria-expanded="false"
-                          aria-label="Toggle navigation"
-                        >
-                          {" "}
-                          <span className="fas fa-bars"></span>{" "}
-                        </button>
-                        <div className="collapse navbar-collapse" id="myNav">
-                          <div className="navbar-nav ms-auto">
-                            <a
-                              className="nav-link active"
-                              aria-current="page"
-                              href="#"
-                            >
-                              Xem nhiều hơn
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </nav>
-                    <div className="row">
-                      <NewProducts />
-                    </div>
-                  </div>
-                </div>
+              <div className={style.listNewProduct}>
+                <label className={style.heading}>DANH SÁCH SẢN PHẨM MỚI</label>
+                <NewProducts />
               </div>
 
               <div
@@ -318,7 +181,10 @@ function Home() {
                   </div>
                 </div>
               </div>
-              <RecommendedProducts />
+              <div className={style.listRecommended}>
+                <label className={style.heading}>SẢN PHẨM DÀNH CHO BẠN</label>
+                <RecommendedProducts />
+              </div>
             </div>
           </div>
         </div>

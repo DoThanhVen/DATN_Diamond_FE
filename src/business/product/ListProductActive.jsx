@@ -7,6 +7,7 @@ import moment from "moment";
 import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
 const numberPage = 10;
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -21,19 +22,13 @@ function formatDate(date) {
 }
 
 export default function ListProduct() {
-  const [accountLogin, setAccountLogin] = useState(null);
-
   const navigate = useNavigate();
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
 
-    if (accountCookie !== undefined) {
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
-        getdataProduct(currentPage, data.shop.id);
+        getdataProduct(currentPage, accountLogin.shop.id);
       } catch (error) {
         console.log(error);
       }
@@ -59,7 +54,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getAccountFromCookie();
+    getAccountFromSession();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {

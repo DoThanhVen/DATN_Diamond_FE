@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import style from "../../css/admin/account/editaccount.module.css";
 import Nav from "react-bootstrap/Nav";
 import DataAddress from "../../service/AddressVietNam.json";
+import { GetDataLogin } from "../../service/DataLogin";
+import { useNavigate } from "react-router";
 
 function EditAccount() {
   //SELECT IMAGE
@@ -11,7 +13,6 @@ function EditAccount() {
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
   const [ward, setWard] = useState("");
-  console.log(city + " " + district + " " + ward);
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];

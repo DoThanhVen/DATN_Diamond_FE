@@ -1,126 +1,81 @@
-import React from 'react';
-import '../css/user/suggestedProducts.css'
+import React, { useEffect, useState } from "react";
+import "../css/user/suggestedProducts.css";
+import { callAPI } from "../../service/API";
+import { Pagination } from "react-bootstrap";
+import style from "../css/user/home.module.css";
+import { Link } from "react-router-dom";
+import LazyLoad from "react-lazy-load";
+
+const API_BASE_URL = "http://localhost:8080";
+
+function formatCurrency(price, promotion) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0
+  });
+  return formatter.format(price - price * (promotion / 100));
+}
 
 const RecommendedProducts = () => {
+  const numberPage = 12;
+  const [totalPages, setTotalPages] = useState(1);
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    getdataProduct();
+  }, []);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const getdataProduct = async () => {
+    try {
+      const response = await callAPI(`/api/product`, "GET");
+      const filteredProducts = response.filter(
+        (product) => product.status === 1
+      );
+      setProducts(filteredProducts);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   return (
-   <>
-   <div className="container bg-white p-4" style={{borderRadius: '8px'}}>
-    <nav className="navbar navbar-expand-md navbar-light bg-white">
-        <div className="container-fluid p-0"> <a className="navbar-brand text-uppercase fw-800" href="#"><span className="border-red pe-2">GỢI Ý DÀNH CHO BẠN</span></a> <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#myNav" aria-controls="myNav" aria-expanded="false" aria-label="Toggle navigation"> <span className="fas fa-bars"></span> </button>
-            <div className="collapse navbar-collapse" id="myNav">
-                <div className="navbar-nav ms-auto"> <a className="nav-link active" aria-current="page" href="#">All</a> <a className="nav-link" href="#">Women's</a> <a className="nav-link" href="#">Men's</a> <a className="nav-link" href="#">Kid's</a> <a className="nav-link" href="#">Accessories</a> <a className="nav-link" href="#">Cosmetics</a> </div>
-            </div>
-        </div>
-    </nav>
-    
-    <div className="row">
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/54203/pexels-photo-54203.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-red">sale</div>
-            <div className="title pt-4 pb-1">Winter Sweater</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 60.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/6764040/pexels-photo-6764040.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-black">out of stock</div>
-            <div className="title pt-4 pb-1">Denim Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 55.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/914668/pexels-photo-914668.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-green">new</div>
-            <div className="title pt-4 pb-1"> Empire Waist Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 70.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/6311392/pexels-photo-6311392.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="title pt-4 pb-1">Pinafore Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 60.0</div>
-        </div>
+    <div className={style.list_all_recommended}>
+      {products
+        ? products.map((value, index) => (
+            <LazyLoad
+              once={true}
+              key={index}
+              className={style.item_recommended}
+            >
+              <Link to={`/product/${value.id}`}>
+                <img
+                  key={value.id}
+                  src={`${API_BASE_URL}/api/uploadImageProduct/${
+                    value.image_product[value.image_product.length - 1].url
+                  }`}
+                  alt={`Image ${
+                    value.image_product[value.image_product.length - 1].url
+                  }`}
+                  className={style.image}
+                />
+                <div className={style.name}>{value.product_name}</div>
+                <div className={style.info}>
+                  <label className={style.price}>
+                    {formatCurrency(value.price, 0)}
+                  </label>
+                  <label className={style.amount_sell}>Đã bán 999</label>
+                </div>
+                <div className={style.show_detail}>Xem chi tiết</div>
+              </Link>
+            </LazyLoad>
+          ))
+        : null}
     </div>
-    <div className="row">
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/54203/pexels-photo-54203.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-red">sale</div>
-            <div className="title pt-4 pb-1">Winter Sweater</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 60.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/6764040/pexels-photo-6764040.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-black">out of stock</div>
-            <div className="title pt-4 pb-1">Denim Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 55.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/914668/pexels-photo-914668.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="title pt-4 pb-1"> Empire Waist Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 70.0</div>
-        </div>
-        <div className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-            <div className="product"> <img src="https://images.pexels.com/photos/6311392/pexels-photo-6311392.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""/>
-                <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                    <li className="icon"><span className="fas fa-expand-arrows-alt"></span></li>
-                    <li className="icon mx-3"><span className="far fa-heart"></span></li>
-                    <li className="icon"><span className="fas fa-shopping-bag"></span></li>
-                </ul>
-            </div>
-            <div className="tag bg-green">new</div>
-            <div className="title pt-4 pb-1">Pinafore Dresses</div>
-            <div className="d-flex align-content-center justify-content-center"> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> <span className="fas fa-star"></span> </div>
-            <div className="price">$ 60.0</div>
-        </div>
-    </div>
-</div>
-   </>
   );
 };
 

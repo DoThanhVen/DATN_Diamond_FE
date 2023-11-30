@@ -67,14 +67,14 @@ function ListCategory() {
         </div>
 
         {/* Sort */}
-        <div className={`${style.typeProduct}`}>
+        <div className={`${style.sort}`}>
           <label>Sắp xếp</label>
           <select
             value={sortBy}
             onChange={(e) => {
               setsortBy(e.target.value)
             }}
-            className={`${style.optionSelectType}`}
+            className={`ms-2 ${style.optionSelect}`}
           >
             <option value="">Lựa chọn...</option>
             <option value={'id'}>
@@ -93,7 +93,7 @@ function ListCategory() {
               onChange={(e) => {
                 setsortType(e.target.value)
               }}
-              className={`${style.optionSelectType}`}
+              className={`${style.optionSelect}`}
             >
               <option value="asc">Tăng dần</option>
               <option value="desc">Giảm dần</option>
@@ -102,8 +102,7 @@ function ListCategory() {
         </div>
         <div className={style.table}>
           <div className={style.tableHeading}>
-            <label className={style.column}>ID</label>
-            <label className={style.column}>Mã loại</label>
+            <label className={style.column}>Mã</label>
             <label className={style.column}>Hình ảnh</label>
             <label className={style.column}>Tên loại</label>
             <label className={style.column}>Danh sách loại</label>
@@ -113,9 +112,6 @@ function ListCategory() {
           </div>
           {listCategory.map((value, index) => (
             <div key={value.id} className={style.tableBody}>
-              <label className={style.column}>
-                {index}
-              </label>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
                 <img
@@ -130,7 +126,7 @@ function ListCategory() {
                   {value.listCategory?.map((valueCategory, indexCategory) => (
                     <li key={indexCategory} className={style.menuItem}>
                       {valueCategory.type_category_item}
-                      <i className="bi bi-pencil-square" onClick={() => {
+                      <i className="ms-2 bi bi-pencil-square" onClick={() => {
                         dispatch(getIdcategoryItemUpdate(valueCategory.id));
                       }}></i>
 

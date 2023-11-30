@@ -1,7 +1,9 @@
 .breadcrumb-section {
 	display: flex;
 	align-items: center;
-	padding: 45px 0 40px;
+	padding: 45px 40px;
+	margin: 0 auto;
+	width: calc(100% - 80px) !important;
 }
 
 .breadcrumb__text h2 {
@@ -214,6 +216,7 @@
 -----------------------*/
 .product {
 	padding-top: 10px;
+	background-color: rgb(236, 235, 235);
 }
 
 .product__discount {

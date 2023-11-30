@@ -10,19 +10,17 @@ import {
 import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
 
 function EditCategory() {
   const [accountLogin, setAccountLogin] = useState(null);
 
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
 
-    if (accountCookie !== undefined) {
+    if (accountLogin !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
+        setAccountLogin(accountLogin);
       } catch (error) {
         console.log(error);
       }
@@ -30,9 +28,8 @@ function EditCategory() {
       navigate("/login");
     }
   };
-
   useEffect(() => {
-    getAccountFromCookie();
+    getAccountFromSession();
   }, []);
 
   const dispatch = useDispatch();
@@ -358,17 +355,6 @@ function EditCategory() {
 
   return (
     <React.Fragment>
-      <div className={style.header}>
-        <div className={style.formSearch}>
-          <i className={`bi bi-search ${style.icon}`} />
-          <input
-            className={style.input}
-            type="text"
-            placeholder="Tìm kiếm..."
-          />
-        </div>
-        <i className={`bi bi-person-circle ${style.iconUser}`} />
-      </div>
       <div className={style.cardForm}>
         <div className={style.form}>
           <div className={style.column}>

@@ -8,11 +8,34 @@ import Category from "./category/Category";
 import ProductAdmin from "./product/ProductAdmin";
 import Statistical from "./statisitcal/Statistical";
 import style from "../css/admin/nav.module.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { callAPI } from "../service/API.js";
 import axios from "axios";
+import { GetDataLogin } from "../service/DataLogin.js";
+import { Nav } from "react-bootstrap";
 
 function AdminDashboard() {
+  const [accountLogin, setAccountLogin] = useState(null);
+  const navigate = useNavigate();
+
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
+      try {
+        setAccountLogin(accountLogin);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    getAccountFromSession();
+  }, []);
+  
   //ROUTER
   const location = useLocation();
   const isActiveHome = location.pathname === "/admin";
@@ -81,14 +104,6 @@ function AdminDashboard() {
       mapping: "/admin/statistical",
       active: isActiveStatistical,
       activeDetail: null
-    },
-    {
-      id: "7",
-      value: "Đăng Xuất",
-      icon: "bi bi-door-open",
-      mapping: "/admin",
-      active: null,
-      activeDetail: null
     }
   ];
 
@@ -98,15 +113,53 @@ function AdminDashboard() {
     borderRadius: "10px"
   };
 
+  
+  const handleLogout = () => {
+    sessionStorage.removeItem("accountLogin");
+    const delay = setTimeout(() => {
+      navigate("/");
+    }, 800);
+    return () => clearTimeout(delay);
+  };
+
   return (
     <React.Fragment>
       <div id={style.adminDashBoard}>
-        <div className={style.sidebar}>
-          <div className={style.logo}>
-            <img className={style.image} src="/images/diamond.png" alt="LOGO" />
+      <div className={`${style.header}`}>
+          <div className={`${style.logo}`}>
+            <img src="/images/diamond.png" alt="Hình Ảnh" />
+            <Nav.Link href="/business">Kênh Quản Trị</Nav.Link>
           </div>
+          <div className={`${style.others}`}>
+            <div className={`${style.account}`}>
+              <img
+                className={style.image}
+                src={
+                  accountLogin &&
+                  accountLogin.infoAccount &&
+                  accountLogin.infoAccount.image
+                    ? `http://localhost:8080/api/uploadImageProduct/${accountLogin
+                        .infoAccount.image}`
+                    : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                }
+                alt="Hình Ảnh"
+              />
+              <label className={`${style.label} ms-2`}>
+                {accountLogin && accountLogin.fullname}
+              </label>
+            </div>
+            <div
+              className={`${style.logout} ms-2 me-2`}
+              onClick={() => handleLogout()}
+            >
+              <i className="bi bi-door-open"></i>
+              Đăng xuất
+            </div>
+          </div>
+        </div>
+        <div className={style.sidebar}>
           <ul className={style.menu}>
-            {listMenu.map((value, index) =>
+            {listMenu.map((value, index) => (
               <li
                 key={index}
                 className={`${style.menuItem}`}
@@ -125,14 +178,14 @@ function AdminDashboard() {
                   <i className={value.icon} /> {value.value}
                 </Link>
               </li>
-            )}
+            ))}
           </ul>
         </div>
         <div id={style.content}>
           {isActiveHome ? <Home /> : null}
           {isActiveAccount ? <Account /> : null}
-          {isActiveShop? <Shop /> : null}
-          {isActiveShopDetail? <ShopDetail /> : null}
+          {isActiveShop ? <Shop /> : null}
+          {isActiveShopDetail ? <ShopDetail /> : null}
           {isActiveTypeProduct ? <Category /> : null}
           {isActiveListProduct ? <ProductAdmin /> : null}
           {isActiveStatistical ? <Statistical /> : null}

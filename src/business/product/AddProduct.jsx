@@ -9,20 +9,18 @@ import { reloadPage } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
 
 function AddProduct() {
   const [accountLogin, setAccountLogin] = useState(null);
 
   const navigate = useNavigate();
-  const getAccountFromCookie = () => {
-    const accountCookie = Cookies.get("accountLogin");
+  const getAccountFromSession = () => {
+    const accountSession = GetDataLogin();
 
-    if (accountCookie !== undefined) {
+    if (accountSession !== undefined) {
       try {
-        const data = JSON.parse(
-          decodeURIComponent(escape(window.atob(Cookies.get("accountLogin"))))
-        );
-        setAccountLogin(data);
+        setAccountLogin(accountSession)
       } catch (error) {
         console.log(error);
       }
@@ -48,7 +46,7 @@ function AddProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getAccountFromCookie();
+    getAccountFromSession();
   }, []);
 
   const getdataCategory = async () => {
@@ -265,7 +263,7 @@ function AddProduct() {
         }}
       />
       <button
-        className={`${style.buttonCreateProduct}`}
+        className={`mt-2 ${style.buttonCreateProduct}`}
         onClick={handleSubmitAdd}
       >
         LƯU SẢN PHẨM

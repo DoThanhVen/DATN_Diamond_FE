@@ -203,12 +203,12 @@ body {
             background-color: blue;
             color: white
         }
-    }
 
-    .buttonPage a {
-        background-color: lightgrey;
-        color: black;
-        margin: 0 5px;
+        .button{
+            width: 30px;
+            height: 30px;
+            display: grid; place-items: center;
+        }
     }
 }
 

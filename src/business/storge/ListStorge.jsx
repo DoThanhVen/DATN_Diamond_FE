@@ -5,7 +5,29 @@ import { Pagination } from "@mui/material";
 import { callAPI } from "../../service/API";
 import getAccountFromCookie from "../../service/getAccountLogin";
 import { useNavigate } from "react-router";
+<<<<<<< HEAD
 function ListStorge() {
+=======
+import Cookies from "js-cookie";
+import { GetDataLogin } from "../../service/DataLogin";
+function ListStorge() {
+
+  const navigate = useNavigate();
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== undefined) {
+      try {
+        getdataProduct(currentPage, accountLogin.shop.id);
+
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+>>>>>>> origin/main
 
   const reload = useSelector((state) => state.getreloadPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,6 +39,7 @@ function ListStorge() {
   const [textInput, setTextInput] = useState("");
 
   useEffect(() => {
+<<<<<<< HEAD
     getData();
   }, [reload, currentPage,textInput]);
 
@@ -32,6 +55,10 @@ function ListStorge() {
       console.log(error)
     }
   }
+=======
+    getAccountFromSession();
+  }, [reload, currentPage]);
+>>>>>>> origin/main
 
   const getdataProduct = async (page, idShop) => {
     try {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import style from "../../css/admin/account/listaccount.module.css";
 import { callAPI } from "../../service/API";
-import moment from 'moment';
+import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import ModelEdit from "./ModelEdit";
 import { getIdAccountAdmin } from "../../service/Actions";
@@ -18,21 +18,41 @@ function ListAccount() {
   const numberPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+<<<<<<< HEAD
   const [keyword, setkeyword] = useState('');
   const [keyfind, setkeyfind] = useState('');
   const [reload, setreload] = useState(0)
   const [sortBy, setsortBy] = useState('')
   const [sortType, setsortType] = useState('')
   const [filterbyStatus, setFilterStatus] = useState("")
+=======
+  const [keyword, setkeyword] = useState("");
+  const [keyfind, setkeyfind] = useState("");
+  const [reload, setreload] = useState(0);
+  const [sortBy, setsortBy] = useState("");
+  const [sortType, setsortType] = useState("");
+>>>>>>> origin/main
 
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType]);
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 
   const getdata = async (page, filterStatus) => {
     try {
+<<<<<<< HEAD
       const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
+=======
+      const response = await callAPI(
+        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&shoporaccount=account&offset=${
+          (page - 1) * numberPage
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
+        "GET"
+      );
+>>>>>>> origin/main
       const responseData = response.data;
       if (filterStatus === undefined || filterStatus === "") {
         setAccounts(responseData.content || []);
@@ -48,7 +68,6 @@ function ListAccount() {
   };
   
 
-
   const openModal = () => {
     setShowModal(true);
   };
@@ -61,19 +80,18 @@ function ListAccount() {
     setCurrentPage(value);
   };
 
-
   return (
     <React.Fragment>
       <div className={style.listAccount}>
         <div className={style.heading}>
           <div className={style.column}>
-            <label className={style.title}>Danh sách sản phẩm</label>
+            <label className={style.title}>Danh sách tài khoản</label>
             <div className={`${style.formSearch}`}>
               <select
                 className={`${style.optionSelect}`}
                 value={keyfind}
                 onChange={(e) => {
-                  setkeyfind(e.target.value)
+                  setkeyfind(e.target.value);
                 }}
               >
                 <option value="fullname">Tên tài khoản</option>
@@ -83,25 +101,35 @@ function ListAccount() {
                 className={`${style.inputSearch}`}
                 type="text"
                 onChange={(e) => {
-                  setkeyword(e.target.value)
+                  setkeyword(e.target.value);
                 }}
               />
-              <button className={`${style.buttonSearch}`} onClick={() => { setreload(reload + 1) }}>Tìm Kiếm</button>
+              <button
+                className={`${style.buttonSearch}`}
+                onClick={() => {
+                  setreload(reload + 1);
+                }}
+              >
+                Tìm Kiếm
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Sort */}
-        <div className={`${style.typeProduct}`}>
+        <div className={`${style.sort}`}>
           <label>Sắp xếp</label>
           <select
             value={sortBy}
             onChange={(e) => {
+<<<<<<< HEAD
               setsortBy(e.target.value)
+=======
+              setsortBy(e.target.value);
+>>>>>>> origin/main
             }}
-            className={`${style.optionSelectType}`}
+            className={`ms-2 ${style.optionSelect}`}
           >
             <option value="">Lựa chọn...</option>
+<<<<<<< HEAD
             <option value={'id'}>
               Mã tài khoản
             </option>
@@ -111,20 +139,30 @@ function ListAccount() {
             <option value={'create_date'}>
               Ngày tạo
             </option>
+=======
+            <option value={"id"}>Mã tài khoản</option>
+            <option value={"username"}>Tên đăng nhập</option>
+            <option value={"create_date"}>Ngày tạo</option>
+>>>>>>> origin/main
           </select>
-          {sortBy !== ''
-            ? <select
+          {sortBy !== "" ? (
+            <select
               value={sortType}
               onChange={(e) => {
+<<<<<<< HEAD
                 setsortType(e.target.value)
+=======
+                setsortType(e.target.value);
+>>>>>>> origin/main
               }}
-              className={`${style.optionSelectType}`}
+              className={`${style.optionSelect}`}
             >
               <option value="asc">Tăng dần</option>
               <option value="desc">Giảm dần</option>
             </select>
-            : null}
+          ) : null}
         </div>
+<<<<<<< HEAD
         <div className={style.typeProduct}>
           <label>Lọc sản phẩm theo trạng thái:</label>
           <select
@@ -142,39 +180,43 @@ function ListAccount() {
           </select>
         </div>
         <label className={style.heading}>Danh sách tài khoản</label>
+=======
+>>>>>>> origin/main
         <div className={style.table}>
           <div className={style.tableHeading}>
-            <label className={style.column}>STT</label>
             <label className={style.column}>ID</label>
             <label className={style.column}>Hình ảnh</label>
-            <label className={style.column}>Tên tài khoản</label>
+            <label className={style.column}>Tài khoản</label>
             <label className={style.column}>Họ & tên</label>
             <label className={style.column}>Giới tính</label>
-            <label className={style.column}>Số điện thoại</label>
-            <label className={style.column}>Email</label>
             <label className={style.column}>Ngày tạo</label>
-            <label className={style.column}>Loại tài khoản</label>
             <label className={style.column}>Trạng thái</label>
             <label className={style.column}></label>
           </div>
           {accounts.map((value, index) => (
             <div key={index} className={style.tableBody}>
-              <label className={style.column}>
-                {index + 1}
-              </label>
               <label className={style.column}>{value.id}</label>
-              <label className={style.column}><img
-                className={style.image}
-                src={`http://localhost:8080/api/uploadImageProduct/${value.infoAccount?.image}`}
-                alt="Hình Ảnh"
-              ></img></label>
+              <label className={style.column}>
+                <img
+                  className={style.image}
+                  src={
+                    value.infoAccount?.image
+                      ? `http://localhost:8080/api/uploadImageProduct/${value.infoAccount?.image}`
+                      : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                  }
+                  alt="Hình Ảnh"
+                ></img>
+              </label>
               <label className={style.column}>{value.username}</label>
-              <label className={style.column}>{value.infoAccount?.fullname}</label>
-              <label className={style.column}>{value.infoAccount?.gender}</label>
-              <label className={style.column}>{value.infoAccount?.phone}</label>
-              <label className={style.column}>{value.infoAccount?.email}</label>
-              <label className={style.column}>{formatDate(value.create_date)}</label>
-              <label className={style.column}>{value.role?.role.role_name}</label>
+              <label className={style.column}>
+                {value.infoAccount?.fullname}
+              </label>
+              <label className={style.column}>
+                {value.infoAccount?.gender === true ? "Nam" : "Nữ"}
+              </label>
+              <label className={style.column}>
+                {formatDate(value.create_date)}
+              </label>
               <label className={style.column}>
                 <span
                   className={style.statusAccount}
@@ -184,20 +226,26 @@ function ListAccount() {
                 </span>
               </label>
               <label className={style.column}>
-                <i className={`bi bi-pencil-square`} onClick={() => {
-                  dispatch(getIdAccountAdmin(value.id));
-                  openModal();
-                }}></i>
+                <i
+                  className={`bi bi-pencil-square`}
+                  onClick={() => {
+                    dispatch(getIdAccountAdmin(value.id));
+                    openModal();
+                  }}
+                ></i>
               </label>
             </div>
           ))}
         </div>
 
-        <div className={style.paginationContainer} style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '20px'
-        }}>
+        <div
+          className={style.paginationContainer}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px"
+          }}
+        >
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -210,11 +258,9 @@ function ListAccount() {
             showLastButton
           />
         </div>
-
-
       </div>
       {showModal && <ModelEdit status={showModal} toggleShow={closeModal} />}
-    </React.Fragment >
+    </React.Fragment>
   );
 }
 

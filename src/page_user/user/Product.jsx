@@ -15,9 +15,19 @@ import Footer from "../components/Footer";
 import "../css/user/product.css";
 import "../css/user/home.css";
 import "../css/user/slider.css";
+import style from "../css/user/product.module.css";
+import LazyLoad from "react-lazy-load";
 
 const API_BASE_URL = "http://localhost:8080";
 
+function formatCurrency(price, promotion) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0
+  });
+  return formatter.format(price - price * (promotion / 100));
+}
 // Hàm này được sử dụng để hiển thị giá trị của Slider
 function valuetext(value) {
   return `${value}°C`;
@@ -31,7 +41,7 @@ function productReducer(state, action) {
         ...state,
         value1: action.value1,
         valueMin: action.valueMin,
-        valueMax: action.valueMax,
+        valueMax: action.valueMax
       };
     case "SET_CATEGORY_ITEM":
       return { ...state, categoryItem: action.categoryItem };
@@ -61,7 +71,7 @@ function Product() {
     selectedCategory: null,
     dateSorting: "ascending",
     priceSorting: "ascending",
-    ratingFilter: "5",
+    ratingFilter: "5"
   });
   const {
     value1,
@@ -72,7 +82,7 @@ function Product() {
     selectedCategory,
     dateSorting,
     priceSorting,
-    ratingFilter,
+    ratingFilter
   } = localState;
   const [sortedProducts, setSortedProducts] = useState([]);
 
@@ -82,7 +92,7 @@ function Product() {
       type: "SET_VALUE",
       value1: newValue,
       valueMin: newValue[0],
-      valueMax: newValue[1],
+      valueMax: newValue[1]
     });
   };
 
@@ -120,7 +130,7 @@ function Product() {
         // Cập nhật danh sách danh mục
         dispatch({
           type: "SET_CATEGORY_ITEM",
-          categoryItem: response.data.listCategory,
+          categoryItem: response.data.listCategory
         });
       })
       .catch((error) => {
@@ -185,7 +195,7 @@ function Product() {
     valueMax,
     priceSorting,
     listFilter,
-    sortedProducts,
+    sortedProducts
   ]);
 
   // Hàm so sánh đối tượng
@@ -200,19 +210,19 @@ function Product() {
       </nav>
       <div className="product">
         <section
-          className="breadcrumb-section container"
+          className="breadcrumb-section"
           style={{
             backgroundImage: "url('/images/product_banner.jpg')",
             backgroundSize: "cover",
-            width: "100%",
+            width: "100%"
           }}
         >
           <Container>
             <Row>
               <Col lg={12} className="text-center">
                 <div className="breadcrumb__text">
-                  <h2>Diamond Shop</h2>
-                  <p>
+                  <h2>FE Ads</h2>
+                  <p className={`text-light`}>
                     Khám phá một thế giới biến đổi với các sản phẩm của chúng
                     tôi. Cho dù bạn đang tìm cách nâng cấp phong cách của mình,
                     duy trì kết nối hay làm cho ngôi nhà của bạn thông minh hơn,
@@ -223,309 +233,171 @@ function Product() {
             </Row>
           </Container>
         </section>
-        <section className="product spad">
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-3 col-md-5">
-                <div
-                  className="sidebar mt-4"
-                  style={{ position: "sticky", top: "20px" }}
-                >
-                  <div className="hero__categories">
-                    <div className="hero__categories__all">
-                      <i className="fa fa-bars"></i>
-                      <span>Danh mục sản phẩm</span>
-                    </div>
-                    <ListGroup variant="flush">
+        <div className={style.container}>
+          <div className={style.sidebar}>
+            <div
+              className="sidebar mt-4 bg-white p-2"
+              style={{ position: "sticky", top: "20px" }}
+            >
+              <div className="hero__categories">
+                <div className="hero__categories__all">
+                  <i className="fa fa-bars"></i>
+                  <span>Danh mục sản phẩm</span>
+                </div>
+                <ListGroup variant="flush">
+                  <ListGroup.Item
+                    onClick={() => {
+                      // Xử lý khi người dùng chọn "Tất cả sản phẩm"
+                      dispatch({
+                        type: "SET_SELECTED_CATEGORY",
+                        selectedCategory: null // Đặt selectedCategory thành null để hiển thị tất cả sản phẩm
+                      });
+                    }}
+                  >
+                    Tất cả sản phẩm
+                  </ListGroup.Item>
+                  {Array.isArray(categoryItem) &&
+                    categoryItem.map((item) => (
                       <ListGroup.Item
+                        key={item.id}
                         onClick={() => {
-                          // Xử lý khi người dùng chọn "Tất cả sản phẩm"
+                          // Xử lý khi người dùng chọn một danh mục khác
                           dispatch({
                             type: "SET_SELECTED_CATEGORY",
-                            selectedCategory: null, // Đặt selectedCategory thành null để hiển thị tất cả sản phẩm
+                            selectedCategory: item
                           });
                         }}
+                        className={item === selectedCategory ? "active" : ""}
                       >
-                        Tất cả sản phẩm
+                        {item.type_category_item}
                       </ListGroup.Item>
-                      {Array.isArray(categoryItem) &&
-                        categoryItem.map((item) => (
-                          <ListGroup.Item
-                            key={item.id}
-                            onClick={() => {
-                              // Xử lý khi người dùng chọn một danh mục khác
-                              dispatch({
-                                type: "SET_SELECTED_CATEGORY",
-                                selectedCategory: item,
-                              });
-                            }}
-                            className={
-                              item === selectedCategory ? "active" : ""
-                            }
-                          >
-                            {item.type_category_item}
-                          </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                  </div>
-                  <div className="col-lg-9 col-md-7">
-                    {/* Hiển thị danh sách sản phẩm */}
-                  </div>
-                  {/* <ul>
-                    {listFilter
-                      .filter((product) => { // Lọc sản phẩm
-                        const productPrice = parseFloat(product.price); // Chuyển đổi kiểu sang float
-                        return (!selectedCategory || product.categoryItem_product.id === selectedCategory.id) // Điều kiện sản phẩm thuộc danh mục sản phẩm khi nhấp vào
-                          && productPrice >= valueMin && productPrice <= valueMax; // điều kiện lọc sản phẩm theo khoảng giá
-                      })
-                      .map((product) => ( // duyệt sản phẩm 
-                        <li key={product.id}>
-                          <Link to={`/product/${product.id}`}>
-                            {product.product_name} - {product.price}
-                            {product.image_product.map((image, index) => (
-                              <img
-                                key={index}
-                                src={image.url}
-                                alt={`Image ${index}`}
-                                style={{ width: '150px' }}
-                              />
-                            ))}
-
-                          </Link>
-                        </li>
-                      ))}
-                    {listFilter.length === 0 && (
-                      <li>Không có sản phẩm</li>
-                    )}
-                  </ul> */}
-                  <div className="sidebar__item mt-4">
-                    <h5>Giá</h5>
-                    <div className="price-range-wrap pb-4">
-                      <Box sx={{ width: 300 }}>
-                        <Slider
-                          getAriaLabel={() => "Temperature range"}
-                          value={value1}
-                          onChange={handleChange1}
-                          valueLabelDisplay="auto"
-                          getAriaValueText={valuetext}
-                          min={0}
-                          max={1000000}
-                        />
-                        <Typography variant="body2">
-                          <span style={{ color: "#FF0000" }}>Value:</span>
-                          {value1[0]} - {value1[1]}
-                        </Typography>
-                      </Box>
-                    </div>
-                    <div className="sidebar__item sidebar__item__color--option">
-                      <h5>Sắp xếp giá</h5>
-                      <RadioGroup
-                        aria-label="priceSorting"
-                        name="priceSorting"
-                        value={priceSorting}
-                        onChange={handlePriceSortingChange}
-                      >
-                        <FormControlLabel
-                          value="ascending"
-                          control={<Radio />}
-                          label="Sắp xếp theo tăng dần"
-                        />
-                        <FormControlLabel
-                          value="descending"
-                          control={<Radio />}
-                          label="Sắp xếp theo giảm dần"
-                        />
-                      </RadioGroup>
-                    </div>
-
-                    <div className="sidebar__item sidebar__item__color--option">
-                      <h5>Đánh giá</h5>
-                      <RadioGroup
-                        aria-label="ratingFilter"
-                        name="ratingFilter"
-                        value={ratingFilter}
-                        onChange={handleRatingFilterChange}
-                      >
-                        <FormControlLabel
-                          value="5"
-                          control={<Radio />}
-                          label="5 sao"
-                        />
-                        <FormControlLabel
-                          value="4"
-                          control={<Radio />}
-                          label="4 sao"
-                        />
-                        <FormControlLabel
-                          value="3"
-                          control={<Radio />}
-                          label="3 sao"
-                        />
-                        <FormControlLabel
-                          value="2"
-                          control={<Radio />}
-                          label="2 sao"
-                        />
-                        <FormControlLabel
-                          value="1"
-                          control={<Radio />}
-                          label="1 sao"
-                        />
-                      </RadioGroup>
-                    </div>
-                  </div>
-                  <div className="sidebar__item mt-4">
-                    <div className="latest-product__text">
-                      <h4>Sản phẩm mới nhất</h4>
-                      <div className="latest-product__slider owl-carousel">
-                        <div className="latest-prdouct__slider__item">
-                          <a href="#" className="latest-product__item">
-                            <div className="latest-product__item__pic">
-                              <img
-                                src="/images/best-saler-4.jpg"
-                                alt=""
-                                style={{ width: "150px" }}
-                              />
-                            </div>
-                            <div className="latest-product__item__text">
-                              <h6>Crab Pool Security</h6>
-                              <span>$30.00</span>
-                            </div>
-                          </a>
-                        </div>
-                        <div className="latest-prdouct__slider__item">
-                          <a href="#" className="latest-product__item">
-                            <div className="latest-product__item__pic">
-                              <img
-                                src="/images/best-saler-4.jpg"
-                                alt=""
-                                style={{ width: "150px" }}
-                              />
-                            </div>
-                            <div className="latest-product__item__text">
-                              <h6>Crab Pool Security</h6>
-                              <span>$30.00</span>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    ))}
+                </ListGroup>
               </div>
-              <div className="col-lg-9 col-md-7">
-                <div className="product__discount">
-                  <div>
-                    <div className=" ">
-                      <div className="all-items">
-                        <div className="container bg-white">
-                          <nav className="navbar navbar-expand-md navbar-light bg-white">
-                            <div className="container-fluid p-0">
-                              <a
-                                className="navbar-brand text-uppercase fw-800"
-                                href="/#"
-                              >
-                                <span className="border-red pe-2">
-                                  DANH SÁCH SẢN PHẨM
-                                </span>
-                              </a>
-                              <button
-                                className="navbar-toggler"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#myNav"
-                                aria-controls="myNav"
-                                aria-expanded="false"
-                                aria-label="Toggle navigation"
-                              >
-                                <span className="fas fa-bars"></span>
-                              </button>
-                              <div
-                                className="collapse navbar-collapse"
-                                id="myNav"
-                              ></div>
-                            </div>
-                          </nav>
-
-                          <div className="row">
-                            {sortedProducts.map((product, index) =>
-                              product.price >= valueMin &&
-                              product.price <= valueMax ? (
-                                <div
-                                  key={index}
-                                  className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3"
-                                >
-                                  <div className="product">
-                                    {product.image_product.map(
-                                      (image, index) => (
-                                        <img
-                                          key={index}
-                                          src={
-                                            `${API_BASE_URL}/api/uploadImageProduct/` +
-                                            image.url
-                                          }
-                                          alt={`Product Image ${index + 1}`}
-                                        />
-                                      )
-                                    )}
-                                    {/* <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                                      <li className="icon">
-                                        <span className="fas fa-expand-arrows-alt"></span>
-                                      </li>
-                                      <li className="icon mx-3">
-                                        <span className="far fa-heart"></span>
-                                      </li>
-                                      <li className="icon">
-                                        <span className="fas fa-shopping-bag"></span>
-                                      </li>
-                                    </ul> */}
-                                  </div>
-                                  <div className="tag bg-red">sale</div>
-                                  <div className="title pt-4 pb-1">
-                                    <Link to={`/product/${product.id}`}>
-                                      {product.product_name}
-                                    </Link>
-                                  </div>
-                                  <div className="d-flex align-content-center justify-content-center">
-                                    <span className="fas fa-star"></span>
-                                    <span className="fas fa-star"></span>
-                                    <span className="fas fa-star"></span>
-                                    <span className="fas fa-star"></span>
-                                    <span className="fas fa-star"></span>
-                                  </div>
-                                  <div className="price">{product.price}</div>
-                                  {/* <button
-                                    onClick={() =>
-                                      handleLikeProduct(product.id)
-                                    }
-                                  >
-                                    Thích
-                                  </button> */}
-                                </div>
-                              ) : null
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="sidebar__item mt-4">
+                <div className="price-range-wrap d-flex justify-content-center pb-4">
+                  <Box sx={{ width: 250 }}>
+                    <Slider
+                      getAriaLabel={() => "Temperature range"}
+                      value={value1}
+                      onChange={handleChange1}
+                      valueLabelDisplay="auto"
+                      getAriaValueText={valuetext}
+                      min={0}
+                      max={1000000}
+                    />
+                    <Typography variant="body2">
+                      <span style={{ color: "#FF0000" }}>Giá:</span> {value1[0]} - {value1[1]}
+                    </Typography>
+                  </Box>
                 </div>
-                <div className="product__pagination">
-                  <a href="#">1</a>
-                  <a href="#">2</a>
-                  <a href="#">3</a>
-                  <a href="#">
-                    <i className="fa fa-long-arrow-right"></i>
-                  </a>
+                <div className="sidebar__item sidebar__item__color--option">
+                  <h5>Sắp xếp giá</h5>
+                  <RadioGroup
+                    aria-label="priceSorting"
+                    name="priceSorting"
+                    value={priceSorting}
+                    onChange={handlePriceSortingChange}
+                  >
+                    <FormControlLabel
+                      value="ascending"
+                      control={<Radio />}
+                      label="Sắp xếp theo tăng dần"
+                    />
+                    <FormControlLabel
+                      value="descending"
+                      control={<Radio />}
+                      label="Sắp xếp theo giảm dần"
+                    />
+                  </RadioGroup>
+                </div>
+
+                <div className="sidebar__item m-0 sidebar__item__color--option">
+                  <h5>Đánh giá</h5>
+                  <RadioGroup
+                    aria-label="ratingFilter"
+                    name="ratingFilter"
+                    value={ratingFilter}
+                    onChange={handleRatingFilterChange}
+                  >
+                    <FormControlLabel
+                      value="5"
+                      control={<Radio />}
+                      label="5 sao"
+                    />
+                    <FormControlLabel
+                      value="4"
+                      control={<Radio />}
+                      label="4 sao"
+                    />
+                    <FormControlLabel
+                      value="3"
+                      control={<Radio />}
+                      label="3 sao"
+                    />
+                    <FormControlLabel
+                      value="2"
+                      control={<Radio />}
+                      label="2 sao"
+                    />
+                    <FormControlLabel
+                      value="1"
+                      control={<Radio />}
+                      label="1 sao"
+                    />
+                  </RadioGroup>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+          <div className={style.content}>
+            <div className={style.listProduct}>
+              <label className={style.heading}>DANH SÁCH SẢN PHẨM</label>
+              <div className={style.list_product}>
+                {sortedProducts.map((value, index) =>
+                  value.price >= valueMin &&
+                  value.price <= valueMax &&
+                  value.status === 1 ? (
+                    <LazyLoad
+                      once={true}
+                      key={index}
+                      className={style.item_product}
+                    >
+                      <Link to={`/product/${value.id}`}>
+                        <img
+                          key={value.id}
+                          src={`${API_BASE_URL}/api/uploadImageProduct/${
+                            value.image_product[value.image_product.length - 1]
+                              .url
+                          }`}
+                          alt={`Image ${
+                            value.image_product[value.image_product.length - 1]
+                              .url
+                          }`}
+                          className={style.image}
+                        />
+                        <div className={style.name}>{value.product_name}</div>
+                        <div className={style.info}>
+                          <label className={style.price}>
+                            {formatCurrency(value.price, 0)}
+                          </label>
+                          <label className={style.amount_sell}>
+                            Đã bán 999
+                          </label>
+                        </div>
+                        <div className={style.show_detail}>Xem chi tiết</div>
+                      </Link>
+                    </LazyLoad>
+                  ) : null
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
         <div id="footer">
           <Footer />
         </div>
-      </div>
     </>
   );
 }
