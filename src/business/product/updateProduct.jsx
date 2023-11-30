@@ -98,7 +98,7 @@ export default function ModelEdit({ onReload, data, closeModal }) {
       return;
     }
 
-    const isValidName = /^[a-zA-Z0-9\s]+$/u.test(name);
+    const isValidName = /^[\p{L}0-9\s]+$/u.test(name) && !/[!@#$%^&*(),.?":{}|<>]/g.test(name);
     if (!isValidName || name.length > MAX_NAME_LENGTH) {
       ThongBao(`Tên sản phẩm không hợp lệ hoặc vượt quá ${MAX_NAME_LENGTH} ký tự.`, "error");
       return;

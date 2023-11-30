@@ -30,6 +30,8 @@ import LikeProduct from "./page_user/user/LikeProduct";
 import Shop from "./page_user/user/Shop";
 
 import NotFoundPage from "./page_user/user/NotFoundPage";
+import VNPayBankSelection from "./pay/pay";
+import ChatApp from "./chatApp/chatApp";
 
 function App() {
   return (
@@ -62,6 +64,11 @@ function App() {
 
       <Route path="/admin/*" element={<AdminDashBoard />} />
       <Route path="/business/*" element={<BusinessDashBoard />} />
+
+      {/* Mdung test pay */}
+      <Route path="/pay" element={<VNPayBankSelection />} />
+
+      <Route path="/chatApp" element={<ChatApp />} />
     </Routes>
   );
 }

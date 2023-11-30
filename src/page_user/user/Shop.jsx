@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import ListGroup from "react-bootstrap/ListGroup";
-
+import { useNavigate } from 'react-router';
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/user/product.css";
@@ -20,6 +20,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  colors,
 } from "@mui/material";
 
 const API_BASE_URL = "http://localhost:8080";
@@ -29,6 +30,7 @@ function valuetext(value) {
 }
 
 function productReducer(state, action) {
+
   switch (action.type) {
     case "SET_VALUE":
       return {
@@ -57,6 +59,7 @@ function productReducer(state, action) {
 }
 
 function Shop() {
+  const navigate=useNavigate();
   const [localState, dispatch] = useReducer(productReducer, {
     value1: [0, 1000000],
     valueMin: 0,
@@ -204,6 +207,9 @@ function Shop() {
                       <span>
                         <a href="#">following</a>
                       </span>
+                     
+                        <p style={{fontSize:'20px',color:'red'}} onClick={()=>{navigate(`/chatApp?ShopName=${shopData[1]}`)}}>Nhắn tin với người bán</p>
+                      
                     </div>
                   </li>
                 </ul>

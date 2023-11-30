@@ -57,15 +57,16 @@ function Shop() {
   const handleSubmit = async () => {
     try {
       // Validation for shopName
-      const isValidShopName = /^[a-zA-Z0-9\s]+$/g.test(shopName) && shopName.length <= 30;
+      const isValidShopName = /^[\p{L}0-9\s]+$/u.test(shopName) && !/[!@#$%^&*(),.?":{}|<>]/g.test(shopName) &&shopName.length<=30 ;
+
 
       // Validation for address
-      const isValidAddress = /^[a-zA-Z0-9\s]+$/g.test(address) && address.length <= 100;
+      const isValidAddress = /^[\p{L}0-9\s]+$/u.test(shopName) && !/[!@#$%^&*(),.?":{}|<>]/g.test(shopName) && address.length <= 100;
 
       // Validation for city, district, ward (checking for emptiness)
       const areFieldsEmpty = !city || !district || !ward;
 
-      if (!isValidShopName) {
+      if (!isValidShopName || shopName.trim()==='') {
         ThongBao("Tên cửa hàng không hợp lệ.", 'error');
         return; // Stop execution if validation fails
       }

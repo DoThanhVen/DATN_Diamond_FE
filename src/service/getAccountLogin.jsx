@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
 export default function getAccountFromCookie() {
-  const accountCookie = Cookies.get("accountLogin");
+  const accountCookie = sessionStorage.getItem("accountLogin");
   if (accountCookie !== undefined) {
     try {
       const data = JSON.parse(

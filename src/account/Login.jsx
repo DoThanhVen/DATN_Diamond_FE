@@ -28,7 +28,6 @@ function Login() {
       })
       .then((response) => {
         if(response.data.status === "success"){
-
           const data = {
             id_account: response.data.data.id,
             username: response.data.data.username,
@@ -73,7 +72,14 @@ function Login() {
   
           const timeCookie = new Date();
           timeCookie.setTime(timeCookie.getTime() + 60 * 60 * 1000);
-          Cookies.set("accountLogin", base64String, { expires: timeCookie });
+          try {
+            sessionStorage.setItem("accountLogin",base64String);
+            Cookies.set("accountLogin", base64String, { expires: timeCookie });
+            console.log("Ok setting cookie:");
+          } catch (error) {
+            console.log("Error setting cookie:", error);
+          }
+          
           navigate("/");
         }else{
           ThongBao(response.data.message,"error")
