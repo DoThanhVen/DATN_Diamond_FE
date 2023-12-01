@@ -13,8 +13,9 @@ import swal from "sweetalert";
 import Cookies from "js-cookie";
 import listDataAddress from "../../service/AddressVietNam.json";
 import style from "../css/user/detail.module.css";
-import {GetDataLogin} from "../../service/DataLogin.js"
-
+import { GetDataLogin } from "../../service/DataLogin.js"
+import { useDispatch } from "react-redux";
+import cartSilce from '../../Reducer/cartSilce';
 const API_BASE_URL = "http://localhost:8080";
 
 function localStateReducer(state, action) {
@@ -62,7 +63,7 @@ function ProductPage() {
       navigate("/login");
     }
   };
-  
+
   useEffect(() => {
     getAccountFromSession();
   }, []);
@@ -81,12 +82,15 @@ function ProductPage() {
     localState;
 
   const increaseCount = () => {
-    dispatch({ type: "SET_COUNT", payload: count + 1 });
+    setQuantity(Number(quantity) + 1)
+    // dispatch({ type: "SET_COUNT", payload: count + 1 });
   };
 
   const decreaseCount = () => {
     if (count > 1) {
-      dispatch({ type: "SET_COUNT", payload: count - 1 });
+      setQuantity(Number(quantity) - 1)
+
+      // dispatch({ type: "SET_COUNT", payload: count - 1 });
     }
   };
 
@@ -287,6 +291,21 @@ function ProductPage() {
     setDistrict(value);
     setWard("");
   };
+
+  const dispatchs = useDispatch();
+  const [quantity, setQuantity] = useState(1);
+  const handleAddCart = (e) => {
+    console.log("add")
+    console.log(product)
+    console.log(quantity)
+    dispatchs(
+      cartSilce.actions.addToCart({
+        product: product,
+        quantity: quantity
+      })
+    )
+  }
+
   return (
     <>
       <nav>
@@ -294,7 +313,7 @@ function ProductPage() {
       </nav>
 
       <div className="detail" style={{ backgroundColor: "#f5f5fa" }}>
-        <section className="">
+      <section className="">
           <div
             className="container bg-white mt-4"
             style={{ borderRadius: "8px" }}
@@ -302,8 +321,8 @@ function ProductPage() {
             <div className="row p-4">
               <aside className="col-lg-6">
                 {product &&
-                product.image_product &&
-                product.image_product.length > 0 ? (
+                  product.image_product &&
+                  product.image_product.length > 0 ? (
                   <Carousel>
                     {product.image_product.map((image, index) => (
                       <div
@@ -313,14 +332,11 @@ function ProductPage() {
                           height: "700px",
                           display: "flex",
                           justifyContent: "center",
-                          alignItems: "center"
+                          alignItems: "center",
                         }}
                       >
                         <img
-                          src={
-                            `${API_BASE_URL}/api/uploadImageProduct/` +
-                            image.url
-                          }
+                          src={"http://localhost:8080/api/uploadImageProduct/" + image.url}
                           alt={`Image ${index}`}
                         />
                       </div>
@@ -334,8 +350,15 @@ function ProductPage() {
               <main className="col-lg-6 ">
                 <div className="ps-lg-3">
                   {product && shopName !== null ? (
-                    <h4 className="title text-dark">{product.product_name}</h4>
-                  ) : null}
+                    <h4 className="title text-dark">
+                      {product.product_name}
+                      {/* <h2>{shopName}</h2> */}
+
+                      {/* Continue displaying other product details */}
+                    </h4>
+                  ) : (
+                    <p>Loading...</p>
+                  )}
 
                   <div className="d-flex flex-row my-3">
                     <div className="text-warning mb-1 me-2">
@@ -354,10 +377,17 @@ function ProductPage() {
 
                   <div className="mb-3">
                     <span className="h5">
+                      {/* <div className="sale-price" style={{ fontSize: '25px' }}>
+                      <del>2.499.000 <sup>đ</sup> </del>
+                    </div> */}
                       <div className="d-flex ">
                         <h2 className="text-danger">
                           {product ? `${product.price} ₫` : "Loading..."}
                         </h2>
+
+                        {/* <div className="sale ms-4 bg-danger text-light mb-2 p-1">
+                        <b>Giảm 50%</b>
+                      </div> */}
                       </div>
                     </span>
                   </div>
@@ -367,160 +397,10 @@ function ProductPage() {
                       <span className="title ">ĐỊA CHỈ GIAO HÀNG</span>
                     </b>
                     <br />
-                    {accountLogin ? (
-                      <div className={style.listAddress}>
-                        {accountLogin.address.map((value, index) =>
-                          listDataAddress.map((valueCity, index) =>
-                            valueCity.codename === value.city
-                              ? valueCity.districts.map(
-                                  (valueDistrict, index) =>
-                                    valueDistrict.codename === value.district
-                                      ? valueDistrict.wards.map(
-                                          (valueWard, index) =>
-                                            valueWard.codename ===
-                                            value.ward ? (
-                                              <div
-                                                key={valueCity.codename}
-                                                className={`${style.address} ${
-                                                  value.status
-                                                    ? style.active
-                                                    : ""
-                                                }`}
-                                              >
-                                                <div className={style.value}>
-                                                  {valueCity.name},{" "}
-                                                  {valueDistrict.name},{" "}
-                                                  {valueWard.name},{" "}
-                                                  {value.address}
-                                                </div>
-                                                <div
-                                                  className={style.groupButton}
-                                                >
-                                                  <span
-                                                    className={`${
-                                                      style.status
-                                                    } ${
-                                                      value.status
-                                                        ? style.active
-                                                        : ""
-                                                    } ms-2`}
-                                                    onClick={() =>
-                                                      handleSelectUseAddress(
-                                                        valueCity.name,
-                                                        valueDistrict.name,
-                                                        valueWard.name,
-                                                        value.address
-                                                      )
-                                                    }
-                                                  >
-                                                    Dùng
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            ) : null
-                                        )
-                                      : null
-                                )
-                              : null
-                          )
-                        )}
-                      </div>
-                    ) : (
-                      <div className="row gutters">
-                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                          <h6 className="mt-3 text-primary">Địa chỉ</h6>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={city}
-                              onChange={(e) => handleChangeCity(e.target.value)}
-                              className={style.input}
-                            >
-                              <option value="">Tỉnh/Thành Phố</option>
-                              {listDataAddress.map((valueCity, index) => (
-                                <option
-                                  key={valueCity.codename}
-                                  value={valueCity.codename}
-                                >
-                                  {valueCity.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={district}
-                              onChange={(e) =>
-                                handleChangeDistrict(e.target.value)
-                              }
-                              className={style.input}
-                            >
-                              <option value="">Quận/Huyện</option>
-                              {listDataAddress.map((valueCity, index) =>
-                                valueCity.codename === city
-                                  ? valueCity.districts.map(
-                                      (valueDistrict, index) => (
-                                        <option
-                                          key={valueDistrict.codename}
-                                          value={valueDistrict.codename}
-                                        >
-                                          {valueDistrict.name}
-                                        </option>
-                                      )
-                                    )
-                                  : null
-                              )}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={ward}
-                              onChange={(e) => setWard(e.target.value)}
-                              className={style.input}
-                            >
-                              <option value="">Phường/Xã/Trị Trấn</option>
-                              {listDataAddress.map((valueCity, index) =>
-                                valueCity.codename === city
-                                  ? valueCity.districts.map(
-                                      (valueDistrict, index) =>
-                                        valueDistrict.codename === district
-                                          ? valueDistrict.wards.map(
-                                              (valueWard, index) => (
-                                                <option
-                                                  key={valueWard.codename}
-                                                  value={valueWard.codename}
-                                                >
-                                                  {valueWard.name}
-                                                </option>
-                                              )
-                                            )
-                                          : null
-                                    )
-                                  : null
-                              )}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <input
-                              type="text"
-                              className={`form-control ${style.input}`}
-                              id="adress"
-                              placeholder="Số nhà"
-                              defaultValue={address}
-                              onChange={(e) => setAddress(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    <span>Tô Ký, Quận 12, TP Hồ Chí Minh</span>
+                    <a href="#" style={{ color: "blue", marginLeft: "10px" }}>
+                      Thay đổi
+                    </a>
                   </div>
 
                   <hr />
@@ -542,7 +422,11 @@ function ProductPage() {
                         <i className="bi bi-dash"></i>
                       </button>
                       <input
-                        type="text"
+                        type="number" min={1}
+                        value={quantity}
+                        onChange={(e)=> {
+                            setQuantity(e.target.value)
+                        }}  
                         className="form-control text-center border border-secondary"
                         placeholder={count}
                         aria-label="Example text with button addon"
@@ -559,40 +443,39 @@ function ProductPage() {
                       </button>
                     </div>
                   </div>
-                  {accountLogin ? (
-                    <div className="row mb-4">
-                      <div className="col-md-4 col-6">
-                        <button
-                          type="button"
-                          className="btn btn-success"
-                          onClick={() => handleLikeProduct(product.id)}
-                        >
-                          Thích
-                        </button>
-                      </div>
+                  <div className="row mb-4">
+                    <div className="col-md-4 col-6">
+                      {/* <label className="mb-2">Size</label>
+                      <select className="form-select border border-secondary" style={{ height: '35px' }}>
+                        <option>Small</option>
+                        <option>Medium</option>
+                        <option>Large</option>
+                      </select> */}
                     </div>
-                  ) : null}
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <button
-                      className="btn shadow-0 "
-                      style={{
-                        padding: "10px 50px",
-                        fontSize: "16px",
-                        backgroundColor: "#ffc801",
-                        color: "#fff"
-                      }}
-                    >
-                      <i className="bi bi-bag-plus mx-2"></i>
-                      <span style={{}}>Mua ngay</span>
-                    </button>
-                    <button
-                      className="btn btn-success shadow-0 mx-4"
-                      style={{ padding: "10px 50px", fontSize: "16px" }}
-                    >
-                      <i className="bi bi-basket3-fill"></i>
-                      <span style={{}}>Thêm vào giỏ hàng</span>
-                    </button>
                   </div>
+                  <a
+                    href="#"
+                    className="btn  shadow-0 "
+                    style={{
+                      backgroundColor: " rgb(252,162,53)",
+                      padding: "10px 50px",
+                    }}
+                  >
+                    <i className="bi bi-bag-plus mx-2"></i>
+                    <strong>Mua ngay</strong>
+                  </a>
+                  <button
+                    onClick={handleAddCart}
+                    className="btn  shadow-0 mx-4 text-white
+                  "
+                    style={{
+                      backgroundColor: " rgb(48,83,73)",
+                      padding: "10px 50px",
+                    }}
+                  >
+                    <i className="bi bi-basket3-fill"></i>
+                    <strong> Thêm vào giỏ hàng</strong>
+                  </button>
                 </div>
               </main>
             </div>

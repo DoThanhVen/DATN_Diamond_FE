@@ -14,7 +14,7 @@ export default createSlice({
     reducers: {
         
         addToCart: (state, action) => {
-            
+            console.log("add2")
             const exist = state.filter((cart) => cart.product.id === action.payload.product.id);
             console.log(exist)
             if (exist <= 0) {
@@ -46,5 +46,3 @@ export default createSlice({
         }
     }
 })
-
-

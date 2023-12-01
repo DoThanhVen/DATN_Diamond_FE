@@ -29,8 +29,9 @@ import NotFoundPage from './page_user/user/NotFoundPage'
 import { GetDataLogin } from './service/DataLogin'
 import VNPayBankSelection from './pay/pay'
 import ChatApp from './chatApp/chatApp'
-
-function App () {
+import { Provider } from "react-redux";
+import store from './Store/store'
+function App() {
   const [accountLogin, setAccountLogin] = useState(null)
   const navigate = useNavigate()
 
@@ -53,41 +54,43 @@ function App () {
   }, [])
 
   return (
-    <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/cart' element={<Cart />} />
-      <Route path='/category/:id' element={<Product />} exact />
-      <Route path='/product/:productId' element={<Detail />} exact />
-      <Route path='/newProducts' element={<NewProducts />} />
-      <Route path='/orderDetail' element={<OrderDetail />} />
-      <Route path='/checkout' element={<Checkout />} />
-      <Route path='/profile' element={<Profile />} />
-      <Route path='/order' element={<Order />} />
-      <Route path='/suggestedProducts' element={<SuggestedProducts />} />
-      <Route path='/recommendedProducts' element={<RecommendedProducts />} />
-      <Route path='/forgotPassword' element={<ForgotPass />} />
-      <Route path='/register' element={<Register />} />
-      <Route path='/salesRegistration' element={<SalesRegistration />} />
-      <Route path='/contact' element={<ContactInfo />} />
-      <Route path='/policy' element={<Policy />} />
-      <Route path='/likeProduct' element={<LikeProduct />} />
-      <Route path='/shops/:productId/shop' element={<Shop />} />
-      <Route path='*' element={<Navigate to="/not-found" />} />
-      <Route path='/not-found' element={<NotFoundPage />} />
+    <Provider store={store}>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/cart' element={<Cart />} />
+        <Route path='/category/:id' element={<Product />} exact />
+        <Route path='/product/:productId' element={<Detail />} exact />
+        <Route path='/newProducts' element={<NewProducts />} />
+        <Route path='/orderDetail' element={<OrderDetail />} />
+        <Route path='/checkout' element={<Checkout />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/order' element={<Order />} />
+        <Route path='/suggestedProducts' element={<SuggestedProducts />} />
+        <Route path='/recommendedProducts' element={<RecommendedProducts />} />
+        <Route path='/forgotPassword' element={<ForgotPass />} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/salesRegistration' element={<SalesRegistration />} />
+        <Route path='/contact' element={<ContactInfo />} />
+        <Route path='/policy' element={<Policy />} />
+        <Route path='/likeProduct' element={<LikeProduct />} />
+        <Route path='/shops/:productId/shop' element={<Shop />} />
+        <Route path='*' element={<Navigate to="/not-found" />} />
+        <Route path='/not-found' element={<NotFoundPage />} />
 
 
-      <Route path="*" element={<Navigate to="/not-found" />} />
-      <Route path="/not-found" element={<NotFoundPage />} />
+        <Route path="*" element={<Navigate to="/not-found" />} />
+        <Route path="/not-found" element={<NotFoundPage />} />
 
-      <Route path="/admin/*" element={<AdminDashBoard />} />
-      <Route path="/business/*" element={<BusinessDashBoard />} />
+        <Route path="/admin/*" element={<AdminDashBoard />} />
+        <Route path="/business/*" element={<BusinessDashBoard />} />
 
-      {/* Mdung test pay */}
-      <Route path="/pay" element={<VNPayBankSelection />} />
+        {/* Mdung test pay */}
+        <Route path="/pay" element={<VNPayBankSelection />} />
 
-      <Route path="/chatApp" element={<ChatApp />} />
-    </Routes>
+        <Route path="/chatApp" element={<ChatApp />} />
+      </Routes>
+    </Provider >
   )
 }
 

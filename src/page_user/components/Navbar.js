@@ -10,8 +10,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
-
+import { cartSelector } from '../../actions/actions';
+import { useDispatch, useSelector } from 'react-redux';
 const MainNavbar = () => {
+
+  const cart = useSelector(cartSelector);
+  let total = 0;
+  cart.map((item,index) => {
+    total = index + 1
+  })
+  console.log(total)
+
   const [accountLogin, setAccountLogin] = useState(null);
 
   useEffect(() => {
@@ -214,16 +223,17 @@ const MainNavbar = () => {
                   <div className="sinlge-bar shopping">
                     <a href="/cart" className="single-icon">
                       <i className="fa-solid fa-bag-shopping"></i>{" "}
-                      <span className="total-count">2</span>
+                      <span className="total-count">{total}</span>
                     </a>
                     {/* Shopping Item */}
                     <div className="shopping-item">
                       <div className="dropdown-cart-header">
-                        <span>2 sản phẩm</span>
+                        <span>{total} sản phẩm</span>
                         <a href="/cart">Xem giỏ hàng</a>
                       </div>
                       <ul className="shopping-list">
-                        <li>
+                        {cart?.map((item,index) => (
+                          <li key={index}>
                           <a
                             href="#"
                             className="remove"
@@ -238,33 +248,15 @@ const MainNavbar = () => {
                             />
                           </a>
                           <h4>
-                            <a href="#">Sản phẩm 1</a>
+                            <a href="#">{item.product_name}</a>
                           </h4>
                           <p className="quantity">
-                            1 - <span className="amount">$99.00</span>
+                            1 - <span className="amount">{item.quantity}</span>
                           </p>
                         </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="remove"
-                            title="Remove this item"
-                          >
-                            <i className="fa fa-remove"></i>
-                          </a>
-                          <a className="cart-img" href="#">
-                            <img
-                              src="https://via.placeholder.com/70x70"
-                              alt="#"
-                            />
-                          </a>
-                          <h4>
-                            <a href="#">Sản phẩm 2</a>
-                          </h4>
-                          <p className="quantity">
-                            1x - <span className="amount">$35.00</span>
-                          </p>
-                        </li>
+                        ))}
+                        
+                       
                       </ul>
                       <div className="bottom">
                         <div className="total">
