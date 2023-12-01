@@ -18,41 +18,19 @@ function ListAccount() {
   const numberPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-<<<<<<< HEAD
-  const [keyword, setkeyword] = useState('');
-  const [keyfind, setkeyfind] = useState('');
-  const [reload, setreload] = useState(0)
-  const [sortBy, setsortBy] = useState('')
-  const [sortType, setsortType] = useState('')
-  const [filterbyStatus, setFilterStatus] = useState("")
-=======
   const [keyword, setkeyword] = useState("");
   const [keyfind, setkeyfind] = useState("");
   const [reload, setreload] = useState(0);
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
->>>>>>> origin/main
 
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType]);
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 
   const getdata = async (page, filterStatus) => {
     try {
-<<<<<<< HEAD
       const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
-=======
-      const response = await callAPI(
-        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&shoporaccount=account&offset=${
-          (page - 1) * numberPage
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
-        "GET"
-      );
->>>>>>> origin/main
       const responseData = response.data;
       if (filterStatus === undefined || filterStatus === "") {
         setAccounts(responseData.content || []);
@@ -120,40 +98,20 @@ function ListAccount() {
           <select
             value={sortBy}
             onChange={(e) => {
-<<<<<<< HEAD
-              setsortBy(e.target.value)
-=======
               setsortBy(e.target.value);
->>>>>>> origin/main
             }}
             className={`ms-2 ${style.optionSelect}`}
           >
             <option value="">Lựa chọn...</option>
-<<<<<<< HEAD
-            <option value={'id'}>
-              Mã tài khoản
-            </option>
-            <option value={'username'}>
-              Tên đăng nhập
-            </option>
-            <option value={'create_date'}>
-              Ngày tạo
-            </option>
-=======
             <option value={"id"}>Mã tài khoản</option>
             <option value={"username"}>Tên đăng nhập</option>
             <option value={"create_date"}>Ngày tạo</option>
->>>>>>> origin/main
           </select>
           {sortBy !== "" ? (
             <select
               value={sortType}
               onChange={(e) => {
-<<<<<<< HEAD
-                setsortType(e.target.value)
-=======
                 setsortType(e.target.value);
->>>>>>> origin/main
               }}
               className={`${style.optionSelect}`}
             >
@@ -162,26 +120,6 @@ function ListAccount() {
             </select>
           ) : null}
         </div>
-<<<<<<< HEAD
-        <div className={style.typeProduct}>
-          <label>Lọc sản phẩm theo trạng thái:</label>
-          <select
-            value={filterbyStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value)
-              // You can also call getdata function here directly
-              getdata(currentPage, e.target.value);
-            }}
-            className={`${style.optionSelectType}`}
-          >
-            <option value="">Tất cả</option>
-            <option value={true}> Đang Hoạt Động</option>
-            <option value={false}>Cấm Hoạt Động</option>
-          </select>
-        </div>
-        <label className={style.heading}>Danh sách tài khoản</label>
-=======
->>>>>>> origin/main
         <div className={style.table}>
           <div className={style.tableHeading}>
             <label className={style.column}>ID</label>

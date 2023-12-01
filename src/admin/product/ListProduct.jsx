@@ -30,7 +30,6 @@ function ListProduct() {
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType]);
-  }, [data, currentPage, reload, sortType]);
 
   const getdata = async (page, filterStatus) => {
     try {
@@ -159,7 +158,7 @@ function ListProduct() {
               <option value="asc">Tăng dần</option>
               <option value="desc">Giảm dần</option>
             </select>
-            : null}
+           ) : null}
         </div>
         <div className={style.typeProduct}>
           <label>Lọc sản phẩm theo trạng thái:</label>
@@ -209,7 +208,7 @@ function ListProduct() {
                     alt="Hình Ảnh"
                   />
                 )
-                  : <img
+                  :( <img
                     className={style.image}
                     src={`/images/nullImage.png`}
                     alt="Hình Ảnh"

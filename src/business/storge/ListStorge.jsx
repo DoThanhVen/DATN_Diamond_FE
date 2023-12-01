@@ -5,14 +5,10 @@ import { Pagination } from "@mui/material";
 import { callAPI } from "../../service/API";
 import getAccountFromCookie from "../../service/getAccountLogin";
 import { useNavigate } from "react-router";
-<<<<<<< HEAD
-function ListStorge() {
-=======
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 function ListStorge() {
 
-  const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
@@ -27,7 +23,6 @@ function ListStorge() {
       navigate("/login");
     }
   };
->>>>>>> origin/main
 
   const reload = useSelector((state) => state.getreloadPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,26 +34,9 @@ function ListStorge() {
   const [textInput, setTextInput] = useState("");
 
   useEffect(() => {
-<<<<<<< HEAD
-    getData();
+    getAccountFromSession();
   }, [reload, currentPage,textInput]);
 
-  const getData = async () => {
-    try {
-      const accountData = await getAccountFromCookie();
-      if (accountData) {
-        getdataProduct(currentPage, accountData.shop.id);
-      } else {
-        navigate('/login')
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-=======
-    getAccountFromSession();
-  }, [reload, currentPage]);
->>>>>>> origin/main
 
   const getdataProduct = async (page, idShop) => {
     try {

@@ -8,7 +8,7 @@ import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
-const numberPage = 10;
+const numberPage = 1;
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -77,16 +77,14 @@ export default function ListProduct() {
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${
-          (page - 1) * numberPage
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
+        `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=unactive`,
         "GET"
       );
-      const filteredProducts = response.data.content.filter(product => {
-        const totalQuantity = product.listStorage.reduce((total, storage) => total + storage.quantity, 0);
-        return totalQuantity === 0;
-      });
-      setProducts(filteredProducts);
+
+
+      setProducts(response.data.content);
+ // Tính số trang dựa trên số sản phẩm và số sản phẩm trên mỗi trang
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -278,22 +276,22 @@ export default function ListProduct() {
                       value.status === 0
                         ? "#34219E"
                         : value.status === 1
-                        ? "green"
-                        : value.status === 2
-                        ? "red"
-                        : "#E74C3C"
+                          ? "green"
+                          : value.status === 2
+                            ? "red"
+                            : "#E74C3C"
                   }}
                   value={`${value.status}`}
                 >
                   {value.status === 0
                     ? "Chờ Phê Duyệt"
                     : value.status === 1
-                    ? "Đang Hoạt Động"
-                    : value.status === 2
-                    ? "Dừng Hoạt Động"
-                    : value.status === 3
-                    ? "Cấm hoạt động"
-                    : "Lỗi"}
+                      ? "Đang Hoạt Động"
+                      : value.status === 2
+                        ? "Dừng Hoạt Động"
+                        : value.status === 3
+                          ? "Cấm hoạt động"
+                          : "Lỗi"}
                 </span>
               </label>
               <label className={style.column}>

@@ -47,33 +47,33 @@ const RecommendedProducts = () => {
     <div className={style.list_all_recommended}>
       {products
         ? products.map((value, index) => (
-            <LazyLoad
-              once={true}
-              key={index}
-              className={style.item_recommended}
-            >
-              <Link to={`/product/${value.id}`}>
-                <img
-                  key={value.id}
-                  src={`${API_BASE_URL}/api/uploadImageProduct/${
-                    value.image_product[value.image_product.length - 1].url
-                  }`}
-                  alt={`Image ${
-                    value.image_product[value.image_product.length - 1].url
-                  }`}
-                  className={style.image}
-                />
-                <div className={style.name}>{value.product_name}</div>
-                <div className={style.info}>
-                  <label className={style.price}>
-                    {formatCurrency(value.price, 0)}
-                  </label>
-                  <label className={style.amount_sell}>Đã bán 999</label>
+          <LazyLoad
+            once={true}
+            key={index}
+            className={style.item_recommended}
+          >
+            <Link to={`/product/${value.id}`}>
+              {value.image_product && (
+                <div>
+                  <img
+                    src={`http://yourdomain.com/api/uploadImageProduct/${value.image_product[0].url}`}
+                    className={style.image}
+                    alt={`Image ${value.image_product[0].url}`}
+                  />
                 </div>
-                <div className={style.show_detail}>Xem chi tiết</div>
-              </Link>
-            </LazyLoad>
-          ))
+              )}
+
+              <div className={style.name}>{value.product_name}</div>
+              <div className={style.info}>
+                <label className={style.price}>
+                  {formatCurrency(value.price, 0)}
+                </label>
+                <label className={style.amount_sell}>Đã bán 999</label>
+              </div>
+              <div className={style.show_detail}>Xem chi tiết</div>
+            </Link>
+          </LazyLoad>
+        ))
         : null}
     </div>
   );

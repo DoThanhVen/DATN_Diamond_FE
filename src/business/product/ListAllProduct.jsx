@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
-import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 
 const numberPage = 10;
@@ -27,7 +26,6 @@ export default function ListProduct() {
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
     if (accountLogin !== undefined) {
       try {
         getdataProduct(currentPage, accountLogin.shop.id);
@@ -79,8 +77,8 @@ export default function ListProduct() {
     try {
       const response = await callAPI(
         `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${
-          (page - 1) * numberPage
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
+          (page - 1) 
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=`,
         "GET"
       );
       setProducts(response.data);
