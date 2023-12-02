@@ -17,7 +17,6 @@ function EditCategory() {
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
     if (accountLogin !== undefined) {
       try {
         setAccountLogin(accountLogin);
@@ -51,8 +50,11 @@ function EditCategory() {
   const reloadold = useSelector(state => state.getreloadPage);
 
   useEffect(
+    
     () => {
+      console.log('hu',data)
       if (Array.isArray(data)) {
+        console.log(data)
         setListcategory(data);
         if (listCategory !== null && idCategory !== 0 && idCategoryItem === 0) {
           getCategoryId();
@@ -117,7 +119,7 @@ function EditCategory() {
         const response = await CategoryService.addCategory(
           type_category,
           image,
-          accountLogin.id_account
+          5
         );
         if (response.status === "success") {
           ThongBao(response.message, response.status);
@@ -252,12 +254,12 @@ function EditCategory() {
         const reponse = await CategoryService.addCategoryItem(
           valueCategory,
           type_categoryItem,
-          accountLogin.id_account
+          5
         );
         if (reponse.status === "success") {
           ThongBao(reponse.message, reponse.status);
           dispatch(reloadPage(reloadold + 1));
-          dispatch(getIdcategoryItemUpdate(reponse.data.id));
+          dispatch(getIdcategoryItemUpdate(0));
         } else {
           ThongBao(reponse.message, reponse.status);
           dispatch(reloadPage(reloadold + 1));
@@ -406,7 +408,7 @@ function EditCategory() {
                 onClick={() => {
                   handleAddCategory();
                 }}
-                disabled={idCategory !== 0}
+                // disabled={idCategory !== 0}
               >
                 <i className="bi bi-plus-lg" /> THÊM
               </button>

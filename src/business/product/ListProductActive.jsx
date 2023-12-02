@@ -53,7 +53,8 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getAccountFromSession();
+    getdataProduct(currentPage,1);
+    //getAccountFromSession();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {

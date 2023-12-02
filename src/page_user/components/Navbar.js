@@ -16,7 +16,7 @@ const MainNavbar = () => {
 
   const cart = useSelector(cartSelector);
   let total = 0;
-  cart.map((item,index) => {
+  cart&& cart.map((item,index) => {
     total = index + 1
   })
   console.log(total)

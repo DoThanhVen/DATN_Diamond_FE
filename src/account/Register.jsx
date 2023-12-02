@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 import { ThongBao } from "../service/ThongBao";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import { callAPI } from "../service/API";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -82,27 +83,22 @@ export default function Register() {
       } else {
         if (password === repassword) {
           if (code === validateCode) {
-            axios
-              .post(domain + "/api/account/register/" + email, {
-                username,
-                password
-              })
-              .then((response) => {
-                console.log(response);
-                if (response.data.success) {
-                  ThongBao("Đăng ký thành công!", "success");
-                  clearInput();
-                  const delay = setTimeout(() => {
-                    navigate("/login");
-                  }, 800);
-                  return () => clearTimeout(delay);
-                } else {
-                  ThongBao(response.data.message, "error");
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+            const response =await callAPI(`/api/register`, 'POST', {
+              username: username,
+              password: password,
+              email:email
+            })
+            if (response.status==='success') {
+              ThongBao(response.message, response.status);
+              clearInput();
+              const delay = setTimeout(() => {
+                navigate("/login");
+              }, 800);
+              return () => clearTimeout(delay);
+            } else {
+              ThongBao(response.message, response.status);
+            }
+
           } else {
             ThongBao("Mã xác nhận không chính xác!", "error");
           }

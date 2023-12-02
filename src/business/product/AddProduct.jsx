@@ -42,7 +42,7 @@ function AddProduct() {
   const [description, setdescription] = useState("");
   const reloadold = useSelector(state => state.getreloadPage);
   const MAX_NAME_LENGTH = 300; // Example maximum name length
-  const MAX_DESCRIPTION_LENGTH = 1000; // Example maximum description length
+  const MAX_DESCRIPTION_LENGTH = 100000; // Example maximum description length
 
   useEffect(() => {
     getdataCategory();
@@ -140,7 +140,7 @@ function AddProduct() {
       quantityValue,
       selectedImages,
       imagesave,
-      accountLogin.shop.id
+      4
     );
   
     if (response.status === "success") {

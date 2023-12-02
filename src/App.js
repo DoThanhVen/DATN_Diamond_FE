@@ -54,7 +54,7 @@ function App() {
   }, [])
 
   return (
-    <Provider store={store}>
+ 
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
@@ -90,7 +90,7 @@ function App() {
 
         <Route path="/chatApp" element={<ChatApp />} />
       </Routes>
-    </Provider >
+
   )
 }
 

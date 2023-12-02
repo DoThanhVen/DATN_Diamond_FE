@@ -8,6 +8,7 @@ import ScrollableFeed from 'react-scrollable-feed';
 import './App.css';
 import Footer from '../page_user/components/Footer';
 import MainNavbar from '../page_user/components/Navbar';
+import moment from 'moment';
 
 var stompClient = null;
 
@@ -21,6 +22,8 @@ const ChatApp = () => {
   const navigate = useNavigate();
   const [receiverData, setReceiverData] = useState([]);
   const [file, setfile] = useState(null);
+  const [showTime, setShowTime] = useState(false);
+
   const [userData, setUserData] = useState({
     username: '',
     receivername: '',
@@ -46,7 +49,10 @@ const ChatApp = () => {
 
   const getData = async () => {
     try {
-      const accountData = await getAccountFromCookie();
+      const accountData = {
+        id_account: 1,
+        username: 'mdung0907'
+      };
       const params = new URLSearchParams(window.location.search);
       if (params.has('ShopName')) {
         const res = await callAPI(`/api/account/findaccountbyshopname/${params.get('ShopName')}`, 'GET');
@@ -185,11 +191,11 @@ const ChatApp = () => {
       setListMess(prevMessages => [...prevMessages, newMessage]);
       const newSender = { sender: selectedRecipient };
       setHistorySender(prevSenders => prevSenders ? [newSender, ...prevSenders] : [newSender]);
-      
+
       // Tương tự cho historyReceiver
       const newReceiver = { receiver: selectedRecipient };
       setHistoryReceiver(prevReceivers => prevReceivers ? [newReceiver, ...prevReceivers] : [newReceiver]);
-      
+
     }
 
   };
@@ -231,11 +237,11 @@ const ChatApp = () => {
       setfile(null)
       const newSender = { sender: userData.username };
       setHistorySender(prevSenders => prevSenders ? [newSender, ...prevSenders] : [newSender]);
-  
+
       // Cập nhật người nhận trong historyReceiver
       const newReceiver = { receiver: selectedRecipient };
       setHistoryReceiver(prevReceivers => prevReceivers ? [newReceiver, ...prevReceivers] : [newReceiver]);
-    
+
     }
   };
 
@@ -271,7 +277,9 @@ const ChatApp = () => {
     reader.readAsDataURL(file);
   };
 
-
+  function formatDate(date) {
+    return moment(date).format("DD-MM-YYYY HH:mm:ss");
+  }
 
   return (
     <div className="container">
@@ -285,7 +293,7 @@ const ChatApp = () => {
               <li onClick={() => setTab('CHATROOM')} className={`member ${tab === 'CHATROOM' && 'active'}`} style={{ fontSize: '27px' }}>
                 {userData.username}
               </li>
-              {historySender&&historySender.map((name, index) => (
+              {historySender && historySender.map((name, index) => (
                 name.receiver && name.receiver.username !== receiverData[0] && name.receiver.username !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name.receiver.username); setSelectedRecipient(name.receiver.username); }}
@@ -296,7 +304,7 @@ const ChatApp = () => {
                   </li>
                 )
               ))}
-              {historyReceiver&&historyReceiver.map((name, index) => (
+              {historyReceiver && historyReceiver.map((name, index) => (
                 name.sender && name.receiver.username !== receiverData[0] && name.sender.username !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name.sender.username); setSelectedRecipient(name.sender.username); }}
@@ -306,7 +314,7 @@ const ChatApp = () => {
                     {name.sender.username}
                   </li>)
               ))}
-              {receiverData&&receiverData.map((name, index) => (
+              {receiverData && receiverData.map((name, index) => (
                 name !== userData.username && (
                   <li
                     onClick={() => { registerUser(); getHistoryData2(name); setSelectedRecipient(name); }}
@@ -332,26 +340,31 @@ const ChatApp = () => {
                         backgroundColor:
                           chat.sender.username === userData.username ? '#c3e6cb' : '#bee5eb'
                       }}
+                      onClick={() =>setShowTime(!showTime)}
                     >
                       {chat.sender.username === userData.username ? (
                         <div className="message-data" >
                           <span className="username">Bạn: </span>
                           {chat.message}
+                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
                         </div>
                       ) : chat.sender.username === selectedRecipient ? (
-                        <div className="message-data">
+                        <div className="message-data" >
                           <span className="username">{chat.sender.username}: </span>
                           {chat.message}
+                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
                         </div>
                       ) : chat.receiver.username === userData.username ? (
-                        <div className="message-data">
+                        <div className="message-data" >
                           <span className="username">You: </span>
                           {chat.message}
+                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
                         </div>
                       ) : chat.receiver.username === selectedRecipient ? (
-                        <div className="message-data">
+                        <div className="message-data" >
                           <span className="username">{chat.receiver.username}: </span>
                           {chat.message}
+                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
                         </div>
                       ) : null}
 

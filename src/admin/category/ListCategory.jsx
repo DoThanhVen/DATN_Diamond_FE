@@ -29,6 +29,7 @@ function ListCategory() {
     setlistcategory(response.content || []);
     setTotalPages(response.totalPages || 1);
     dispatch(getAllCategory(response.content))
+    console.log('con',response)
   }
 
   const handlePageChange = (event, value) => {

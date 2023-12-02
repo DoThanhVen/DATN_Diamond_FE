@@ -29,25 +29,19 @@ function ListProduct() {
   const [filterbyStatus, setFilterStatus] = useState("")
   useEffect(() => {
     getdata(currentPage);
-  }, [data, currentPage, reload, sortType]);
+  }, [data, currentPage, reload, sortType,filterbyStatus]);
 
-  const getdata = async (page, filterStatus) => {
+  const getdata = async (page) => {
     try {
       const response = await callAPI(
         `/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${
           page - 1
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`,
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}`,
         "GET"
       );
-      const responseData = response.data;
-      if (filterStatus === undefined || filterStatus === "") {
-        setProducts(responseData.content || []);
-        setTotalPages(responseData.totalPages || 1);
-      } else {
-        const newData = responseData.content.filter((product) => product.status === Number(filterStatus));
-        setProducts(newData || []);
-        setTotalPages(responseData.totalPages || 1);
-      }
+        setProducts(response.data.content || []);
+        setTotalPages(response.data.totalPages || 1);
+
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -165,9 +159,8 @@ function ListProduct() {
           <select
             value={filterbyStatus}
             onChange={(e) => {
-              setFilterStatus(e.target.value)
-              // You can also call getdata function here directly
-              getdata(currentPage, e.target.value);
+              setFilterStatus(e.target.value);
+              
             }}
             className={`${style.optionSelectType}`}
           >

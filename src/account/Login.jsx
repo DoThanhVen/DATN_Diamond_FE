@@ -19,66 +19,76 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const domain = process.env.REACT_APP_API || "http://localhost:8080";
   const handleLogin = async () => {
-    axios
-      .post(domain + `/api/account/login`, {
-        username,
-        password
-      })
-      .then((response) => {
-        if(response.data.status === "success"){
-          const data = {
-            id_account: response.data.data.id,
-            username: response.data.data.username,
-            create_date: response.data.data.create_date,
-            role: response.data.data.listRole.map((value) => value.role.role_name),
-            gender: response.data.data.infoAccount.gender,
-            address: []
-          };
-          //INFO ACCOUNT
-          if (response.data.data.infoAccount && response.data.data.infoAccount.fullname) {
-            data.fullname = response.data.data.infoAccount.fullname;
-          }
-  
-          if (response.data.data.infoAccount && response.data.data.infoAccount.image) {
-            data.image = response.data.data.infoAccount.image;
-          }
-  
-          if (response.data.data.infoAccount && response.data.data.infoAccount.id_card) {
-            data.id_card = response.data.data.infoAccount.id_card;
-          }
-  
-          if (response.data.data.infoAccount && response.data.data.infoAccount.phone) {
-            data.phone = response.data.data.infoAccount.phone;
-          }
-  
-          if (response.data.data.infoAccount && response.data.data.infoAccount.email) {
-            data.email = response.data.data.infoAccount.email;
-          }
-  
-          if (response.data.data.shop) {
-            data.shop = response.data.data.shop;
-          }
-  
-          if (response.data.data.address_account) {
-            response.data.data.address_account.forEach((value) => {
-              data.address.push(value);
-            });
-          }
-  
-          //ENCODE
-          const base64String = utf8_to_b64(JSON.stringify(data));
-  
-          sessionStorage.setItem("accountLogin",base64String);
-          navigate("/");
-        }else{
-          ThongBao(response.data.message,"error")
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const response = await callAPI(`/api/login`, 'POST', {
+      username: username,
+      password: password
+    })
+    console.log(response)
+    ThongBao(response.message, response.status)
+    navigate("/")
+    console.log(response.data.data)
+    const base64String = utf8_to_b64(JSON.stringify(response.data.data));
+    console.log(base64String)
+    sessionStorage.setItem("accountLogin", base64String);
+    // axios
+    //   .post(domain + `/api/account/login`, {
+    //     username,
+    //     password
+    //   })
+    //   .then((response) => {
+    //     if(response.data.status === "success"){
+    //       const data = {
+    //         id_account: response.data.data.id,
+    //         username: response.data.data.username,
+    //         create_date: response.data.data.create_date,
+    //         role: response.data.data.listRole.map((value) => value.role.role_name),
+    //         gender: response.data.data.infoAccount.gender,
+    //         address: []
+    //       };
+    //       //INFO ACCOUNT
+    //       if (response.data.data.infoAccount && response.data.data.infoAccount.fullname) {
+    //         data.fullname = response.data.data.infoAccount.fullname;
+    //       }
+
+    //       if (response.data.data.infoAccount && response.data.data.infoAccount.image) {
+    //         data.image = response.data.data.infoAccount.image;
+    //       }
+
+    //       if (response.data.data.infoAccount && response.data.data.infoAccount.id_card) {
+    //         data.id_card = response.data.data.infoAccount.id_card;
+    //       }
+
+    //       if (response.data.data.infoAccount && response.data.data.infoAccount.phone) {
+    //         data.phone = response.data.data.infoAccount.phone;
+    //       }
+
+    //       if (response.data.data.infoAccount && response.data.data.infoAccount.email) {
+    //         data.email = response.data.data.infoAccount.email;
+    //       }
+
+    //       if (response.data.data.shop) {
+    //         data.shop = response.data.data.shop;
+    //       }
+
+    //       if (response.data.data.address_account) {
+    //         response.data.data.address_account.forEach((value) => {
+    //           data.address.push(value);
+    //         });
+    //       }
+
+    //       //ENCODE
+    //       const base64String = utf8_to_b64(JSON.stringify(data));
+
+    //       sessionStorage.setItem("accountLogin",base64String);
+    //       navigate("/");
+    //     }else{
+    //       ThongBao(response.data.message,"error")
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
   };
 
   return (
