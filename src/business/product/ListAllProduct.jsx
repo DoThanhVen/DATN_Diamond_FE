@@ -26,20 +26,16 @@ export default function ListProduct() {
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-    const log=sessionStorage.getItem('accessToken')
-    console.log(log)
-    if (accountLogin !== undefined && accountLogin !== null) {
-      if (accountLogin.shop !== null) {
-        try {
-          getdataProduct(currentPage, accountLogin.shop.id);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        navigate("/");
-      }
+    const log = sessionStorage.getItem('accessToken')
 
-    } else {
+    if (accountLogin !== null) {
+      try {
+        getdataProduct(currentPage, accountLogin.shop.id);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    else {
       navigate("/login");
     }
   };

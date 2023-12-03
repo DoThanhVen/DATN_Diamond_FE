@@ -13,6 +13,7 @@ import { callAPI } from "../service/API.js";
 import axios from "axios";
 import { GetDataLogin } from "../service/DataLogin.js";
 import { Nav } from "react-bootstrap";
+import e from "cors";
 
 function AdminDashboard() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -21,12 +22,18 @@ function AdminDashboard() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
-      try {
-        setAccountLogin(accountLogin);
-      } catch (error) {
-        console.log(error);
+    if (accountLogin !== null) {
+      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin');
+      if(isAdmin){
+        try {
+          setAccountLogin(accountLogin);
+        } catch (error) {
+          console.log(error);
+        }
+      }else{
+        navigate("/not-found");
       }
+
     } else {
       navigate("/login");
     }

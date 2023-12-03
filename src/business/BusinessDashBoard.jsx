@@ -16,12 +16,18 @@ function Navbar() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
-      try {
-        setAccountLogin(accountLogin);
-      } catch (error) {
-        console.log(error);
+    if (accountLogin !== null) {
+      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin' || role.authority === 'ROLE_Bussiness');
+      if (isAdmin) {
+        try {
+          setAccountLogin(accountLogin);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        navigate("/not-found");
       }
+
     } else {
       navigate("/login");
     }
@@ -108,10 +114,10 @@ function Navbar() {
                 className={style.image}
                 src={
                   accountLogin &&
-                  accountLogin.infoAccount &&
-                  accountLogin.infoAccount.image
+                    accountLogin.infoAccount &&
+                    accountLogin.infoAccount.image
                     ? `http://localhost:8080/api/uploadImageProduct/${accountLogin
-                        .infoAccount.image}`
+                      .infoAccount.image}`
                     : "https://bootdey.com/img/Content/avatar/avatar7.png"
                 }
                 alt="Hình Ảnh"
