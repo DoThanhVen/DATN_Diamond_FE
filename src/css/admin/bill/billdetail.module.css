@@ -1,0 +1,193 @@
+.header {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+
+    .formSearch {
+        width: 93%;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .input {
+            width: calc(100% - 30px);
+            border: none;
+            padding: 5px 10px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .iconUser {
+        font-size: 18px;
+    }
+}
+
+.cardDetail {
+    padding: 20px 30px;
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 20px;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        .column {
+            &:nth-child(1){
+                display: flex;
+                align-items: center;
+            }
+            .status {
+                width: 120px;
+                padding: 8px 5px;
+                border-radius: 20px;
+                color: white;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            .createDate{
+                margin-left: 10px;
+            }
+
+            .exit{
+                font-size: 25px;
+            }
+        }
+    }
+
+    .cardContent {
+        margin-top: 20px;
+
+        .shop {
+            display: flex;
+            align-items: start;
+            margin: 20px 0;
+
+            .image {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .shopName {
+                margin-left: 10px;
+                font-size: 15px;
+                font-weight: bold;
+            }
+        }
+
+        .listProduct {
+            display: flex;
+            flex-wrap: wrap;
+
+            .product {
+                display: flex;
+                margin-right: 20px;
+
+                .image {
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                    border-radius: 5px;
+                }
+
+                .detail {
+                    display: flex;
+                    flex-direction: column;
+                    margin-left: 10px;
+
+                    .heading {
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+
+                    .productName,
+                    .price,
+                    .description {
+                        font-size: 14px;
+                    }
+                }
+
+                .description {
+                    width: 300px;
+                }
+
+                &:not(:last-child) {
+                    margin-bottom: 20px;
+                }
+
+
+            }
+        }
+
+        .totalAllProduct {
+            margin-top: 40px;
+            display: flex;
+            padding: 0 120px 0 0;
+            justify-content: space-between;
+        }
+
+        .total {
+            margin-top: 40px;
+            display: flex;
+            padding: 0 120px 20px 0;
+            justify-content: space-between;
+        }
+
+        .ship {
+            display: flex;
+            padding: 0 120px 40px 0;
+            justify-content: space-between;
+            border-bottom: 2px solid lightgrey;
+        }
+    }
+}
+
+.other {
+    display: flex;
+
+    .cardShip {
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        padding: 20px;
+        margin-top: 20px;
+        width: 300px;
+        border-radius: 10px;
+
+        .heading {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .statusShip {
+            margin: 10px 0;
+        }
+    }
+
+    .cardAddress {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        padding: 20px;
+        margin-top: 20px;
+        width: 300px;
+        border-radius: 10px;
+
+        .heading {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    }
+}

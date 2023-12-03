@@ -1,0 +1,188 @@
+.cardLoading {
+    background-color: white;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+
+    .loading1 {
+        margin-bottom: 20px;
+
+        .label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 34px;
+            color: white;
+            font-weight: bold;
+            filter: drop-shadow(0 0 2px black);
+            margin: 0 3px;
+
+            &:nth-child(8) {
+                animation: loading1 2s infinite;
+            }
+
+            &:nth-child(9) {
+                animation: loading1 2s infinite;
+                animation-delay: .2s;
+            }
+
+            &:nth-child(10) {
+                animation: loading1 2s infinite;
+                animation-delay: .4s;
+            }
+        }
+    }
+
+    .loading2 {
+        .label {
+            width: 30px;
+            height: 30px;
+            margin: 0 5px;
+            border-radius: 50%;
+            animation: loading2 1.5s infinite;
+
+            &:nth-child(1) {
+                background: blue;
+                animation-delay: .1s;
+            }
+
+            &:nth-child(2) {
+                background: green;
+                animation-delay: .2s;
+            }
+
+            &:nth-child(3) {
+                background: orangered;
+                animation-delay: .3s;
+
+            }
+
+            &:nth-child(4) {
+                background: yellow;
+                animation-delay: .4s;
+            }
+
+            &:nth-child(5) {
+                background: pink;
+                animation-delay: .5s;
+            }
+        }
+    }
+
+    .loading3 {
+        width: 50px;
+        height: 50px;
+        border: 6px solid #3498db;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-radius: 50%;
+        animation: loading3 1s linear infinite;
+        margin-top: 10px;
+    }
+
+    .loading4 {
+        position: relative;
+        margin-top: 10px;
+
+        .row {
+            display: flex;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+
+            &:nth-child(1) {
+                .label {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    opacity: .8;
+                    background-color: blue;
+                    margin: 0 3px;
+                    animation: loading4 3s infinite;
+
+                    &:nth-child(2) {
+                        animation-delay: .2s;
+                    }
+
+                    &:nth-child(3) {
+                        animation-delay: .4s;
+                    }
+
+                    &:nth-child(4) {
+                        animation-delay: .6s;
+                    }
+
+                    &:nth-child(5) {
+                        animation-delay: .8s;
+                    }
+
+                    &:nth-child(6) {
+                        animation-delay: 1s;
+                    }
+
+                    &:nth-child(7) {
+                        animation-delay: 1.2s;
+                    }
+
+                    &:nth-child(8) {
+                        animation-delay: 1.4s;
+                    }
+
+                    &:nth-child(9) {
+                        animation-delay: 1.6s;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes loading2 {
+    0% {
+        transform: scale(1)
+    }
+
+    50% {
+        opacity: .5;
+        transform: scale(2)
+    }
+
+    100% {
+        transform: scale(1)
+    }
+}
+
+@keyframes loading1 {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes loading3 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loading4 {
+    50% {
+        opacity: .2;
+    }
+}
