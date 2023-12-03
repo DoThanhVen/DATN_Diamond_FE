@@ -25,11 +25,10 @@ function ListCategory() {
   }, [reload,currentPage, reloadinPage, sortType]);
 
   const getdataCategory = async (page) => {
-    const response = await callAPI(`/api/category?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`, "GET");
+    const response = await callAPI(`/api/category?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`, "GET");
     setlistcategory(response.content || []);
     setTotalPages(response.totalPages || 1);
     dispatch(getAllCategory(response.content))
-    console.log('con',response)
   }
 
   const handlePageChange = (event, value) => {

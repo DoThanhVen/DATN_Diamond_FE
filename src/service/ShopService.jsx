@@ -1,5 +1,5 @@
 import { callAPI } from "./API";
-const url = `/api/shop`
+const url = `/api`
 class ShopService {
     getAllshop = async () => {
         return await callAPI(`${url}/findAll`, 'GET')
@@ -39,7 +39,11 @@ class ShopService {
 
     // };
     updateStatusAdmin=async(shop,status)=>{
-        const response = await callAPI(`${url}/admin/update/${shop}/${status}`, 'PUT',null);
+        console.log(shop,status)
+        const response = await callAPI(`${url}/admin/update`, 'PUT',{
+            id:shop,
+            status:status
+        });
            return response;
     }
     // deleteshop=async (id)=>{

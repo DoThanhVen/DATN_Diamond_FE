@@ -32,17 +32,16 @@ function ListShopWait() {
   const getdata = async (page) => {
     try {
       const response = await callAPI(
-        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${
-          (page - 1) * numberPage
+        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
         "GET"
       );
       const responseData = response.data;
 
       const listFilter = responseData.content.filter((a) => {
-        return  a.shop !== null && a.shop.status === 0;
+        return a.shop !== null && a.shop.status === 0;
       });
-
+      console.log(listFilter)
       setListShopwait(listFilter || []);
       setTotalPages(responseData.totalPages || 1);
     } catch (error) {
@@ -120,10 +119,10 @@ function ListShopWait() {
                 </span>
               </label>
               <label className={style.column}>
-                src=
-                {value.shop.image
-                  ? `http://localhost:8080/api/uploadImageProduct/${value.shop.image}`
-                  : "/images/image_shop.jpg"}
+                <img style={{width:'60%'}} src=
+                  {value.shop.image
+                    ? `http://localhost:8080/api/uploadImageProduct/${value.shop.image}`
+                    : "/images/image_shop.jpg"} alt="Hình ảnh" />
               </label>
 
               <label

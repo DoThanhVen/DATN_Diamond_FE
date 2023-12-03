@@ -67,24 +67,15 @@
             height: 20px;
             display: grid;
             place-items: center;
-<<<<<<< HEAD
-            color:white;
-            border-radius: 50%;
-            cursor: pointer;
-            &.active{
-=======
             color: white;
             border-radius: 50%;
             cursor: pointer;
 
             &.active {
->>>>>>> origin/tven
                 display: none;
             }
         }
     }
-<<<<<<< HEAD
-=======
 }
 
 .groupButton {
@@ -140,5 +131,4 @@
             }
         }
     }
->>>>>>> origin/tven
 }

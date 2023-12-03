@@ -54,17 +54,21 @@ function ListShop() {
   const getdata = async (page) => {
     try {
       const response = await callAPI(
-        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${
-          (page - 1) * numberPage
+        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
         "GET"
       );
       const responseData = response.data;
-      const listShop = responseData.content.map((value) => value.shop);
-      const newData = listShop.filter((shop) => shop.status === Number(1)||shop.status === Number(2));
+      const listShop = responseData && responseData.content.map((value) => value.shop);
+      const filteredListShop = listShop.filter(shop => shop !== null);
+
+      const newData = filteredListShop.filter((shop) => shop.status === Number(1) || shop.status === Number(2));
       setListShop(newData || []);
+      console.log('listShop2', newData)
       setTotalPages(responseData.totalPages || 1);
       dispatch(getAllShop(responseData.content));
+
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -153,10 +157,10 @@ function ListShop() {
                   {listDataAddress.map((valueCity, index) =>
                     valueCity.codename === value.addressShop?.city
                       ? valueCity.districts.map((valueDistrict, index) =>
-                          valueDistrict.codename === value.addressShop?.district
-                            ? valueDistrict.name
-                            : null
-                        )
+                        valueDistrict.codename === value.addressShop?.district
+                          ? valueDistrict.name
+                          : null
+                      )
                       : null
                   )}
                 </label>
@@ -165,14 +169,14 @@ function ListShop() {
                   {listDataAddress.map((valueCity, index) =>
                     valueCity.codename === value.addressShop?.city
                       ? valueCity.districts.map((valueDistrict, index) =>
-                          valueDistrict.codename === value.addressShop?.district
-                            ? valueDistrict.wards.map((valueWard, index) =>
-                                valueWard.codename === value.addressShop?.ward
-                                  ? valueWard.name
-                                  : null
-                              )
-                            : null
-                        )
+                        valueDistrict.codename === value.addressShop?.district
+                          ? valueDistrict.wards.map((valueWard, index) =>
+                            valueWard.codename === value.addressShop?.ward
+                              ? valueWard.name
+                              : null
+                          )
+                          : null
+                      )
                       : null
                   )}
                 </label>
@@ -187,8 +191,8 @@ function ListShop() {
                     value.status === 0
                       ? "blue"
                       : value.status === 1
-                      ? "green"
-                      : "red"
+                        ? "green"
+                        : "red"
                 }}
                 onClick={() => {
                   dispatch(getIdShop(value.id));
@@ -198,10 +202,10 @@ function ListShop() {
                 {value.status === 0
                   ? "Chờ Xác Nhận"
                   : value.status === 1
-                  ? "Đang hoạt động"
-                  : value.status === 2
-                  ? "Cấm hoạt động"
-                  : null}
+                    ? "Đang hoạt động"
+                    : value.status === 2
+                      ? "Cấm hoạt động"
+                      : null}
               </span>
             </div>
           </div>

@@ -30,7 +30,7 @@ function ListAccount() {
 
   const getdata = async (page, filterStatus) => {
     try {
-      const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
+      const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
       const responseData = response.data;
       if (filterStatus === undefined || filterStatus === "") {
         setAccounts(responseData.content || []);

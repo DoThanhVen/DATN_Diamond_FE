@@ -32,64 +32,56 @@ import ChatApp from './chatApp/chatApp'
 import { Provider } from "react-redux";
 import store from './Store/store'
 function App() {
-  const [accountLogin, setAccountLogin] = useState(null)
-  const navigate = useNavigate()
-
-  const getAccountFromSession = () => {
-    const accountLogin = GetDataLogin()
-
-    if (accountLogin !== undefined) {
-      try {
-        setAccountLogin(accountLogin)
-      } catch (error) {
-        console.log(error)
-      }
-    } else {
-      navigate('/login')
-    }
-  }
-
+  const [accountLogin, setAccountLogin] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
-    getAccountFromSession()
-  }, [])
+    const account = GetDataLogin();
+    if (account) {
+      setAccountLogin(account);
+    } else {
+      navigate('/login');
+    }
+  }, [navigate]);
 
+  const isAdmin = accountLogin && accountLogin.authorities.some(role => role.authority === 'ROLE_Admin');
+  console.log('check',isAdmin)
   return (
- 
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/cart' element={<Cart />} />
-        <Route path='/category/:id' element={<Product />} exact />
-        <Route path='/product/:productId' element={<Detail />} exact />
-        <Route path='/newProducts' element={<NewProducts />} />
-        <Route path='/orderDetail' element={<OrderDetail />} />
-        <Route path='/checkout' element={<Checkout />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/order' element={<Order />} />
-        <Route path='/suggestedProducts' element={<SuggestedProducts />} />
-        <Route path='/recommendedProducts' element={<RecommendedProducts />} />
-        <Route path='/forgotPassword' element={<ForgotPass />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/salesRegistration' element={<SalesRegistration />} />
-        <Route path='/contact' element={<ContactInfo />} />
-        <Route path='/policy' element={<Policy />} />
-        <Route path='/likeProduct' element={<LikeProduct />} />
-        <Route path='/shops/:productId/shop' element={<Shop />} />
-        <Route path='*' element={<Navigate to="/not-found" />} />
-        <Route path='/not-found' element={<NotFoundPage />} />
 
+    <Routes>
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/cart' element={<Cart />} />
+      <Route path='/category/:id' element={<Product />} exact />
+      <Route path='/product/:productId' element={<Detail />} exact />
+      <Route path='/newProducts' element={<NewProducts />} />
+      <Route path='/orderDetail' element={<OrderDetail />} />
+      <Route path='/checkout' element={<Checkout />} />
+      <Route path='/profile' element={<Profile />} />
+      <Route path='/order' element={<Order />} />
+      <Route path='/suggestedProducts' element={<SuggestedProducts />} />
+      <Route path='/recommendedProducts' element={<RecommendedProducts />} />
+      <Route path='/forgotPassword' element={<ForgotPass />} />
+      <Route path='/register' element={<Register />} />
+      <Route path='/salesRegistration' element={<SalesRegistration />} />
+      <Route path='/contact' element={<ContactInfo />} />
+      <Route path='/policy' element={<Policy />} />
+      <Route path='/likeProduct' element={<LikeProduct />} />
+      <Route path='/shops/:productId/shop' element={<Shop />} />
+      <Route path='*' element={<Navigate to="/not-found" />} />
+      <Route path='/not-found' element={<NotFoundPage />} />
 
-        <Route path="*" element={<Navigate to="/not-found" />} />
-        <Route path="/not-found" element={<NotFoundPage />} />
+      <Route path="*" element={<Navigate to="/not-found" />} />
+      <Route path="/not-found" element={<NotFoundPage />} />
 
-        <Route path="/admin/*" element={<AdminDashBoard />} />
-        <Route path="/business/*" element={<BusinessDashBoard />} />
+      <Route path="/admin/*" element={isAdmin ?<Navigate to="/not-found" />  :<AdminDashBoard /> } />
 
-        {/* Mdung test pay */}
-        <Route path="/pay" element={<VNPayBankSelection />} />
+      <Route path="/business/*" element={<BusinessDashBoard />} />
 
-        <Route path="/chatApp" element={<ChatApp />} />
-      </Routes>
+      {/* Mdung test pay */}
+      <Route path="/pay" element={<VNPayBankSelection />} />
+
+      <Route path="/chatApp" element={<ChatApp />} />
+    </Routes>
 
   )
 }

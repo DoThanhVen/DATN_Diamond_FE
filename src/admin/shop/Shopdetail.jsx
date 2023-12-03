@@ -4,6 +4,7 @@ import ShopService from "../../service/ShopService";
 import { getIdShop } from "../../service/Actions";
 import { Link, useNavigate } from "react-router-dom";
 import style from "../../css/admin/shop/shopdetail.module.css";
+import { callAPI } from "../../service/API";
 
 function ShopDetail() {
   const [shop, setshop] = useState({});
@@ -17,17 +18,18 @@ function ShopDetail() {
 
   const getShop = async () => {
     if (Array.isArray(data)) {
-      console.log(data)
-      const listFilter = data.filter(a => {
-        return a.shop.id === id
+      const foundAccount = data.find(item => item.shop && item.shop.id === id);
+      if (foundAccount) {
+        setshop(foundAccount);
       }
-      )
-      listFilter.forEach(e => setshop(e))
-      console.log('list',listFilter)
     }
   };
+
   const handleSubmit = async () => {
-    const reponse = await ShopService.updateStatusAdmin(shop.shop.id, 1);
+    const formData=new FormData();
+    formData.append('id',shop.shop.id);
+    formData.append('status',1);
+    await callAPI(`/api/admin/update`,'PUT',formData);
     navigate("/admin/shops");
     dispatch(getIdShop(0));
   };
@@ -38,7 +40,10 @@ function ShopDetail() {
       <div>
         <img
           className={style.shopImage}
-          src="http://localhost:8080/api/uploadImageProduct/b22654805fd246319e661efb0cc73e87.jpg" // Replace with the actual image URL
+          src=
+          {shop?.shop?.image
+            ? `http://localhost:8080/api/uploadImageProduct/${shop.shop.image}`
+            : "/images/image_shop.jpg"}
           alt="Shop"
           style={{ maxWidth: "100%" }}
         />
