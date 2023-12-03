@@ -23,7 +23,7 @@ export default function SalesRegistration() {
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-    if (accountLogin === undefined || accountLogin === null) {
+    if (accountLogin === null) {
       navigate("/login");
     } else {
       try {

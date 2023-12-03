@@ -96,14 +96,6 @@ function AdminDashboard() {
       mapping: "/admin/bills",
       active: isActiveListOrder,
       activeDetail: isActiveOrderDetail
-    },
-    {
-      id: "6",
-      value: "Thống Kê",
-      icon: "bi bi-graph-up-arrow",
-      mapping: "/admin/statistical",
-      active: isActiveStatistical,
-      activeDetail: null
     }
   ];
 
@@ -128,7 +120,7 @@ function AdminDashboard() {
       <div className={`${style.header}`}>
           <div className={`${style.logo}`}>
             <img src="/images/diamond.png" alt="Hình Ảnh" />
-            <Nav.Link href="/business">Kênh Quản Trị</Nav.Link>
+            <Nav.Link href="/admin">Kênh Quản Trị</Nav.Link>
           </div>
           <div className={`${style.others}`}>
             <div className={`${style.account}`}>

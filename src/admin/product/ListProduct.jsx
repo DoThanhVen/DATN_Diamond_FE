@@ -117,60 +117,51 @@ function ListProduct() {
           </div>
         </div>
 
-        {/* Sort */}
-        <div className={`${style.sortProduct}`}>
-          <label>Sắp xếp</label>
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              setsortBy(e.target.value)
-            }}
-            className={`ms-2 ${style.optionSelect}`}
-          >
-            <option value="">Lựa chọn...</option>
-            <option value={'id'}>
-              Mã sản phẩm
-            </option>
-            <option value={'product_name'}>
-              Tên sản phẩm
-            </option>
-            <option value={'price'}>
-              Giá
-            </option>
-            <option value={'create_date'}>
-              Ngày tạo
-            </option>
-          </select>
-          {sortBy !== "" ? (
+        <div className={style.sort}>
+          <div className={`${style.sortProduct}`}>
+            <label>Sắp xếp</label>
             <select
-              value={sortType}
+              value={sortBy}
               onChange={(e) => {
-                setsortType(e.target.value)
+                setsortBy(e.target.value);
               }}
-              className={`${style.optionSelect}`}
+              className={`ms-2 ${style.optionSelect}`}
             >
-              <option value="asc">Tăng dần</option>
-              <option value="desc">Giảm dần</option>
+              <option value="">Lựa chọn...</option>
+              <option value={"id"}>Mã sản phẩm</option>
+              <option value={"product_name"}>Tên sản phẩm</option>
+              <option value={"price"}>Giá</option>
+              <option value={"create_date"}>Ngày tạo</option>
             </select>
-           ) : null}
+            {sortBy !== "" ? (
+              <select
+                value={sortType}
+                onChange={(e) => {
+                  setsortType(e.target.value);
+                }}
+                className={`${style.optionSelect}`}
+              >
+                <option value="asc">Tăng dần</option>
+                <option value="desc">Giảm dần</option>
+              </select>
+            ) : null}
+          </div>
+          <div className={style.typeProduct}>
+            <label>Trạng thái:</label>
+            <select
+              value={filterbyStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+              }}
+              className={`ms-2 ${style.optionSelect}`}
+            >
+              <option value="">Tất cả</option>
+              <option value="0">Chờ Phê Duyệt</option>
+              <option value="1">Đang Hoạt Động</option>
+              <option value="2">Dừng Hoạt Động</option>
+            </select>
+          </div>
         </div>
-        <div className={style.typeProduct}>
-          <label>Lọc sản phẩm theo trạng thái:</label>
-          <select
-            value={filterbyStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              
-            }}
-            className={`${style.optionSelectType}`}
-          >
-            <option value="">Tất cả</option>
-            <option value="0">Chờ Phê Duyệt</option>
-            <option value="1">Đang Hoạt Động</option>
-            <option value="2">Cấm Hoạt Động</option>
-          </select>
-        </div>
-
         <div className={style.table}>
           <div className={style.tableHeading}>
             <label className={style.column}>Mã SP</label>
@@ -187,21 +178,15 @@ function ListProduct() {
             <div key={index} className={style.tableBody}>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
-                {index}
-              </label>
-              <label className={style.column}>
-                {value.id}
-              </label>
-              <label className={style.column}>
-                {value.image_product != null ? value.image_product?.map((item, index) =>
+                {value.image_product != null ? (
                   <img
-                    key={index}
+                    key={value.image_product[0].id}
                     className={style.image}
-                    src={`http://localhost:8080/api/uploadImageProduct/${item.url}`}
+                    src={`http://localhost:8080/api/uploadImageProduct/${value.image_product[0].url}`}
                     alt="Hình Ảnh"
                   />
-                )
-                  :( <img
+                ) : (
+                  <img
                     className={style.image}
                     src={`/images/nullImage.png`}
                     alt="Hình Ảnh"
@@ -213,7 +198,6 @@ function ListProduct() {
                 {value.categoryItem_product?.type_category_item}
               </label>
               <label className={style.column}>
-                {formatCurrency(value.price, 0)}
                 {formatCurrency(value.price, 0)}
               </label>
               <label className={style.column}>

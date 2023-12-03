@@ -26,7 +26,7 @@ function Shop() {
   const getData = async () => {
     try {
       const accountData = await getAccountFromCookie();
-      if (accountData !== undefined) {
+      if (accountData !== null) {
         setAccountLogin(accountData)
         getDataShop(accountData.shop.id)
       }
@@ -40,15 +40,16 @@ function Shop() {
 
   const getDataShop = async (idshop) => {
     try {
-      const res = await callAPI(`/api/shop/get/${idshop}`, 'GET');
-      console.log('shop', res.data)
-      setshop(res.data)
-      setShopName(res.data.shop_name)
-      setCity(res.data.addressShop.city)
-      setDistrict(res.data.addressShop.district)
-      setWard(res.data.addressShop.ward)
-      setAddress(res.data.addressShop.address)
-      setSelectedImage(`http://localhost:8080/api/uploadImageProduct/${res.data.image}`)
+      const res = await callAPI(`/api/shop/${idshop}`, 'GET');
+      setshop(res)
+      setShopName(res.shop_name)
+      setCity(res.addressShop.city)
+      setDistrict(res.addressShop.district)
+      setWard(res.addressShop.ward)
+      setAddress(res.addressShop.address)
+      if(res.image){
+        setSelectedImage(`http://localhost:8080/api/uploadImageProduct/${res.image}`)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -99,7 +100,8 @@ function Shop() {
       formData.append('ward', ward);
       formData.append('address', address);
 
-      const res = await callAPI(`/api/shop/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
+      const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
+      console.log(res)
       if (res.status === 'success') {
         ThongBao(res.message, res.status);
         setreload(reload + 1);
@@ -147,7 +149,7 @@ function Shop() {
         <div className={style.formImage}>
           {selectedImage !== null ? (
             <img className={style.image} src={selectedImage} alt="Hình Ảnh" />
-          ) : null}
+          ) : <img className={style.image} src="/images/image_shop.jpg" alt="Hình Ảnh" />}
           <div className={style.action}>
             <input
               type="file"
@@ -177,7 +179,7 @@ function Shop() {
               <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 <h6 className="mt-3 text-primary">Địa chỉ</h6>
               </div>
-              <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+              <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div className="form-group">
                   <select
                     value={city}
@@ -194,7 +196,7 @@ function Shop() {
 
                 </div>
               </div>
-              <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+              <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div className="form-group">
                   <select
                     value={district}
@@ -213,7 +215,6 @@ function Shop() {
 
                 </div>
               </div>
-
               <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
                 <div className="form-group">
                   <select

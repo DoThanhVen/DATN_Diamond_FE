@@ -121,49 +121,6 @@ function Navbar() {
               </label>
             </div>
             <div
-              className={`${style.notifycation}`}
-              style={{
-                backgroundColor: activeNotifycation
-                  ? "rgba(211, 211, 211, .5)"
-                  : "transparent"
-              }}
-            >
-              <i
-                className={`bx bx-bell ${style.i}`}
-                onClick={() => setNotifycation(!activeNotifycation)}
-              />
-              <span className={style.span}>5</span>
-              <div
-                className={`${style.card}`}
-                style={{ display: activeNotifycation ? "block" : "none" }}
-              >
-                <div className={`${style.cardHeader}`}>
-                  Thông báo gần đây nhận
-                </div>
-                <div className={`${style.cardBody}`}>
-                  <div className={`${style.cardContent}`}>
-                    <img
-                      className={style.image}
-                      src="/images/banner-left.jpg"
-                      alt="Hình Ảnh"
-                    />
-                    <div className={`${style.content}`}>
-                      <div className={`${style.title}`}>Đặt Hàng</div>
-                      <div className={`${style.substance}`}>
-                        Khách hàng Đỗ Thanh Vẹn đã đặt hàng Áo Sơ Mi Nam Quyến
-                        Rũ
-                      </div>
-                      <div className={`${style.time}`}>
-                        <div className={`day`}>10/10/2023</div>
-                        <div className={`clock`}>12:30:45</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className={`${style.cardFooter}`}>THÔNG BÁO</div>
-              </div>
-            </div>
-            <div
               className={`${style.logout} ms-2 me-2`}
               onClick={() => handleLogout()}
             >

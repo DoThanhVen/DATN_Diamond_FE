@@ -25,7 +25,7 @@ const SidebarM = () => {
       <div className={style.sidebar}>
         <div className={style.list_menu}>
           <span className={style.header}>
-            <i className="me-2 fa fa-bars"></i> DANH MỤC
+            Danh mục
           </span>
           <div className={style.content}>
             {categories.map((category) => (

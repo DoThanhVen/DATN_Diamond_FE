@@ -162,22 +162,19 @@ function ListShop() {
                 </label>
                 <label>
                   Đường:{" "}
-                  {
-                      listDataAddress.map((valueCity, index) =>
-                        valueCity.codename === value.addressShop?.city
-                          ? valueCity.districts.map((valueDistrict, index) =>
-                              valueDistrict.codename ===
-                              value.addressShop?.district
-                                ? valueDistrict.wards.map((valueWard, index) =>
-                                    valueWard.codename ===
-                                    value.addressShop?.ward
-                                      ? valueWard.name
-                                      : null
-                                  )
-                                : null
-                            )
-                          : null
-                    )}
+                  {listDataAddress.map((valueCity, index) =>
+                    valueCity.codename === value.addressShop?.city
+                      ? valueCity.districts.map((valueDistrict, index) =>
+                          valueDistrict.codename === value.addressShop?.district
+                            ? valueDistrict.wards.map((valueWard, index) =>
+                                valueWard.codename === value.addressShop?.ward
+                                  ? valueWard.name
+                                  : null
+                              )
+                            : null
+                        )
+                      : null
+                  )}
                 </label>
                 <label>Số nhà: {value.addressShop?.address}</label>
               </div>
@@ -186,7 +183,12 @@ function ListShop() {
               <span
                 className={style.statusShop}
                 style={{
-                  backgroundColor: value.status === 0 ? "blue" : value.status === 1 ? "green" : "red"
+                  backgroundColor:
+                    value.status === 0
+                      ? "blue"
+                      : value.status === 1
+                      ? "green"
+                      : "red"
                 }}
                 onClick={() => {
                   dispatch(getIdShop(value.id));

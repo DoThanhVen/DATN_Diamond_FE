@@ -17,6 +17,7 @@ import "../css/user/home.css";
 import "../css/user/slider.css";
 import style from "../css/user/product.module.css";
 import LazyLoad from "react-lazy-load";
+import { Pagination } from "@mui/material";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -85,7 +86,9 @@ function Product() {
     ratingFilter
   } = localState;
   const [sortedProducts, setSortedProducts] = useState([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const numberPage = 12;
   // Bắt sự kiện khi giá trị của Slider thay đổi
   const handleChange1 = (event, newValue) => {
     dispatch({
@@ -140,16 +143,25 @@ function Product() {
 
   // Lấy danh sách sản phẩm từ server khi component được render
   useEffect(() => {
-    getListProduct();
-  }, []);
+    getListProduct(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   // Hàm để lấy danh sách sản phẩm từ server
-  const getListProduct = () => {
+  const getListProduct = (page) => {
     axios
-      .get(`${API_BASE_URL}/api/product`)
+      .get(
+        `${API_BASE_URL}/api/product/getAll?key=&keyword=&offset=${
+          page - 1
+        }&sizePage=${numberPage}&sort=&sortType=&status=1`
+      )
       .then((response) => {
+        console.log(response.data.data.content);
         // Cập nhật danh sách sản phẩm
-        dispatch({ type: "SET_PRODUCTS", products: response.data });
+        dispatch({ type: "SET_PRODUCTS", products: response.data.data.content });
       })
       .catch((error) => {
         console.log(error);
@@ -287,7 +299,8 @@ function Product() {
                       max={1000000}
                     />
                     <Typography variant="body2">
-                      <span style={{ color: "#FF0000" }}>Giá:</span> {value1[0]} - {value1[1]}
+                      <span style={{ color: "#FF0000" }}>Giá:</span> {value1[0]}{" "}
+                      - {value1[1]}
                     </Typography>
                   </Box>
                 </div>
@@ -392,12 +405,32 @@ function Product() {
                 )}
               </div>
             </div>
+            <div
+              className={style.paginationContainer}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px"
+              }}
+            >
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                boundaryCount={2}
+                variant="outlined"
+                shape="rounded"
+                size="large"
+                showFirstButton
+                showLastButton
+              />
+            </div>
           </div>
         </div>
       </div>
-        <div id="footer">
-          <Footer />
-        </div>
+      <div id="footer">
+        <Footer />
+      </div>
     </>
   );
 }

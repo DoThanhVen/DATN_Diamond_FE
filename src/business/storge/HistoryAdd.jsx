@@ -13,7 +13,7 @@ function HistoryAdd() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
+    if (accountLogin !== null) {
       try {
         getdataProducts(currentPage, accountLogin.shop.id);
 
@@ -70,7 +70,7 @@ function HistoryAdd() {
     setCurrentPage(value);
   };
   return (
-    <div className={`${style.listProduct}`}>
+    <div className={`${style.listProduct} ${style.history}`}>
       <div className={style.table}>
         <div className={style.tableHeading}>
           <label className={style.column}>STT</label>
@@ -84,18 +84,16 @@ function HistoryAdd() {
         {listProducts.map((product, index) => (
           <div key={product.id} className={style.tableBody}>
             <>
-              <label className={style.column}>{index + 1}</label>
+              <label className={style.column}>{index+ 1 +(currentPage * 10 - numberPage)}</label>
               <label className={style.column}>{product.id}</label>
               <label className={style.column}>
                 {product?.image_product.length > 0 ? (
-                  product?.image_product.map((image) => (
                     <img
-                      key={image.id}
+                      key={product?.image_product[0].id}
                       className={style.image}
-                      src={`http://localhost:8080/api/uploadImageProduct/${image.url}`}
+                      src={`http://localhost:8080/api/uploadImageProduct/${product?.image_product[0].url}`}
                       alt="Hình Ảnh"
                     />
-                  ))
                 ) : (
                   <img
                     className={style.image}

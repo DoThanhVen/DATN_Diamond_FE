@@ -293,7 +293,8 @@ function Home() {
             {currentPage - 1 > 0
               ? <Nav.Link
                   className={style.button}
-                  onClick={() => handlePageChange(currentPage - 1)}
+                  onClick={() => handlePageChange(currentPage - 1) 
+                  }
                 >
                   {currentPage - 1}
                 </Nav.Link>
@@ -319,7 +320,7 @@ function Home() {
           </div>
         </div>
       </div>
-      {loading && <Loading />}
+      {/* {loading && <Loading />} */}
     </React.Fragment>
   );
 }

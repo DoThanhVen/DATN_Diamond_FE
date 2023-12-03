@@ -21,10 +21,10 @@ function Profile_User() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
+    if (accountLogin !== null) {
       try {
         setAccountLogin(accountLogin);
-        setDataLogin(accountLogin)
+        setDataLogin(accountLogin);
       } catch (error) {
         console.log(error);
       }
@@ -235,10 +235,14 @@ function Profile_User() {
   };
 
   const handleUpdateAddress = async () => {
-    if(idAddressUse === 0){
+    if (idAddressUse === 0) {
       ThongBao("Vui lòng chọn địa chỉ cần cập nhật!", "info");
-    }
-    else if (city === "" || address === "" || district === "" || ward === "") {
+    } else if (
+      city === "" ||
+      address === "" ||
+      district === "" ||
+      ward === ""
+    ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
       const response = await callAPI(
@@ -510,7 +514,9 @@ function Profile_User() {
                             name="gender"
                             id="gridRadios1"
                             onChange={() => setGender(true)}
-                            defaultChecked={accountLogin && accountLogin.gender === true}
+                            defaultChecked={
+                              accountLogin && accountLogin.gender === true
+                            }
                           />
                           <label
                             className="form-check-label"
@@ -529,7 +535,9 @@ function Profile_User() {
                             name="gender"
                             id="gridRadios2"
                             onChange={() => setGender(false)}
-                            defaultChecked={accountLogin && accountLogin.gender === false}
+                            defaultChecked={
+                              accountLogin && accountLogin.gender === false
+                            }
                           />
                           <label
                             className="form-check-label"

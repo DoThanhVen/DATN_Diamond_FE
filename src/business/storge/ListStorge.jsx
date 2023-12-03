@@ -8,14 +8,12 @@ import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 function ListStorge() {
-
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
+    if (accountLogin !== null) {
       try {
         getdataProduct(currentPage, accountLogin.shop.id);
-
       } catch (error) {
         console.log(error);
       }
@@ -35,13 +33,13 @@ function ListStorge() {
 
   useEffect(() => {
     getAccountFromSession();
-  }, [reload, currentPage,textInput]);
-
+  }, [reload, currentPage, textInput]);
 
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${(page - 1) * numberPage
+        `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${
+          (page - 1) * numberPage
         }&sizePage=${numberPage}`,
         "GET"
       );
@@ -56,8 +54,8 @@ function ListStorge() {
   };
   return (
     <React.Fragment>
-      <div className={`${style.listProduct}`}>
-      <div className={`${style.formSearch}`}>
+      <div className={`${style.listProduct} ${style.listAll}`}>
+        <div className={`${style.formSearch}`}>
           <select
             value={valueOption}
             onChange={(e) => {
@@ -73,6 +71,7 @@ function ListStorge() {
             type="text"
             onChange={(e) => setTextInput(e.target.value)}
           />
+          <button className={`${style.buttonSearch}`}>Tìm Kiếm</button>
         </div>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -85,19 +84,17 @@ function ListStorge() {
           </div>
           {products?.content?.map((value, index) => (
             <div key={value.id} className={style.tableBody}>
-              <label className={style.column}>{index}</label>
+              <label className={style.column}>{index+ 1 +(currentPage * 10 - numberPage)}</label>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
                 {value?.image_product.length > 0 ? (
-                  value?.image_product.map((valueImage) => (
-                    <div key={valueImage.id}>
+                    <div key={value?.image_product[0].id}>
                       <img
                         className={style.image}
-                        src={`http://localhost:8080/api/uploadImageProduct/${valueImage.url}`}
+                        src={`http://localhost:8080/api/uploadImageProduct/${value?.image_product[0].url}`}
                         alt="Hình Ảnh"
                       ></img>
                     </div>
-                  ))
                 ) : (
                   <img
                     className={style.image}

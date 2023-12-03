@@ -200,17 +200,6 @@ function ListBill() {
   const [endDate,setEndDate] = useState(null)
   return (
     <React.Fragment>
-      <div className={style.header}>
-        <div className={style.formSearch}>
-          <i className={`bi bi-search ${style.icon}`}></i>
-          <input
-            className={style.input}
-            type="text"
-            placeholder="Tìm kiếm..."
-          ></input>
-        </div>
-        <i className={`bi bi-person-circle ${style.iconUser}`}></i>
-      </div>
       <div className={style.listBill}>
         <div className={style.heading}>
           <div className={style.column}>
@@ -326,30 +315,37 @@ function ListBill() {
           ))}
         </div>
         <div className={`${style.buttonPage}`}>
-          <Nav.Link className={`btn`} onClick={() => handlePageChange(1)}>
-            <i className="bi bi-chevron-bar-left"></i>
-          </Nav.Link>
-          <Nav.Link
-            className={`btn`}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            <i className="bi bi-caret-left"></i>
-          </Nav.Link>
-          <Nav.Link
-            className={`btn`}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            <i className="bi bi-caret-right"></i>
-          </Nav.Link>
-          <Nav.Link
-            className={`btn`}
-            onClick={() =>
-              handlePageChange(Math.ceil(listBill.length / numberPage))
-            }
-          >
-            <i className="bi bi-chevron-bar-right"></i>
-          </Nav.Link>
-        </div>
+            <Nav.Link className={style.button} onClick={() => handlePageChange(1)}>
+              <i className="bi bi-chevron-bar-left" />
+            </Nav.Link>
+            {currentPage - 1 > 0
+              ? <Nav.Link
+                  className={style.button}
+                  onClick={() => handlePageChange(currentPage - 1) 
+                  }
+                >
+                  {currentPage - 1}
+                </Nav.Link>
+              : null}
+
+            <Nav.Link className={`${style.button} ${style.btnActivePage}`}>
+              {currentPage}
+            </Nav.Link>
+            {currentPage + 1 <= totalPages
+              ? <Nav.Link
+                  className={style.button}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  {currentPage + 1}
+                </Nav.Link>
+              : null}
+            <Nav.Link
+              className={style.button}
+              onClick={() => handlePageChange(totalPages)}
+            >
+              <i className="bi bi-chevron-bar-right" />
+            </Nav.Link>
+          </div>
       </div>
     </React.Fragment>
   );

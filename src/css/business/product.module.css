@@ -339,6 +339,7 @@
 
         .tableBody,
         .tableHeading {
+            font-size: 14px;
             display: flex;
             align-items: center;
             padding: 5px;
@@ -395,7 +396,6 @@
         .tableBody {
 
             .column {
-                font-size: 14px;
 
                 &:nth-child(4),
                 &:nth-child(3) {

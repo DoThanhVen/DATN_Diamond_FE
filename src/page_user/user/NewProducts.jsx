@@ -45,10 +45,10 @@ function NewProducts() {
   useEffect(() => {
     axios
       .get(`${API_BASE_URL}/api/product/top10`)
-      .then(response => {
+      .then((response) => {
         setTop10Products(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching top 10 products:", error);
       });
   }, []);
@@ -65,23 +65,31 @@ function NewProducts() {
   return (
     <div className={style.list_item_new}>
       {top10Products &&
-        top10Products.map((product, index) =>
+        top10Products.map((product, index) => (
           <LazyLoad once={true} key={index} className={style.item_new_product}>
             <Link to={`/product/${product[0]}`}>
               {typeof product[5] === "string"
-                ? JSON.parse(product[5]).map((image, subIndex) =>
-                    <img
-                      key={image.id}
-                      src={`${API_BASE_URL}/api/uploadImageProduct/${image.url}`}
-                      alt={`Image ${subIndex}`}
-                      className={style.image}
-                    />
-                  )
+                ? (() => {
+                    try {
+                      const images = JSON.parse(product[5]);
+                      const lastImage = images[images.length - 1];
+
+                      return (
+                        <img
+                          key={lastImage.id}
+                          src={`${API_BASE_URL}/api/uploadImageProduct/${lastImage.url}`}
+                          alt={`Last Image`}
+                          className={style.image}
+                        />
+                      );
+                    } catch (error) {
+                      return null;
+                    }
+                  })()
                 : null}
+
               <div className={style.status}>new</div>
-              <div className={style.name}>
-                {product[2]}
-              </div>
+              <div className={style.name}>{product[2]}</div>
               <div className={style.info}>
                 <label className={style.price}>
                   {formatCurrency(product[3], 0)}
@@ -91,7 +99,7 @@ function NewProducts() {
               <div className={style.show_detail}>Xem chi tiết</div>
             </Link>
           </LazyLoad>
-        )}
+        ))}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function AddStorge() {
   const getAccountFromCookie = () => {
     const accountLogin = GetDataLogin();
 
-    if (accountLogin !== undefined) {
+    if (accountLogin !== null) {
       try {
         getdataProduct(accountLogin.shop.id);
       } catch (error) {
@@ -79,17 +79,6 @@ export default function AddStorge() {
 
   return (
     <React.Fragment>
-      <div className={style.header}>
-        <div className={style.formSearch}>
-          <i className={`bi bi-search ${style.icon}`} />
-          <input
-            className={style.input}
-            type="text"
-            placeholder="Tìm kiếm..."
-          />
-        </div>
-        <i className={`bi bi-person-circle ${style.iconUser}`} />
-      </div>
       <div id={`${style.addProduct}`}>
         <div className={`${style.heading}`}>
           <label>Cập nhật số lượng sản phẩm</label>

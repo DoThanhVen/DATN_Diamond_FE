@@ -19,7 +19,6 @@ const MainNavbar = () => {
   cart&& cart.map((item,index) => {
     total = index + 1
   })
-  console.log(total)
 
   const [accountLogin, setAccountLogin] = useState(null);
 

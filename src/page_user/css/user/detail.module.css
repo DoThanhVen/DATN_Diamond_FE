@@ -67,12 +67,78 @@
             height: 20px;
             display: grid;
             place-items: center;
+<<<<<<< HEAD
             color:white;
             border-radius: 50%;
             cursor: pointer;
             &.active{
+=======
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+
+            &.active {
+>>>>>>> origin/tven
                 display: none;
             }
         }
     }
+<<<<<<< HEAD
+=======
+}
+
+.groupButton {
+    display: flex;
+    justify-content: space-between;
+
+    .buttonBuy,
+    .buttonAdd {
+        color: white;
+        font-size: 15px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 200px;
+    }
+
+    .buttonBuy {
+        background-color: red;
+    }
+
+    .buttonAdd {
+        background-color: blue;
+    }
+}
+
+.area_rating {
+    .content {
+        display: flex;
+        flex-direction: column;
+
+        .text {
+            display: flex;
+            align-items: start;
+            margin-top: 10px;
+
+            .label {
+                width: 70px;
+            }
+
+            .input {
+                width: calc(100% - 190px);
+                height: 100px;
+            }
+
+            .button_rating {
+                width: 100px;
+                color: white;
+                border-radius: 10px;
+                padding: 5px 10px;
+                background-color: green;
+                margin-left: 10px;
+            }
+        }
+    }
+>>>>>>> origin/tven
 }

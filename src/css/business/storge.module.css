@@ -5,125 +5,232 @@
     padding: 20px;
 
     .listProduct {
-        .table {
-            .tableHeading {
-                background-color: rgba(240, 240, 240, .8);
 
-                .column {
-                    padding: 10px 0;
-                }
-            }
+        .formSearch {
+            padding: 10px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
 
-            .tableBody {
-                &:not(:last-child) {
-                    border-bottom: 2px solid rgba(240, 240, 240, .8);
-                }
-
-                .column {
-                    padding: 10px 0;
-
-                    .statusAccount {
-                        padding: 7px 10px;
-                        font-size: 14px;
-                        font-weight: bold;
-                        color: white;
-                        border-radius: 10px;
-                    }
-                }
-            }
-
-            .tableBody,
-            .tableHeading {
+            .formSearch {
+                padding: 10px 0;
+                position: relative;
                 display: flex;
                 align-items: center;
-                padding: 5px;
+            }
 
-                .column {
-                    text-align: center;
+            .optionSelect {
+                width: 150px;
+                height: 50px;
+                padding: 0 5px;
+                border: 1px solid lightgrey;
+            }
 
-                    &:nth-child(1) {
-                        width: 40px;
+
+            .optionSelect:focus {
+                outline: none;
+            }
+
+            .inputSearch {
+                height: 50px;
+                width: calc(100% - 150px - 100px);
+                padding: 5px 10px;
+                margin-left: -1px;
+                border: 1px solid lightgrey;
+            }
+
+            .inputSearch:focus {
+                outline: none;
+            }
+
+            .buttonSearch {
+                width: 100px;
+                height: 50px;
+                border: none;
+                color: white;
+                background-color: orangered;
+                font-size: 15px;
+            }
+
+        }
+
+        &.history {
+            .table {
+                .tableHeading {
+                    background-color: rgba(240, 240, 240, 0.8);
+
+                    .column {
+                        padding: 10px 0;
+                    }
+                }
+
+                .tableBody {
+                    &:not(:last-child) {
+                        border-bottom: 2px solid rgba(240, 240, 240, 0.8);
                     }
 
-                    &:nth-child(2) {
-                        width: 150px;
+                    .column {
+                        padding: 10px 0;
+
+                        .statusAccount {
+                            padding: 7px 10px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            color: white;
+                            border-radius: 10px;
+                        }
                     }
+                }
 
-                    &:nth-child(3) {
-                        width: 80px;
-                    }
+                .tableBody,
+                .tableHeading {
+                    display: flex;
+                    align-items: center;
+                    padding: 5px;
+                    font-size: 14px;
 
-                    &:nth-child(4) {
-                        width: 250px;
-                    }
+                    .column {
+                        text-align: center;
 
-                    &:nth-child(5) {
-                        width: 100px;
-                    }
+                        &:nth-child(1) {
+                            width: 40px;
+                        }
 
-                    &:nth-child(6) {
-                        width: 100px;
-                    }
+                        &:nth-child(2) {
+                            width: 60px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
-                    &:nth-child(7) {
-                        width: 140px;
-                    }
+                        &:nth-child(3) {
+                            width: 120px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
-                    &:nth-child(8) {
-                        width: 150px;
-                    }
+                        &:nth-child(4) {
+                            width: 320px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
-                    &:nth-child(9) {}
+                        &:nth-child(5) {
+                            width: 100px;
+                        }
 
-                    .image {
-                        width: 70px;
-                        height: 70px;
-                        object-fit: cover;
-                        border-radius: 10px;
-                    }
+                        &:nth-child(6) {
+                            width: 100px;
+                        }
 
-                    .buttonEdit {
-                        color: blue;
-                        cursor: pointer;
+                        &:nth-child(7) {
+                            width: 140px;
+                        }
+
+                        &:nth-child(8) {
+                            width: 150px;
+                        }
+
+                        &:nth-child(9) {}
+
+                        .image {
+                            width: 100px;
+                            height: 100px;
+                            object-fit: cover;
+                            border-radius: 10px;
+                        }
+
+                        .buttonEdit {
+                            color: blue;
+                            cursor: pointer;
+                        }
                     }
                 }
             }
+        }
+        &.listAll {
+            .table {
+                .tableHeading {
+                    background-color: rgba(240, 240, 240, 0.8);
 
-            .tableBody {
+                    .column {
+                        padding: 10px 0;
+                    }
+                }
 
-                .column {
+                .tableBody {
+                    &:not(:last-child) {
+                        border-bottom: 2px solid rgba(240, 240, 240, 0.8);
+                    }
+
+                    .column {
+                        padding: 10px 0;
+
+                        .statusAccount {
+                            padding: 7px 10px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            color: white;
+                            border-radius: 10px;
+                        }
+                    }
+                }
+
+                .tableBody,
+                .tableHeading {
+                    display: flex;
+                    align-items: center;
+                    padding: 5px;
                     font-size: 14px;
 
-                    &:nth-child(4),
-                    &:nth-child(3) {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
+                    .column {
+                        text-align: center;
 
-                    &:nth-child(7),
-                    &:nth-child(6),
-                    &:nth-child(5) {
-                        display: flex;
-                        justify-content: center;
-                    }
+                        &:nth-child(1) {
+                            width: 40px;
+                        }
 
-                    .status {
-                        width: 85%;
-                        padding: 3px 0;
-                        border-radius: 20px;
-                        color: white;
-                        font-size: 14px;
-                    }
+                        &:nth-child(2) {
+                            width: 60px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
-                    .updateStatus {
-                        width: 90%;
-                        font-size: 14px;
-                        padding: 5px 0;
-                        color: white;
-                        border-radius: 0;
-                    }
+                        &:nth-child(3) {
+                            width: 120px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
+                        &:nth-child(4) {
+                            width: calc(100% - 420px);
+                        }
+
+                        &:nth-child(5) {
+                            width: 100px;
+                        }
+
+                        &:nth-child(6) {
+                            width: 100px;
+                        }
+
+
+                        .image {
+                            width: 100px;
+                            height: 100px;
+                            object-fit: cover;
+                            border-radius: 10px;
+                        }
+
+                        .buttonEdit {
+                            color: blue;
+                            cursor: pointer;
+                        }
+                    }
                 }
             }
         }
@@ -148,7 +255,6 @@
     display: flex;
     align-items: center;
     border-radius: 10px;
-    margin-bottom: 20px;
 
     .formSearch {
         width: 93%;
@@ -191,6 +297,7 @@
     .product {
         display: flex;
         margin-bottom: 10px;
+
         .label {
             min-width: 200px;
             text-align: right;
@@ -203,7 +310,8 @@
             padding: 5px 10px;
             border-radius: 5px;
             border: 1px solid lightgrey;
-            &:focus{
+
+            &:focus {
                 outline: none;
             }
         }
@@ -223,7 +331,7 @@
 
             &:nth-child(1),
             &:nth-child(2) {
-                background-color: #0FA958;
+                background-color: #0fa958;
             }
 
             &:last-child {

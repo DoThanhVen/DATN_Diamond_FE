@@ -126,6 +126,7 @@ body {
 
         .tableBody,
         .tableHeading {
+            font-size: 14px;
             display: flex;
             align-items: center;
             padding: 5px;
@@ -163,8 +164,6 @@ body {
         .tableBody {
 
             .column {
-                font-size: 14px;
-
                 &:nth-child(5),
                 &:nth-child(4),
                 &:nth-child(3) {
@@ -197,17 +196,22 @@ body {
         display: flex;
         justify-content: center;
         margin-top: 20px;
-        padding: 10px;
+        padding: 15px;
 
         .btnActivePage {
-            background-color: blue;
-            color: white
+            background-color: lightgray;
+            color: white;
+            border-radius: 5px;
         }
 
-        .button{
-            width: 30px;
-            height: 30px;
-            display: grid; place-items: center;
+        .button {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin: 0 3px;
         }
     }
 }
@@ -217,7 +221,8 @@ body {
         border: 1px solid lightgrey;
         padding: 5px 10px;
         margin-top: 10px;
-        &:focus{
+
+        &:focus {
             outline: none;
         }
     }

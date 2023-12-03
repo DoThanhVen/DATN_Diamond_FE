@@ -40,8 +40,9 @@ function ListShopWait() {
       const responseData = response.data;
 
       const listFilter = responseData.content.filter((a) => {
-        return a.shop.status === 0;
+        return  a.shop !== null && a.shop.status === 0;
       });
+
       setListShopwait(listFilter || []);
       setTotalPages(responseData.totalPages || 1);
     } catch (error) {

@@ -13,10 +13,19 @@ import swal from "sweetalert";
 import Cookies from "js-cookie";
 import listDataAddress from "../../service/AddressVietNam.json";
 import style from "../css/user/detail.module.css";
-import { GetDataLogin } from "../../service/DataLogin.js"
+import { GetDataLogin } from "../../service/DataLogin.js";
 import { useDispatch } from "react-redux";
-import cartSilce from '../../Reducer/cartSilce';
+import cartSilce from "../../Reducer/cartSilce";
 const API_BASE_URL = "http://localhost:8080";
+
+function formatCurrency(price, promotion) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0
+  });
+  return formatter.format(price - price * (promotion / 100));
+}
 
 function localStateReducer(state, action) {
   switch (action.type) {
@@ -43,10 +52,6 @@ function localStateReducer(state, action) {
 
 function ProductPage() {
   const navigate = useNavigate();
-  const [city, setCity] = useState("");
-  const [district, setDistrict] = useState("");
-  const [ward, setWard] = useState("");
-  const [address, setAddress] = useState("");
 
   const [accountLogin, setAccountLogin] = useState(null);
 
@@ -67,6 +72,7 @@ function ProductPage() {
   useEffect(() => {
     getAccountFromSession();
   }, []);
+
   const { productId } = useParams();
   const [localState, dispatch] = useReducer(localStateReducer, {
     product: null,
@@ -82,13 +88,13 @@ function ProductPage() {
     localState;
 
   const increaseCount = () => {
-    setQuantity(Number(quantity) + 1)
+    setQuantity(Number(quantity) + 1);
     // dispatch({ type: "SET_COUNT", payload: count + 1 });
   };
 
   const decreaseCount = () => {
     if (count > 1) {
-      setQuantity(Number(quantity) - 1)
+      setQuantity(Number(quantity) - 1);
 
       // dispatch({ type: "SET_COUNT", payload: count - 1 });
     }
@@ -119,7 +125,6 @@ function ProductPage() {
       .get(`${API_BASE_URL}/api/product/${productId}/shop`)
       .then((response) => {
         const shopData = response.data.data;
-        console.log(response.data.data);
         dispatch({ type: "SET_SHOP_DATA", payload: shopData });
         dispatch({ type: "SET_SHOP_NAME", payload: shopData[1] });
       })
@@ -274,37 +279,16 @@ function ProductPage() {
     }
   }, []);
 
-  const handleSelectUseAddress = async (city, district, ward, address) => {
-    setCity(city);
-    setDistrict(district);
-    setWard(ward);
-    setAddress(address);
-  };
-
-  const handleChangeCity = (value) => {
-    setCity(value);
-    setDistrict("");
-    setWard("");
-  };
-
-  const handleChangeDistrict = (value) => {
-    setDistrict(value);
-    setWard("");
-  };
-
   const dispatchs = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const handleAddCart = (e) => {
-    console.log("add")
-    console.log(product)
-    console.log(quantity)
     dispatchs(
       cartSilce.actions.addToCart({
         product: product,
         quantity: quantity
       })
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -313,7 +297,7 @@ function ProductPage() {
       </nav>
 
       <div className="detail" style={{ backgroundColor: "#f5f5fa" }}>
-      <section className="">
+        <section className="">
           <div
             className="container bg-white mt-4"
             style={{ borderRadius: "8px" }}
@@ -321,8 +305,8 @@ function ProductPage() {
             <div className="row p-4">
               <aside className="col-lg-6">
                 {product &&
-                  product.image_product &&
-                  product.image_product.length > 0 ? (
+                product.image_product &&
+                product.image_product.length > 0 ? (
                   <Carousel>
                     {product.image_product.map((image, index) => (
                       <div
@@ -332,11 +316,14 @@ function ProductPage() {
                           height: "700px",
                           display: "flex",
                           justifyContent: "center",
-                          alignItems: "center",
+                          alignItems: "center"
                         }}
                       >
                         <img
-                          src={"http://localhost:8080/api/uploadImageProduct/" + image.url}
+                          src={
+                            "http://localhost:8080/api/uploadImageProduct/" +
+                            image.url
+                          }
                           alt={`Image ${index}`}
                         />
                       </div>
@@ -350,12 +337,7 @@ function ProductPage() {
               <main className="col-lg-6 ">
                 <div className="ps-lg-3">
                   {product && shopName !== null ? (
-                    <h4 className="title text-dark">
-                      {product.product_name}
-                      {/* <h2>{shopName}</h2> */}
-
-                      {/* Continue displaying other product details */}
-                    </h4>
+                    <h4 className="title text-dark">{product.product_name}</h4>
                   ) : (
                     <p>Loading...</p>
                   )}
@@ -377,41 +359,19 @@ function ProductPage() {
 
                   <div className="mb-3">
                     <span className="h5">
-                      {/* <div className="sale-price" style={{ fontSize: '25px' }}>
-                      <del>2.499.000 <sup>đ</sup> </del>
-                    </div> */}
                       <div className="d-flex ">
                         <h2 className="text-danger">
-                          {product ? `${product.price} ₫` : "Loading..."}
+                          {product ? formatCurrency(product.price, 0) : null}
                         </h2>
-
-                        {/* <div className="sale ms-4 bg-danger text-light mb-2 p-1">
-                        <b>Giảm 50%</b>
-                      </div> */}
                       </div>
                     </span>
                   </div>
-
-                  <div className="address mb-2">
-                    <b>
-                      <span className="title ">ĐỊA CHỈ GIAO HÀNG</span>
-                    </b>
-                    <br />
-                    <span>Tô Ký, Quận 12, TP Hồ Chí Minh</span>
-                    <a href="#" style={{ color: "blue", marginLeft: "10px" }}>
-                      Thay đổi
-                    </a>
-                  </div>
-
                   <hr />
                   <div className="col-md-4 col-6 mb-3">
                     <b>
                       <span className="title ">SỐ LƯỢNG</span>
                     </b>
-                    <div
-                      className="input-group mb-3"
-                      style={{ width: "170px" }}
-                    >
+                    <div className="input-group mb-3">
                       <button
                         className="btn btn-white border border-secondary px-3"
                         type="button"
@@ -422,11 +382,12 @@ function ProductPage() {
                         <i className="bi bi-dash"></i>
                       </button>
                       <input
-                        type="number" min={1}
+                        type="number"
+                        min={1}
                         value={quantity}
-                        onChange={(e)=> {
-                            setQuantity(e.target.value)
-                        }}  
+                        onChange={(e) => {
+                          setQuantity(e.target.value);
+                        }}
                         className="form-control text-center border border-secondary"
                         placeholder={count}
                         aria-label="Example text with button addon"
@@ -443,39 +404,16 @@ function ProductPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="row mb-4">
-                    <div className="col-md-4 col-6">
-                      {/* <label className="mb-2">Size</label>
-                      <select className="form-select border border-secondary" style={{ height: '35px' }}>
-                        <option>Small</option>
-                        <option>Medium</option>
-                        <option>Large</option>
-                      </select> */}
-                    </div>
+                  <div className={style.groupButton}>
+                    <a href="#" className={style.buttonBuy}>
+                      <i className="bi bi-bag-plus mx-2"></i>
+                      <strong>Mua ngay</strong>
+                    </a>
+                    <button onClick={handleAddCart} className={style.buttonAdd}>
+                      <i className="bi bi-basket3-fill"></i>
+                      <strong> Thêm vào giỏ hàng</strong>
+                    </button>
                   </div>
-                  <a
-                    href="#"
-                    className="btn  shadow-0 "
-                    style={{
-                      backgroundColor: " rgb(252,162,53)",
-                      padding: "10px 50px",
-                    }}
-                  >
-                    <i className="bi bi-bag-plus mx-2"></i>
-                    <strong>Mua ngay</strong>
-                  </a>
-                  <button
-                    onClick={handleAddCart}
-                    className="btn  shadow-0 mx-4 text-white
-                  "
-                    style={{
-                      backgroundColor: " rgb(48,83,73)",
-                      padding: "10px 50px",
-                    }}
-                  >
-                    <i className="bi bi-basket3-fill"></i>
-                    <strong> Thêm vào giỏ hàng</strong>
-                  </button>
                 </div>
               </main>
             </div>
@@ -506,7 +444,7 @@ function ProductPage() {
                       <div>
                         <b>{shopName}</b> <br />
                         {listDataAddress.map((valueCity, index) =>
-                          valueCity.codename === shopData[2].city
+                          shopData[2] && valueCity.codename === shopData[2].city
                             ? valueCity.name
                             : null
                         )}
@@ -537,7 +475,11 @@ function ProductPage() {
                       role="tabpanel"
                       aria-labelledby="ex1-tab-1"
                     >
-                      <p dangerouslySetInnerHTML={{ __html: product ? product.description : '' }} />
+                      <p
+                        dangerouslySetInnerHTML={{
+                          __html: product ? product.description : ""
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="shipping-info ">
@@ -629,52 +571,54 @@ function ProductPage() {
           </div>
         </section>
 
-        <section className="">
+        <section className={style.rating}>
           <div className="container">
             <div className="row gx-4">
               <div className="col-lg-8 mb-4">
                 <div className=" p-3 bg-white" style={{ borderRadius: "8px" }}>
-                  <div className="reviews">
-                    <b>
-                      <span component="legend" className="title">
-                        ĐÁNH GIÁ SẢN PHẨM
-                      </span>
-                    </b>
-                    {/* <Typography component="legend">
-                      Đánh giá sản phẩm
-                    </Typography> */}
-                    <div className="rating-section">
-                      {userReviews.length === 0 ? (
-                        <>
-                          <Rating
-                            name="product-rating"
-                            value={value}
-                            onChange={handleRatingChange}
-                          />
+                  <div>
+                    <div className={style.area_rating}>
+                      <b className={style.heading}>
+                        <span component="legend" className="title">
+                          ĐÁNH GIÁ SẢN PHẨM
+                        </span>
+                      </b>
+                      <div className={style.content}>
+                        {userReviews.length === 0 ? (
+                          <>
+                            <Rating
+                              name="product-rating"
+                              value={value}
+                              onChange={handleRatingChange}
+                            />
+                            <div className={style.text}>
+                              <label htmlFor="description" className={style.label}>Mô tả:</label>
+                              <textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className={style.input}
+                              />
 
-                          <label htmlFor="description">Mô tả:</label>
-                          <textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                          />
-
-                          <button
-                            onClick={handlePostRating}
-                            disabled={!isValidRating()}
-                          >
-                            Đăng
-                          </button>
-                        </>
-                      ) : (
-                        <p>Sản phẩm này bạn đã đánh giá</p>
-                      )}
+                              <button
+                                onClick={handlePostRating}
+                                disabled={!isValidRating()}
+                                className={style.button_rating}
+                              >
+                                Đăng
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <p>Sản phẩm này bạn đã đánh giá</p>
+                        )}
+                      </div>
                     </div>
 
                     <div className="average-rating-section">
-                      {avg !== null && (
+                      {avg !== 0 && (
                         <div>
-                          <p>Average Rating: {avg}</p>
+                          <p>Trung bình: {avg}</p>
                         </div>
                       )}
 
@@ -702,7 +646,7 @@ function ProductPage() {
                           </div>
                         ))
                       ) : (
-                        <Typography>
+                        <Typography className={`text-danger`}>
                           Chưa có bình luận nào về sản phẩm này.
                         </Typography>
                       )}

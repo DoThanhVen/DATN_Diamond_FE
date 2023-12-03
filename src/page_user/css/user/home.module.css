@@ -3,22 +3,38 @@
     justify-content: space-between;
 
     .sidebar {
+<<<<<<< HEAD
         width: 280px;
+=======
+        width: 250px;
+>>>>>>> origin/tven
 
         .list_menu {
             overflow: hidden;
 
             .header {
+<<<<<<< HEAD
                 background-color: blue;
                 width: 100%;
                 color: white;
+=======
+                width: 100%;
+                color: black;
+>>>>>>> origin/tven
                 display: flex;
                 align-items: center;
                 justify-content: start;
                 border-top-right-radius: 8px;
                 border-top-left-radius: 8px;
+<<<<<<< HEAD
                 padding: 7px 5px 7px 15px;
                 font-size: 16px;
+=======
+                padding: 15px 5px 0px 22px;
+                font-size: 16px;
+                font-weight: bold;
+                background-color: white;
+>>>>>>> origin/tven
             }
 
             .content {
@@ -27,6 +43,10 @@
                 margin: 0;
                 border-bottom-left-radius: 8px;
                 border-bottom-right-radius: 8px;
+<<<<<<< HEAD
+=======
+                padding: 10px;
+>>>>>>> origin/tven
                 display: flex;
                 flex-direction: column;
 
@@ -35,13 +55,17 @@
                     height: 40px;
                     object-fit: cover;
                     border-radius: 50%;
+<<<<<<< HEAD
                     filter: grayscale(100%);
                     border: 1px solid lightgrey;
+=======
+>>>>>>> origin/tven
                     transition: all .5s ease-in-out;
                 }
 
                 .item {
                     padding: 7px 0 7px 10px;
+<<<<<<< HEAD
 
                     &:not(:last-child) {
                         border-bottom: 1px solid rgb(231, 231, 231);
@@ -52,6 +76,17 @@
                             filter: grayscale(0);
                             border: 1px solid blue;
                         }
+=======
+                    border-radius: 8px;
+                    transition: all .3s ease-in-out;
+
+                    .value {
+                        color: black;
+                    }
+
+                    &:hover {
+                        background-color: rgb(230, 230, 230);
+>>>>>>> origin/tven
                     }
 
                     &:last-child:hover {
@@ -64,7 +99,11 @@
     }
 
     .content {
+<<<<<<< HEAD
         width: calc(100% - 290px);
+=======
+        width: calc(100% - 260px);
+>>>>>>> origin/tven
 
         .listNewProduct,
         .listRecommended {
@@ -164,11 +203,19 @@
                         z-index: 9999 !important;
                         transition: all .3s ease-in-out;
                     }
+<<<<<<< HEAD
                     
                     &:hover {
                         border: 1px solid blue;
                         transform: translateY(-5px);
                         
+=======
+
+                    &:hover {
+                        border: 1px solid blue;
+                        transform: translateY(-5px);
+
+>>>>>>> origin/tven
                         .show_detail {
                             opacity: 1;
                             visibility: visible;
