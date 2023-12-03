@@ -26,12 +26,19 @@ export default function ListProduct() {
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-    if (accountLogin !== undefined) {
-      try {
-        getdataProduct(currentPage, accountLogin.shop.id);
-      } catch (error) {
-        console.log(error);
+    const log=sessionStorage.getItem('accessToken')
+    console.log(log)
+    if (accountLogin !== undefined && accountLogin !== null) {
+      if (accountLogin.shop !== null) {
+        try {
+          getdataProduct(currentPage, accountLogin.shop.id);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        navigate("/");
       }
+
     } else {
       navigate("/login");
     }
@@ -54,8 +61,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getdataProduct(currentPage,4)
-    // getAccountFromSession();
+    getAccountFromSession();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {
@@ -77,8 +83,7 @@ export default function ListProduct() {
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${
-          (page - 1) 
+        `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=`,
         "GET"
       );
@@ -90,7 +95,7 @@ export default function ListProduct() {
   };
 
   const getdataCategory = async () => {
-    const reponse = await callAPI(`/api/category`, "GET");
+    const reponse = await callAPI(`/api/category?sizePage=10000`, "GET");
     if (reponse) {
       setcategorydata(reponse.content);
     }
@@ -274,22 +279,22 @@ export default function ListProduct() {
                       value.status === 0
                         ? "#34219E"
                         : value.status === 1
-                        ? "green"
-                        : value.status === 2
-                        ? "red"
-                        : "#E74C3C"
+                          ? "green"
+                          : value.status === 2
+                            ? "red"
+                            : "#E74C3C"
                   }}
                   value={`${value.status}`}
                 >
                   {value.status === 0
                     ? "Chờ Phê Duyệt"
                     : value.status === 1
-                    ? "Đang Hoạt Động"
-                    : value.status === 2
-                    ? "Dừng Hoạt Động"
-                    : value.status === 3
-                    ? "Cấm hoạt động"
-                    : "Lỗi"}
+                      ? "Đang Hoạt Động"
+                      : value.status === 2
+                        ? "Dừng Hoạt Động"
+                        : value.status === 3
+                          ? "Cấm hoạt động"
+                          : "Lỗi"}
                 </span>
               </label>
               <label className={style.column}>

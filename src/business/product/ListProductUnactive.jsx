@@ -24,14 +24,17 @@ function formatDate(date) {
 export default function ListProduct() {
 
   const navigate = useNavigate();
-  const getAccountFromCookie = () => {
+  const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
-    if (accountLogin !== undefined) {
-      try {
-        getdataProduct(currentPage, accountLogin.shop.id);
-      } catch (error) {
-        console.log(error);
+    if (accountLogin !== undefined && accountLogin !== null) {
+      if (accountLogin.shop !== null) {
+        try {
+          getdataProduct(currentPage, accountLogin.shop.id);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        navigate("/");
       }
     } else {
       navigate("/login");
@@ -55,7 +58,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getAccountFromCookie();
+    getAccountFromSession();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {
@@ -92,7 +95,7 @@ export default function ListProduct() {
   };
 
   const getdataCategory = async () => {
-    const reponse = await callAPI(`/api/category`, "GET");
+    const reponse = await callAPI(`/api/category?sizePage=10000`, "GET");
     if (reponse) {
       setcategorydata(reponse.content);
     }

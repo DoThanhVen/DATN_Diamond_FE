@@ -25,12 +25,15 @@ function Login() {
       password: password
     })
     console.log(response)
-    ThongBao(response.message, response.status)
-    navigate("/")
-    console.log(response.data.data)
-    const base64String = utf8_to_b64(JSON.stringify(response.data.data));
-    console.log(base64String)
-    sessionStorage.setItem("accountLogin", base64String);
+    if(response.status==='success'){
+      sessionStorage.setItem('accessToken',response.data.token)
+      const base64String = utf8_to_b64(JSON.stringify(response.data.data));
+      sessionStorage.setItem("accountLogin", base64String);
+      navigate("/")
+    }else{
+      ThongBao(response.message, response.status)
+    }
+   
     // axios
     //   .post(domain + `/api/account/login`, {
     //     username,

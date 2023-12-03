@@ -50,7 +50,7 @@ function AddProduct() {
   }, []);
 
   const getdataCategory = async () => {
-    const reponse = await callAPI(`/api/category`, "GET");
+    const reponse = await callAPI(`/api/category?sizePage=10000`, "GET");
     setcategorydata(reponse.content);
   };
 

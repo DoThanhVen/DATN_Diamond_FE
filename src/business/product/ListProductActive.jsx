@@ -24,13 +24,17 @@ export default function ListProduct() {
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
-    if (accountLogin !== undefined) {
-      try {
-        getdataProduct(currentPage, accountLogin.shop.id);
-      } catch (error) {
-        console.log(error);
+    if (accountLogin !== undefined && accountLogin !== null) {
+      if (accountLogin.shop !== null) {
+        try {
+          getdataProduct(currentPage, accountLogin.shop.id);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        navigate("/");
       }
+
     } else {
       navigate("/login");
     }
@@ -53,8 +57,7 @@ export default function ListProduct() {
 
   useEffect(() => {
     getdataCategory();
-    getdataProduct(currentPage,1);
-    //getAccountFromSession();
+    getAccountFromSession();
   }, [reload, currentPage, reloadinPage, sortType]);
 
   function handleClickEditProduct(event) {
@@ -74,17 +77,16 @@ export default function ListProduct() {
   };
 
   const getdataProduct = async (page, idShop) => {
-    const url = `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${
-      (page - 1) 
-    }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=active`;
-      console.log(url)
+    const url = `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
+      }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=active`;
+    console.log(url)
     try {
       const response = await callAPI(url,
         "GET"
       );
       console.log(response)
 
-      if(response){
+      if (response) {
         setProducts(response.data.content);
         setTotalPages(response.data.totalPages || 1);
       }
@@ -94,7 +96,7 @@ export default function ListProduct() {
   };
 
   const getdataCategory = async () => {
-    const reponse = await callAPI(`/api/category`, "GET");
+    const reponse = await callAPI(`/api/category?sizePage=10000`, "GET");
     if (reponse) {
       setcategorydata(reponse.content);
     }
