@@ -1,0 +1,45 @@
+/* PriceRange.css */
+.price-range {
+  margin: 20px 0;
+}
+
+.ui-slider {
+  position: relative;
+}
+
+.ui-slider-range {
+  background-color: #007bff; /* Màu của thanh trượt giá */
+  height: 100%;
+}
+
+.ui-slider-handle {
+  background-color: #007bff; /* Màu của nút trượt */
+  border: 1px solid #007bff;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.range-slider {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.price-input input {
+  width: 50px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.slider-container {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+/* Các quy tắc CSS khác tùy thuộc vào yêu cầu của bạn */

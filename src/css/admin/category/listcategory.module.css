@@ -1,0 +1,183 @@
+.listCategory {
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 20px 30px;
+
+    .heading {
+        margin-bottom: 40px;
+
+        .column {
+            .title {
+                font-size: 20px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+
+    .table {
+        .tableHeading {
+            background-color: rgba(240, 240, 240, .8);
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody {
+            &:not(:last-child) {
+                border-bottom: 2px solid rgba(240, 240, 240, .8);
+            }
+
+            .column {
+                padding: 10px 0;
+                font-size: 14px;
+            }
+        }
+
+        .tableBody,
+        .tableHeading {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+
+            .column {
+                &:nth-child(1) {
+                    width: 60px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                &:nth-child(2) {
+                    width: 120px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+
+                    .image {
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 10px;
+                    }
+                }
+
+                &:nth-child(3) {
+                    width: 150px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                &:nth-child(4) {
+                    width: 200px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                &:nth-child(5) {
+                    width: 150px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                &:nth-child(6) {
+                    width: 150px;
+                    display: grid;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+
+                    .status {
+                        text-align: center;
+                        width: 90%;
+                        padding: 5px 0;
+                        border-radius: 20px;
+                        color: white;
+                    }
+                }
+
+                &:nth-child(7) {
+                    width: 40px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+            }
+        }
+    }
+
+    .buttonPage {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .buttonPage a {
+        background-color: lightgrey;
+        color: black;
+        margin: 0 5px;
+    }
+}
+
+
+.formSearch {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+
+.optionSelect {
+    width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    font-size: 15px;
+}
+
+
+.optionSelect:focus {
+    outline: none;
+}
+
+.inputSearch {
+    height: 50px;
+    width: calc(100% - 150px - 100px);
+    padding: 5px 10px;
+    margin-left: -1px;
+    border: 1px solid lightgrey;
+}
+
+.inputSearch:focus {
+    outline: none;
+}
+
+.buttonSearch {
+    width: 100px;
+    height: 50px;
+    border: none;
+    color: white;
+    background-color: orangered;
+    font-size: 15px;
+}
+
+.sort {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
