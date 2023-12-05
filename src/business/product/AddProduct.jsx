@@ -10,15 +10,17 @@ import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
+import ModalAction from "../../service/ModalAction";
 
 function AddProduct() {
   const [accountLogin, setAccountLogin] = useState(null);
-
+  const [token, settoken] = useState(null);
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountSession = GetDataLogin();
-
-    if (accountSession !== undefined) {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
+    if (accountSession !== null) {
       try {
         setAccountLogin(accountSession)
       } catch (error) {
@@ -94,7 +96,7 @@ function AddProduct() {
       setSelectedImages(prevSelectedImages => [...prevSelectedImages, selectedImagesArray]);
     }
   };
-  
+
 
   const handleDeleteImage = index => {
     const deletedImage = [...selectedImages];
@@ -102,56 +104,64 @@ function AddProduct() {
     setSelectedImages(deletedImage);
   };
   const handleSubmitAdd = async () => {
-    if (name.trim()==="" || !price || !description || !valueCategoryItem || !selectedImages) {
+    if (name.trim() === "" || !price || !description || !valueCategoryItem || !selectedImages) {
       ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
       return;
     }
-  
+
     const isValidName = /^[\p{L}0-9\s]+$/u.test(name) && !/[!@#$%^&*(),.?":{}|<>]/g.test(name);
     if (!isValidName || name.length > MAX_NAME_LENGTH) {
       ThongBao(`Tên sản phẩm không hợp lệ hoặc vượt quá ${MAX_NAME_LENGTH} ký tự.`, "error");
       return;
     }
-  
+
     const isValidPrice = /^\d+(\.\d{1,2})?$/u.test(price);
     const isValidQuantity = /^\d+$/u.test(quantityValue);
-  
+
     if (!isValidPrice || parseFloat(price) <= 0) {
       ThongBao("Giá phải là số dương.", "error");
       return;
     }
-  
+
     if (!isValidQuantity || parseInt(quantityValue) <= 0) {
       ThongBao("Số lượng phải là số nguyên dương.", "error");
       return;
     }
-  
+
     if (description.length > MAX_DESCRIPTION_LENGTH) {
       ThongBao(`Mô tả sản phẩm không được vượt quá ${MAX_DESCRIPTION_LENGTH} ký tự.`, "error");
       return;
     }
-  
-    const response = await ProductService.addProduct(
-      name,
-      price,
-      description,
-      0,
-      valueCategoryItem,
-      quantityValue,
-      selectedImages,
-      imagesave,
-      4
-    );
-  
-    if (response.status === "success") {
-      dispatch(reloadPage(reloadold + 1));
-      ThongBao(response.message, response.status);
-    } else {
-      ThongBao(response.message, response.status);
-    }
-  };
-  
-  
+    const isConfirmed =await ModalAction("Bạn có chắc muốn thêm sản phẩm này?", "warning");
+    if (isConfirmed) {
+      try {
+        const response = await ProductService.addProduct(
+          name,
+          price,
+          description,
+          0,
+          valueCategoryItem,
+          quantityValue,
+          selectedImages,
+          imagesave,
+          accountLogin.shop.id,
+          token
+        );
+
+        if (response.status === "success") {
+          dispatch(reloadPage(reloadold + 1));
+          ThongBao(response.message, response.status);
+        } else {
+          ThongBao(response.message, response.status);
+        }
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra.", "error");
+      }
+
+    };
+  }
+
+
   return (
     <React.Fragment>
       <div className={`${style.cardHeading}`}>Thông tin cơ bản</div>
@@ -180,14 +190,14 @@ function AddProduct() {
             />
             {selectedImages.length < 9
               ? <label
-                  htmlFor="selectedImage"
-                  className={`${style.labelSelected}`}
-                >
-                  <i class="bx bx-image-add" />
-                  <span>
-                    Thêm hình ảnh ({selectedImages.length}/9)
-                  </span>
-                </label>
+                htmlFor="selectedImage"
+                className={`${style.labelSelected}`}
+              >
+                <i class="bx bx-image-add" />
+                <span>
+                  Thêm hình ảnh ({selectedImages.length}/9)
+                </span>
+              </label>
               : null}
           </div>
         </div>
@@ -230,19 +240,19 @@ function AddProduct() {
         </select>
         {valueCategory !== ""
           ? <select
-              value={valueCategoryItem}
-              onChange={handleChangeCategoryItem}
-              className={`${style.optionSelectType}`}
-            >
-              <option value="">Phân Loại Sản Phẩm...</option>
-              {categoryItemData.map((value, index) => {
-                return (
-                  <option key={index} value={value.id}>
-                    {value.type_category_item}
-                  </option>
-                );
-              })}
-            </select>
+            value={valueCategoryItem}
+            onChange={handleChangeCategoryItem}
+            className={`${style.optionSelectType}`}
+          >
+            <option value="">Phân Loại Sản Phẩm...</option>
+            {categoryItemData.map((value, index) => {
+              return (
+                <option key={index} value={value.id}>
+                  {value.type_category_item}
+                </option>
+              );
+            })}
+          </select>
           : null}
       </div>
       <div className={`${style.quantity}`}>

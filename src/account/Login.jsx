@@ -26,6 +26,7 @@ function Login() {
     })
     console.log(response)
     if(response.status==='success'){
+      console.log(response.data.token)
       sessionStorage.setItem('accessToken',response.data.token)
       const base64String = utf8_to_b64(JSON.stringify(response.data.data));
       sessionStorage.setItem("accountLogin", base64String);

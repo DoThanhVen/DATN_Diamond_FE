@@ -29,8 +29,14 @@ function ListAccount() {
   }, [data, currentPage, reload, sortType]);
 
   const getdata = async (page, filterStatus) => {
+    const token = sessionStorage.getItem('accessToken');
     try {
-      const response = await callAPI(`/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET");
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
+      const response = await callAPI(`/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET",{},config);
       const responseData = response.data;
       if (filterStatus === undefined || filterStatus === "") {
         setAccounts(responseData.content || []);
@@ -44,7 +50,7 @@ function ListAccount() {
       console.error("Error fetching data:", error);
     }
   };
-  
+
 
   const openModal = () => {
     setShowModal(true);

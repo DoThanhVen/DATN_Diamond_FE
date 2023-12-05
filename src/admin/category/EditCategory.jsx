@@ -9,15 +9,18 @@ import {
 } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
-import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
+import ModalAction from "../../service/ModalAction";
 
 function EditCategory() {
   const [accountLogin, setAccountLogin] = useState(null);
+  const [token, settoken] = useState(null);
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-    if (accountLogin !== undefined) {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
+    if (accountLogin !== null) {
       try {
         setAccountLogin(accountLogin);
       } catch (error) {
@@ -50,11 +53,9 @@ function EditCategory() {
   const reloadold = useSelector(state => state.getreloadPage);
 
   useEffect(
-    
+
     () => {
-      console.log('hu',data)
       if (Array.isArray(data)) {
-        console.log(data)
         setListcategory(data);
         if (listCategory !== null && idCategory !== 0 && idCategoryItem === 0) {
           getCategoryId();
@@ -115,33 +116,37 @@ function EditCategory() {
     } else if (!isAlphaWithSpace(type_category)) {
       ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
     } else {
-      try {
-        const response = await CategoryService.addCategory(
-          type_category,
-          image,
-          5
-        );
-        if (response.status === "success") {
-          ThongBao(response.message, response.status);
-          dispatch(getIdcategoryUpdate(0));
-          dispatch(reloadPage(reloadold + 1));
-          setTypeCate('');
-          setimage(null);
-          setSelectedImage(null);
-          setimageload("");
-          setcategory({})
-        } else {
-          ThongBao(response.message, response.status);
-          dispatch(getIdcategoryUpdate(0));
-          dispatch(reloadPage(reloadold + 1));
-          setTypeCate('');
-          setimage(null);
-          setSelectedImage(null);
-          setimageload("");
-          setcategory({})
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        try {
+          const response = await CategoryService.addCategory(
+            type_category,
+            image,
+            accountLogin.id,
+            token
+          );
+          if (response.status === "success") {
+            ThongBao(response.message, response.status);
+            dispatch(getIdcategoryUpdate(0));
+            dispatch(reloadPage(reloadold + 1));
+            setTypeCate('');
+            setimage(null);
+            setSelectedImage(null);
+            setimageload("");
+            setcategory({})
+          } else {
+            ThongBao(response.message, response.status);
+            dispatch(getIdcategoryUpdate(0));
+            dispatch(reloadPage(reloadold + 1));
+            setTypeCate('');
+            setimage(null);
+            setSelectedImage(null);
+            setimageload("");
+            setcategory({})
+          }
+        } catch (error) {
+          ThongBao("Thêm loại sản phẩm thất bại!", "error");
         }
-      } catch (error) {
-        ThongBao("Thêm loại sản phẩm thất bại!", "error");
       }
     }
   };
@@ -157,33 +162,37 @@ function EditCategory() {
       } else if (!isAlphaWithSpace(type_category)) {
         ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
       } else {
-        try {
-          const result = await CategoryService.updateCategory(
-            idCategory,
-            type_category,
-            image
-          );
-          if (result.status === "success") {
-            ThongBao(result.message, result.status);
-            dispatch(getIdcategoryUpdate(0));
-            dispatch(reloadPage(reloadold + 1));
-            setTypeCate('');
-            setimage(null);
-            setSelectedImage(null);
-            setimageload("")
-            setcategory({})
-          } else {
-            ThongBao(result.message, result.status);
-            dispatch(getIdcategoryUpdate(0));
-            dispatch(reloadPage(reloadold + 1));
-            setTypeCate('');
-            setimage(null);
-            setSelectedImage(null);
-            setimageload("")
-            setcategory({})
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          try {
+            const result = await CategoryService.updateCategory(
+              idCategory,
+              type_category,
+              image,
+              token
+            );
+            if (result.status === "success") {
+              ThongBao(result.message, result.status);
+              dispatch(getIdcategoryUpdate(0));
+              dispatch(reloadPage(reloadold + 1));
+              setTypeCate('');
+              setimage(null);
+              setSelectedImage(null);
+              setimageload("")
+              setcategory({})
+            } else {
+              ThongBao(result.message, result.status);
+              dispatch(getIdcategoryUpdate(0));
+              dispatch(reloadPage(reloadold + 1));
+              setTypeCate('');
+              setimage(null);
+              setSelectedImage(null);
+              setimageload("")
+              setcategory({})
+            }
+          } catch (error) {
+            ThongBao("Có lỗi xảy ra. Thử lại", "error");
           }
-        } catch (error) {
-          ThongBao("Có lỗi xảy ra. Thử lại", "error");
         }
       }
     } else {
@@ -191,7 +200,8 @@ function EditCategory() {
         const result = await CategoryService.updateCategory(
           idCategory,
           type_category,
-          image
+          image,
+          token
         );
         if (result.status === "success") {
           ThongBao(result.message, result.status);
@@ -216,27 +226,29 @@ function EditCategory() {
         ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
     }
-
-
   };
 
   const handleDeleteCategory = async () => {
-    try {
-      const reponse = await CategoryService.deleteCategory(idCategory);
-      if (reponse.status === "success") {
-        ThongBao(reponse.message, reponse.status);
-        dispatch(getIdcategoryUpdate(0));
-        dispatch(reloadPage(reloadold + 1));
-        setTypeCate('');
-        setimage(null);
-        setSelectedImage(null);
-        setimageload("")
-        setcategory({})
-      } else {
-        ThongBao(reponse.message, reponse.status);
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      try {
+        const reponse = await CategoryService.deleteCategory(idCategory, token);
+        if (reponse.status === "success") {
+          ThongBao(reponse.message, reponse.status);
+          dispatch(getIdcategoryUpdate(0));
+          dispatch(reloadPage(reloadold + 1));
+          setTypeCate('');
+          setimage(null);
+          setSelectedImage(null);
+          setimageload("")
+          setcategory({})
+        } else {
+          ThongBao(reponse.message, reponse.status);
+        }
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
-    } catch (error) {
-      ThongBao("Có lỗi xảy ra. Thử lại", "error");
+
     }
   };
 
@@ -250,22 +262,26 @@ function EditCategory() {
     } else if (!isAlphaWithSpace(type_categoryItem)) {
       ThongBao("Tên phân loại sản phẩm chứa kí tự không hợp lệ.", "error");
     } else {
-      try {
-        const reponse = await CategoryService.addCategoryItem(
-          valueCategory,
-          type_categoryItem,
-          5
-        );
-        if (reponse.status === "success") {
-          ThongBao(reponse.message, reponse.status);
-          dispatch(reloadPage(reloadold + 1));
-          dispatch(getIdcategoryItemUpdate(0));
-        } else {
-          ThongBao(reponse.message, reponse.status);
-          dispatch(reloadPage(reloadold + 1));
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        try {
+          const reponse = await CategoryService.addCategoryItem(
+            valueCategory,
+            type_categoryItem,
+            accountLogin.id,
+            token
+          );
+          if (reponse.status === "success") {
+            ThongBao(reponse.message, reponse.status);
+            dispatch(reloadPage(reloadold + 1));
+            dispatch(getIdcategoryItemUpdate(0));
+          } else {
+            ThongBao(reponse.message, reponse.status);
+            dispatch(reloadPage(reloadold + 1));
+          }
+        } catch (error) {
+          ThongBao("Có lỗi xảy ra. Thử lại", "error");
         }
-      } catch (error) {
-        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
     }
   };
@@ -302,12 +318,39 @@ function EditCategory() {
       } else if (!isAlphaWithSpace(type_categoryItem)) {
         ThongBao("Tên phân loại sản phẩm chứa kí tự không hợp lệ.", "error");
       } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          try {
+            const result = await CategoryService.updateCategoryItem(
+              categoryItem.id,
+              valueCategory,
+              type_categoryItem,
+              accountLogin.id,
+              token
+            );
+
+            if (result.status === "success") {
+              ThongBao(result.message, result.status);
+              setTypeCateItem(result.data.type_category_item)
+              dispatch(reloadPage(reloadold + 1));
+            } else {
+              ThongBao(result.message, result.status);
+            }
+          } catch (error) {
+            ThongBao("Có lỗi xảy ra. Thử lại", "error");
+          }
+        }
+      };
+    } else {
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
         try {
           const result = await CategoryService.updateCategoryItem(
             categoryItem.id,
             valueCategory,
             type_categoryItem,
-            accountLogin.id_account
+            accountLogin.id,
+            token
           );
           if (result.status === "success") {
             ThongBao(result.message, result.status);
@@ -319,39 +362,24 @@ function EditCategory() {
         } catch (error) {
           ThongBao("Có lỗi xảy ra. Thử lại", "error");
         }
-      };
-    } else {
-      try {
-        const result = await CategoryService.updateCategoryItem(
-          categoryItem.id,
-          valueCategory,
-          type_categoryItem,
-          accountLogin.id_account
-        );
-        if (result.status === "success") {
-          ThongBao(result.message, result.status);
-          setTypeCateItem(result.data.type_category_item)
-          dispatch(reloadPage(reloadold + 1));
-        } else {
-          ThongBao(result.message, result.status);
-        }
-      } catch (error) {
-        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
     }
   }
   const handleDeleteCategoryItem = async () => {
-    try {
-      const reponse = await CategoryService.deleteCategoryItem(idCategoryItem);
-      if (reponse.status === "success") {
-        ThongBao(reponse.message, reponse.status);
-        dispatch(getIdcategoryItemUpdate(0));
-        dispatch(reloadPage(reloadold + 1));
-      } else {
-        ThongBao(reponse.message, reponse.status);
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      try {
+        const reponse = await CategoryService.deleteCategoryItem(idCategoryItem, token);
+        if (reponse.status === "success") {
+          ThongBao(reponse.message, reponse.status);
+          dispatch(getIdcategoryItemUpdate(0));
+          dispatch(reloadPage(reloadold + 1));
+        } else {
+          ThongBao(reponse.message, reponse.status);
+        }
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
-    } catch (error) {
-      ThongBao("Có lỗi xảy ra. Thử lại", "error");
     }
   };
 
@@ -408,7 +436,7 @@ function EditCategory() {
                 onClick={() => {
                   handleAddCategory();
                 }}
-                // disabled={idCategory !== 0}
+               disabled={idCategory !== 0}
               >
                 <i className="bi bi-plus-lg" /> THÊM
               </button>

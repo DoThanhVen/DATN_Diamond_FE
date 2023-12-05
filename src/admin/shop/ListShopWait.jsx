@@ -30,11 +30,17 @@ function ListShopWait() {
   }
 
   const getdata = async (page) => {
+    const token = sessionStorage.getItem('accessToken');
     try {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
       const response = await callAPI(
-        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
+        `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
-        "GET"
+        "GET",{},config
       );
       const responseData = response.data;
 

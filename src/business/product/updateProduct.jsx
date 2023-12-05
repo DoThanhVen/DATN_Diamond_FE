@@ -7,6 +7,7 @@ import ProductService from "../../service/ProductService";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadPage } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
+import ModalAction from "../../service/ModalAction";
 
 export default function ModelEdit({ onReload, data, closeModal }) {
   const dispatch = useDispatch();
@@ -22,7 +23,10 @@ export default function ModelEdit({ onReload, data, closeModal }) {
   const reloadold = useSelector((state) => state.getreloadPage);
   const MAX_NAME_LENGTH = 300; // Example maximum name length
   const MAX_DESCRIPTION_LENGTH = 100000; // Example maximum description length
+  const [token, settoken] = useState(null);
   useEffect(() => {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     getdataproductbyid()
   }
     , []);
@@ -116,12 +120,20 @@ export default function ModelEdit({ onReload, data, closeModal }) {
       return;
     }
 
+    const isConfirmed = await ModalAction("Bạn có chắc muốn cập nhật sản phẩm này?", "warning");
+    if (isConfirmed) {
+      try {
+        const response = await ProductService.updateProduct(product.id, name, price, description, 0, valueCategoryItem, selectedImages, imagesave, token);
+        dispatch(reloadPage(reloadold + 1));
+        setproduct(response)
+        ThongBao(response.message, response.status);
+        closeModal();
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra.", "error");
+      }
 
-    const response = await ProductService.updateProduct(product.id, name, price, description, 0, valueCategoryItem, selectedImages, imagesave);
-    dispatch(reloadPage(reloadold + 1));
-    setproduct(response)
-    ThongBao(response.message, response.status);
-    closeModal();
+    }
+
   };
 
   return (

@@ -14,11 +14,13 @@ import ShopService from "../../service/ShopService";
 import { useEffect } from "react";
 import { getIdShop } from "../../service/Actions";
 import style from "../../css/admin/shop/editshop.module.css"
+import ModalAction from "../../service/ModalAction";
 
 export default function ModelAccses({ status, toggleShow }) {
   const data = useSelector((state) => state.idShop);
   const [value, setvalue] = useState();
   const [shop, setshop] = useState({});
+  const [token, settoken] = useState(null);
   const dispatch = useDispatch();
   useEffect(() => {
     if (data !== 0) {
@@ -27,16 +29,20 @@ export default function ModelAccses({ status, toggleShow }) {
   }, [data]);
 
   const getShop = async () => {
+    const tokenax = sessionStorage.getItem('accessToken');
+    settoken(tokenax)
     const reponse = await ShopService.getAllshopById(data);
     setshop(reponse);
     setvalue(reponse.status);
   };
   const handlesubmit = async () => {
-    const reponse = await ShopService.updateStatusAdmin(shop.id, value);
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+    const reponse = await ShopService.updateStatusAdmin(shop.id, value,token);
     if (reponse) {
       toggleShow();
       dispatch(getIdShop(0));
-    }
+    }}
   };
   return (
     <>

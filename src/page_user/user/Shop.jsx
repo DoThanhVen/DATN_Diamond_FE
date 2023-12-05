@@ -208,7 +208,7 @@ function Shop() {
                         <a href="#">following</a>
                       </span>
                      
-                        <p style={{fontSize:'20px',color:'red'}} onClick={()=>{navigate(`/chatApp?ShopName=${shopData[1]}`)}}>Nhắn tin với người bán</p>
+                        <p style={{fontSize:'20px',color:'red'}} onClick={()=>{navigate(`/test?ShopName=${shopData[1]}`)}}>Nhắn tin với người bán</p>
                       
                     </div>
                   </li>

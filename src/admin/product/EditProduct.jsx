@@ -10,6 +10,7 @@ import { Pagination } from "@mui/material";
 import moment from 'moment';
 import ModelDetail from "./ModelDetail.jsx";
 import { getIdProductAdmin } from "../../service/Actions";
+import ModalAction from "../../service/ModalAction.js";
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
 }
@@ -24,14 +25,16 @@ function ListProduct() {
   const [keyword, setkeyword] = useState('');
   const [keyfind, setkeyfind] = useState('');
   const [reload, setreload] = useState(0)
-  const [sortBy,setsortBy]=useState('')
-  const [sortType,setsortType]=useState('')
-
+  const [sortBy, setsortBy] = useState('')
+  const [sortType, setsortType] = useState('')
+  const [token, settoken] = useState(null);
   useEffect(() => {
     getdata(currentPage);
-  }, [data, currentPage, reload,sortType]);
+  }, [data, currentPage, reload, sortType]);
 
   const getdata = async (page) => {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     try {
       const response = await callAPI(`/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1) * numberPage}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`, "GET");
       const responseData = response.data;
@@ -57,13 +60,21 @@ function ListProduct() {
   };
 
   const handleUpdateStatus = async (id, status) => {
-    try {
-      const formData = new FormData();
-      formData.append('status', status);
-      const res = await callAPI(`/api/product/adminupdatestatus/${id}`, 'PUT', formData)
-      setreload(reload + 1)
-    } catch (error) {
-      console.log(error)
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      try {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const formData = new FormData();
+        formData.append('status', status);
+        const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData, config)
+        setreload(reload + 1)
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
   function formatCurrency(price, promotion) {
@@ -109,29 +120,29 @@ function ListProduct() {
           <label>Sắp xếp</label>
           <select
             value={sortBy}
-            onChange={(e)=>{
+            onChange={(e) => {
               setsortBy(e.target.value)
             }}
             className={`${style.optionSelectType}`}
           >
             <option value="">Lựa chọn...</option>
-                <option value={'id'}>
-                    Mã sản phẩm
-                </option>
-                <option value={'product_name'}>
-                    Tên sản phẩm
-                </option>
-                <option value={'price'}>
-                    Giá
-                </option>
-                <option value={'create_date'}>
-                    Ngày tạo
-                </option>
+            <option value={'id'}>
+              Mã sản phẩm
+            </option>
+            <option value={'product_name'}>
+              Tên sản phẩm
+            </option>
+            <option value={'price'}>
+              Giá
+            </option>
+            <option value={'create_date'}>
+              Ngày tạo
+            </option>
           </select>
           {sortBy !== ''
             ? <select
               value={sortType}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setsortType(e.target.value)
               }}
               className={`${style.optionSelectType}`}
@@ -185,7 +196,7 @@ function ListProduct() {
                 {value.categoryItem_product?.type_category_item}
               </label>
               <label className={style.column}>
-              {formatCurrency(value.price, 0)}
+                {formatCurrency(value.price, 0)}
               </label>
               <label className={style.column}>
                 {formatDate(value.create_date)}

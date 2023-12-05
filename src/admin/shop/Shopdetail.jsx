@@ -5,6 +5,8 @@ import { getIdShop } from "../../service/Actions";
 import { Link, useNavigate } from "react-router-dom";
 import style from "../../css/admin/shop/shopdetail.module.css";
 import { callAPI } from "../../service/API";
+import { ThongBao } from "../../service/ThongBao";
+import ModalAction from "../../service/ModalAction";
 
 function ShopDetail() {
   const [shop, setshop] = useState({});
@@ -12,11 +14,14 @@ function ShopDetail() {
   const id = useSelector(state => state.idShop);
   const navigate = useNavigate();
   const data = useSelector(state => state.allDataShop);
+  const [token, settoken] = useState(null);
   useEffect(() => {
     getShop();
   }, [data]);
 
   const getShop = async () => {
+    const tokenax = sessionStorage.getItem('accessToken');
+    settoken(tokenax)
     if (Array.isArray(data)) {
       const foundAccount = data.find(item => item.shop && item.shop.id === id);
       if (foundAccount) {
@@ -26,12 +31,25 @@ function ShopDetail() {
   };
 
   const handleSubmit = async () => {
-    const formData=new FormData();
-    formData.append('id',shop.shop.id);
-    formData.append('status',1);
-    await callAPI(`/api/admin/update`,'PUT',formData);
-    navigate("/admin/shops");
-    dispatch(getIdShop(0));
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      try {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const formData = new FormData();
+        formData.append('id', shop.shop.id);
+        formData.append('status', 1);
+        await callAPI(`/api/auth/admin/update`, 'PUT', formData, config);
+        navigate("/admin/shops");
+        dispatch(getIdShop(0));
+      } catch (error) {
+        ThongBao("Có lỗi xảy ra.", "error")
+      }
+    }
+
   };
   return (
     <div className={style.card}>

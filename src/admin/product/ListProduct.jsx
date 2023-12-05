@@ -8,6 +8,7 @@ import { Pagination } from "@mui/material";
 import moment from "moment";
 import ModelDetail from "./ModelDetail";
 import { getIdProductAdmin } from "../../service/Actions";
+import ModalAction from "../../service/ModalAction";
 
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
@@ -27,11 +28,14 @@ function ListProduct() {
   const [sortBy, setsortBy] = useState('')
   const [sortType, setsortType] = useState('')
   const [filterbyStatus, setFilterStatus] = useState("")
+  const [token, settoken] = useState(null);
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType,filterbyStatus]);
 
   const getdata = async (page) => {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     try {
       const response = await callAPI(
         `/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${
@@ -61,14 +65,21 @@ function ListProduct() {
   };
 
   const handleUpdateStatus = async (id, status) => {
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
     try {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
       const formData = new FormData();
       formData.append('status', status);
-      const res = await callAPI(`/api/product/adminupdatestatus/${id}`, 'PUT', formData)
+      const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData,config)
       getdata(currentPage, filterbyStatus)
     } catch (error) {
       console.log(error);
-    }
+    }}
   };
 
   function formatCurrency(price, promotion) {

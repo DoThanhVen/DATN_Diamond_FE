@@ -5,11 +5,11 @@ import getAccountFromCookie from '../service/getAccountLogin';
 import { useNavigate } from 'react-router';
 import { callAPI } from '../service/API';
 import ScrollableFeed from 'react-scrollable-feed';
-import './App.css';
 import Footer from '../page_user/components/Footer';
 import MainNavbar from '../page_user/components/Navbar';
 import moment from 'moment';
-
+import './App.css'
+import { ThongBao } from '../service/ThongBao';
 var stompClient = null;
 
 const ChatApp = () => {
@@ -49,10 +49,7 @@ const ChatApp = () => {
 
   const getData = async () => {
     try {
-      const accountData = {
-        id_account: 1,
-        username: 'mdung0907'
-      };
+      const accountData = getAccountFromCookie();
       const params = new URLSearchParams(window.location.search);
       if (params.has('ShopName')) {
         const res = await callAPI(`/api/account/findaccountbyshopname/${params.get('ShopName')}`, 'GET');
@@ -64,7 +61,7 @@ const ChatApp = () => {
             connected: true,
           });
           setSelectedRecipient(res.data.username);
-          getHistoryDataWithParam(accountData.id_account, res.data.username);
+          getHistoryDataWithParam(accountData.id, res.data.username);
         } else {
           navigate('/login');
         }
@@ -75,7 +72,7 @@ const ChatApp = () => {
             username: accountData.username,
             connected: true,
           });
-          getHistoryData(accountData.id_account);
+          getHistoryData(accountData.id);
         } else {
           navigate('/login');
         }
@@ -267,16 +264,31 @@ const ChatApp = () => {
   };
 
   const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64String = event.target.result;
-      setfile(base64String);
-      setUserData({ ...userData, file: base64String });
-    };
-    reader.readAsDataURL(file);
-  };
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const files = event.target.files;
+    if (files !== null) {
+      const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
+      if (imageFiles.length === 0) {
+        ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
+        return;
+      }
+      if (imageFiles[0].size > 15 * 1024) {
+        ThongBao(
+          "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 15Kb.",
+          "info"
+        );
+      } else {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64String = event.target.result;
+          setfile(base64String);
+          setUserData({ ...userData, file: base64String });
+        };
+        reader.readAsDataURL(imageFiles[0]);
+      };
+    }
 
+  }
   function formatDate(date) {
     return moment(date).format("DD-MM-YYYY HH:mm:ss");
   }
@@ -340,7 +352,7 @@ const ChatApp = () => {
                         backgroundColor:
                           chat.sender.username === userData.username ? '#c3e6cb' : '#bee5eb'
                       }}
-                      onClick={() =>setShowTime(!showTime)}
+                      onClick={() => setShowTime(!showTime)}
                     >
                       {chat.sender.username === userData.username ? (
                         <div className="message-data" >
@@ -402,13 +414,14 @@ const ChatApp = () => {
                   send
                 </button>
                 <label className="file-input-label" htmlFor="file-input">
+                  <i className="fa-solid fa-image" style={{ padding: '10px', fontSize: '30px' }}></i>
                   <input
                     type="file"
                     id="file-input"
                     className="file-input"
                     onChange={handleFileSelect}
+                    style={{ display: 'none' }}
                   />
-                  <span className="file-upload-icon">📎</span>
                 </label>
               </div>
 

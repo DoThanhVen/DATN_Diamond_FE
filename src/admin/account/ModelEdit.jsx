@@ -14,10 +14,11 @@ import { useEffect } from "react";
 import { getIdAccountAdmin } from "../../service/Actions";
 import style from "../../css/admin/shop/editshop.module.css"
 import { callAPI } from "../../service/API";
+import ModalAction from "../../service/ModalAction";
 
 export default function ModelEdit({ status, toggleShow }) {
   const data = useSelector((state) => state.idAccountAdmin);
-
+  const [token, settoken] = useState(null);
   const [statussave, setstatussave] = useState();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -27,16 +28,26 @@ export default function ModelEdit({ status, toggleShow }) {
   }, [data]);
 
   const getAccount = async () => {
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     const reponse = await callAPI(`/api/account/${data}`, 'GET');
     setstatussave(reponse.data.status)
   };
   const handlesubmit = async () => {
     const formData = new FormData();
     formData.append('status', statussave);
-    const reponse = await callAPI(`/api/account/adminupdate/${data}`, 'PUT', formData);
-    if (reponse) {
-      toggleShow();
-      dispatch(getIdAccountAdmin(0));
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    };
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      const reponse = await callAPI(`/api/auth/account/adminupdate/${data}`, 'PUT', formData, config);
+      if (reponse) {
+        toggleShow();
+        dispatch(getIdAccountAdmin(0));
+      }
     }
   };
   return (

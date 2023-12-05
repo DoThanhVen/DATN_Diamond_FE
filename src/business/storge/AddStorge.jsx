@@ -8,12 +8,15 @@ import { reloadPage } from "../../service/Actions";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
+import ModalAction from "../../service/ModalAction";
 
 export default function AddStorge() {
   const navigate = useNavigate();
+  const [token, settoken] = useState(null);
   const getAccountFromCookie = () => {
     const accountLogin = GetDataLogin();
-
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     if (accountLogin !== null) {
       try {
         getdataProduct(accountLogin.shop.id);
@@ -61,17 +64,25 @@ export default function AddStorge() {
     } else {
       const product2 = await ProductService.getProductbyId(valueProduct);
       if (product2 !== null) {
-        const response = await callAPI(
-          `/api/product/createStorage/${product2.id}`,
-          "POST",
-          {
-            quantity: parseInt(quantity),
-            create_date: new Date()
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const response = await callAPI(
+            `/api/auth/product/createStorage/${product2.id}`,
+            "POST",
+            {
+              quantity: parseInt(quantity),
+              create_date: new Date()
+            }, config
+          );
+          if (response.status === "success") {
+            ThongBao(response.message, response.status);
+            dispatch(reloadPage(reloadold + 1));
           }
-        );
-        if (response.status === "success") {
-          ThongBao(response.message, response.status);
-          dispatch(reloadPage(reloadold + 1));
         }
       }
     }

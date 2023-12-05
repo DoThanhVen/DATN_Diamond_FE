@@ -34,29 +34,19 @@ function ListShop() {
     getdata(currentPage);
   }, [reload, currentPage, sortType, data]);
 
-  const getAccountFromSession = () => {
-    const accountLogin = GetDataLogin();
-
-    if (accountLogin !== undefined) {
-      try {
-        setAccountLogin(accountLogin);
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      navigate("/login");
-    }
-  };
-  useEffect(() => {
-    getAccountFromSession();
-  }, []);
 
   const getdata = async (page) => {
+    const token = sessionStorage.getItem('accessToken');
     try {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
       const response = await callAPI(
-        `/api/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
+        `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
-        "GET"
+        "GET",{},config
       );
       const responseData = response.data;
       const listShop = responseData && responseData.content.map((value) => value.shop);

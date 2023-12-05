@@ -38,12 +38,16 @@ class ShopService {
     //     return response;
 
     // };
-    updateStatusAdmin=async(shop,status)=>{
-        console.log(shop,status)
-        const response = await callAPI(`${url}/admin/update`, 'PUT',{
+    updateStatusAdmin=async(shop,status,token)=>{
+        const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+        const response = await callAPI(`/api/auth/admin/update`, 'PUT',{
             id:shop,
             status:status
-        });
+        },config);
            return response;
     }
     // deleteshop=async (id)=>{

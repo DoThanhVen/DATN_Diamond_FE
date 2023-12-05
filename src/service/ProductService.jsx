@@ -12,9 +12,15 @@ class ProductService {
     quantityValue,
     selectedImages,
     imagesave,
-    idShop
+    idShop,
+    token
   ) => {
-    const reponse = await callAPI(`${url}/shop/${idShop}`, "POST", {
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    };
+    const reponse = await callAPI(`/api/auth/product/shop/${idShop}`, "POST", {
       product_name: name,
       price: price,
       description: description,
@@ -23,12 +29,12 @@ class ProductService {
       categoryItem_product: {
         id: valueCategoryItem
       }
-    });
+    },config);
     if (reponse && quantityValue !== 0) {
-      await callAPI(`/api/product/createStorage/${reponse.data.id}`, "POST", {
+      await callAPI(`/api/auth/product/createStorage/${reponse.data.id}`, "POST", {
         quantity: quantityValue,
         create_date: new Date()
-      });
+      },config);
     }
 
     if (reponse && selectedImages.length > 0) {
@@ -38,11 +44,6 @@ class ProductService {
           formData.append(`images`, image);
         });
         formData.append("idProduct", reponse.data.id);
-        const config = {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        };
         await callAPI(urlImage, "POST", formData, config);
       } catch (error) {
         console.error("Error for", error);
@@ -59,9 +60,15 @@ class ProductService {
     status,
     valueCategoryItem,
     selectedImages,
-    imagesave
+    imagesave,
+    token
   ) => {
-    const reponse = await callAPI(`${url}/${productid}`, "PUT", {
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    };
+    const reponse = await callAPI(`/api/auth/product/${productid}`, "PUT", {
       product_name: name,
       price: price,
       description: description,
@@ -69,7 +76,7 @@ class ProductService {
       categoryItem_product: {
         id: valueCategoryItem
       }
-    });
+    },config);
     if (reponse && selectedImages.length > 0) {
       try {
         const formData = new FormData();
@@ -77,11 +84,6 @@ class ProductService {
           formData.append(`images`, image);
         });
         formData.append("idProduct", reponse.data.id);
-        const config = {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        };
         await callAPI(urlImage, "POST", formData, config);
       } catch (error) {
         console.error("Error for", error);

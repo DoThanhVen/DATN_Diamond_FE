@@ -32,26 +32,7 @@ import ChatApp from './chatApp/chatApp'
 import { Provider } from "react-redux";
 import store from './Store/store'
 function App() {
-  const [accountLogin, setAccountLogin] = useState(null)
-  const navigate = useNavigate()
 
-  const getAccountFromSession = () => {
-    const accountLogin = GetDataLogin()
-
-    if (accountLogin !== null) {
-      try {
-        setAccountLogin(accountLogin)
-      } catch (error) {
-        console.log(error)
-      }
-    } else {
-      navigate('/login')
-    }
-  }
-
-  useEffect(() => {
-    getAccountFromSession()
-  }, [])
 
   return (
  
@@ -89,6 +70,7 @@ function App() {
         <Route path="/pay" element={<VNPayBankSelection />} />
 
         <Route path="/chatApp" element={<ChatApp />} />
+
       </Routes>
 
   )
