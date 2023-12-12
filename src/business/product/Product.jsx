@@ -34,7 +34,7 @@ function Product() {
                   label="Tất cả"
                   value="1"
                 />
-                <Tab
+                {/* <Tab
                   sx={{
                     textTransform: "none",
                     "&.Mui-selected": {
@@ -43,7 +43,7 @@ function Product() {
                   }}
                   label="Đang Hoạt Động"
                   value="2"
-                />
+                /> */}
                 <Tab
                   sx={{
                     textTransform: "none",
@@ -69,9 +69,9 @@ function Product() {
             <TabPanel value="1">
               <ListAllProduct />
             </TabPanel>
-            <TabPanel value="2">
+            {/* <TabPanel value="2">
               <ListProductActive />
-            </TabPanel>
+            </TabPanel> */}
             <TabPanel value="3">
               <ListProductUnactive />
             </TabPanel>

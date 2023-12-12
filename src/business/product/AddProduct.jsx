@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 import ModalAction from "../../service/ModalAction";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function AddProduct() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -45,7 +46,7 @@ function AddProduct() {
   const reloadold = useSelector(state => state.getreloadPage);
   const MAX_NAME_LENGTH = 300; // Example maximum name length
   const MAX_DESCRIPTION_LENGTH = 100000; // Example maximum description length
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdataCategory();
     getAccountFromSession();
@@ -135,6 +136,7 @@ function AddProduct() {
     const isConfirmed =await ModalAction("Bạn có chắc muốn thêm sản phẩm này?", "warning");
     if (isConfirmed) {
       try {
+        setIsLoading(true);
         const response = await ProductService.addProduct(
           name,
           price,
@@ -147,7 +149,7 @@ function AddProduct() {
           accountLogin.shop.id,
           token
         );
-
+        setIsLoading(false);
         if (response.status === "success") {
           dispatch(reloadPage(reloadold + 1));
           ThongBao(response.message, response.status);
@@ -278,6 +280,7 @@ function AddProduct() {
       >
         LƯU SẢN PHẨM
       </button>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

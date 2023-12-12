@@ -1,4 +1,5 @@
 import { callAPI } from "./API";
+import { deleteImageFromFirebaseStorage, uploadImageToFirebaseStorage } from "./firebase";
 
 const url = `/api/product`;
 const urlImage = `/api/uploadImageProduct`;
@@ -29,20 +30,23 @@ class ProductService {
       categoryItem_product: {
         id: valueCategoryItem
       }
-    },config);
+    }, config);
     if (reponse && quantityValue !== 0) {
       await callAPI(`/api/auth/product/createStorage/${reponse.data.id}`, "POST", {
         quantity: quantityValue,
         create_date: new Date()
-      },config);
+      }, config);
     }
 
     if (reponse && selectedImages.length > 0) {
       try {
+        let responseData = [];
+        for (const image of imagesave) {
+          const downloadURL = await uploadImageToFirebaseStorage(image);
+          responseData.push(downloadURL);
+        }
         const formData = new FormData();
-        imagesave.forEach((image, index) => {
-          formData.append(`images`, image);
-        });
+        formData.append(`images`, responseData);
         formData.append("idProduct", reponse.data.id);
         await callAPI(urlImage, "POST", formData, config);
       } catch (error) {
@@ -60,37 +64,43 @@ class ProductService {
     status,
     valueCategoryItem,
     selectedImages,
-    imagesave,
+    imagesaveNew,
     token
   ) => {
     const config = {
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     };
+
     const reponse = await callAPI(`/api/auth/product/${productid}`, "PUT", {
       product_name: name,
       price: price,
       description: description,
       status: status,
       categoryItem_product: {
-        id: valueCategoryItem
-      }
-    },config);
+        id: valueCategoryItem,
+      },
+    }, config);
+
     if (reponse && selectedImages.length > 0) {
       try {
+        let responseData = [];
+        for (const image of imagesaveNew) {
+          const downloadURL = await uploadImageToFirebaseStorage(image);
+          responseData.push(downloadURL);
+        }
         const formData = new FormData();
-        imagesave.forEach((image, index) => {
-          formData.append(`images`, image);
-        });
+        formData.append(`images`, responseData);
         formData.append("idProduct", reponse.data.id);
         await callAPI(urlImage, "POST", formData, config);
       } catch (error) {
-        console.error("Error for", error);
+        console.error("Error:", error);
       }
     }
     return reponse;
   };
+
 
   getAllProduct = async shop => {
     try {

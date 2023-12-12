@@ -44,23 +44,11 @@ function Cart() {
     );
   };
   let amount = 0;
-  // cart.map(item => {
-  //   amount += item.product.price * item.quantity
-  // })
-  //Lưu giá trị của count vào local khi count thay đổi
-  const findShopByProduct = (idProduct) => {
-    axios
-      .get(`http://localhost:8080/api/shop/findByProduct/${idProduct}`)
-      .then((response) => {
-        const shopData = response.data;
-        // console.log(response.data);
-        console.log(shopData.data.shop_name);
-        return shopData.data.shop_name;
-      })
-      .catch((error) => {
-        console.error("Error loading shop data:", error);
-      });
-  };
+  cart.map(item => {
+    amount += item.product.price * item.quantity
+  })
+
+
 
   return (
     <>
@@ -87,9 +75,14 @@ function Cart() {
                         }}
                       />
                       <div className="shop-name ms-4 ">
-                        <b>Tên shop : {findShopByProduct(item.product.id)}</b>{" "}
+                        <b>Tên shop : {item?.product?.shop?.shop_name}</b>
                         <br />
-                        <span>Địa chỉ shop</span>
+                        <span>Địa chỉ shop :
+                          {item?.product?.shop?.addressShop?.address && + ','}
+                          {item?.product?.shop?.addressShop?.ward && + ','}
+                          {item?.product?.shop?.addressShop?.district && + ','}
+                          {item?.product?.shop?.addressShop?.city}
+                        </span>
                       </div>
                     </div>
 
@@ -184,7 +177,7 @@ function Cart() {
                                 <input
                                   type="number"
                                   value={item.quantity}
-                                  onChange={(e) => {}}
+                                  onChange={(e) => { }}
                                   className="form-control text-center border border-secondary"
                                   // placeholder={count}
                                   aria-label="Example text with button addon"
@@ -198,7 +191,7 @@ function Cart() {
                                   onClick={() => {
                                     increaseCount(index);
                                   }}
-                                  // Gọi hàm tăng số khi nhấn vào nút "Tăng"
+                                // Gọi hàm tăng số khi nhấn vào nút "Tăng"
                                 >
                                   <i className="bi bi-plus-lg"></i>
                                 </button>

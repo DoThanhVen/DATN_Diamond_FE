@@ -9,6 +9,7 @@ import { callAPI } from "../service/API";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { ThongBao } from "../service/ThongBao";
+import { signInWithGoogle } from "../service/firebase";
 
 function utf8_to_b64(str) {
   return window.btoa(unescape(encodeURIComponent(str)));
@@ -25,16 +26,16 @@ function Login() {
       password: password
     })
     console.log(response)
-    if(response.status==='success'){
+    if (response.status === 'success') {
       console.log(response.data.token)
-      sessionStorage.setItem('accessToken',response.data.token)
+      sessionStorage.setItem('accessToken', response.data.token)
       const base64String = utf8_to_b64(JSON.stringify(response.data.data));
       sessionStorage.setItem("accountLogin", base64String);
       navigate("/")
-    }else{
+    } else {
       ThongBao(response.message, response.status)
     }
-   
+
     // axios
     //   .post(domain + `/api/account/login`, {
     //     username,
@@ -95,6 +96,24 @@ function Login() {
     //   });
   };
 
+  const Login = async () => {
+    const res = await signInWithGoogle();
+    if (res) {
+      const formData = new FormData();
+      formData.append('email', res.user.email)
+      formData.append('displayName', res.user.displayName)
+      const response = await callAPI('/api/registerWithGoogle', 'POST', formData)
+      if (response && response.status === 'success') {
+        sessionStorage.setItem('accessToken', response.data.token)
+        const base64String = utf8_to_b64(JSON.stringify(response.data.data));
+        sessionStorage.setItem("accountLogin", base64String);
+        navigate("/")
+      } else {
+        ThongBao(response.message, response.status)
+      }
+    }
+  }
+
   return (
     <>
       <nav>
@@ -154,9 +173,9 @@ function Login() {
                           <span>hoặc</span>
                         </div>
                         <div className={style.groupButtonAuth}>
-                          <button type="submit" className={style.button}>
-                            <i className="bi bi-twitter"></i> Đăng nhập với
-                            Twitter
+                          <button type="button" className={style.button} onClick={Login}>
+                            <i className="bi bi-google"></i> Đăng nhập với
+                            Google
                           </button>
                           <button type="submit" className={style.button}>
                             <i className="bi bi-facebook"></i> Đăng nhập với

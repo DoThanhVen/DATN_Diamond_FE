@@ -9,66 +9,81 @@ import { cartSelector } from "../../actions/actions";
 import cartSilce from "../../Reducer/cartSilce";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { GetDataLogin } from "../../service/DataLogin";
+import { callAPI } from "../../service/API";
 
 const CheckoutForm = () => {
-  const [user, setUser] = useState();
+  // const [user, setUser] = useState();
   const [addressDefault, setAddressDefault] = useState();
   const cart = useSelector(cartSelector);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [accountLogin, setAccountLogin] = useState(null);
+  const [token, settoken] = useState(null);
+  const [shop, setshop] = useState(null);
 
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+    const accessToken=sessionStorage.getItem('accessToken')
+    settoken(accessToken)
+    if (accountLogin !== undefined) {
+      try {
+        setAccountLogin(accountLogin);
+        findAccount(accountLogin.id)
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
   const navigation = useNavigate();
 
   useEffect(() => {
+    getAccountFromSession();
+  }, []);
+
+  const findAccount = async (id) => {
     axios
-      .get(`http://localhost:8080/api/account/5`)
-      .then((response) => {
-        setUser(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error loading shop data:", error);
-      });
-    axios
-      .get(`http://localhost:8080/api/account/5/address`)
+      .get(`http://localhost:8080/api/account/${id}/address`)
       .then((response) => {
         setAddressDefault(response.data.data);
       })
       .catch((error) => {
         console.error("Error loading shop data:", error);
       });
-  }, []);
+  }
 
   let orderDetails = [];
   let amount = 0;
   cart.map((item) => {
     amount += item.product.price * item.quantity;
-
     orderDetails.push({
       productOrder: item.product,
-      quantity: item.quantity
+      quantity: item.quantity,
     });
   });
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
     let order = {
       // accountOrder: user,
       orderDetails: orderDetails,
       total: amount,
-      address: addressDefault
+      address_order: JSON.stringify(addressDefault),
     };
-    axios
-      .post(`http://localhost:8080/api/order/create/account/${user.id}`, order)
-      .then((response) => {
-        // console.log(response.data.data)
-        if (response.data.status == "SUCCESS") {
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    };
+     const response= await callAPI(`/api/auth/order/create/account/${accountLogin.id}`,'POST', order,config);
+     console.log(response)
+        if (response.status === "SUCCESS") {
           dispatch(cartSilce.actions.removeAll());
           alert("Đặt hàng thành công");
           navigation("/order");
         }
-      })
-      .catch((error) => {
-        console.error("Error loading shop data:", error);
-      });
-    // console.log(order);
+
   };
   return (
     <>

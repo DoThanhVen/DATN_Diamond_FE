@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { reloadPage } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
 import ModalAction from "../../service/ModalAction";
+import { deleteImageFromFirebaseStorage } from "../../service/firebase";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 export default function ModelEdit({ onReload, data, closeModal }) {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ export default function ModelEdit({ onReload, data, closeModal }) {
   const MAX_NAME_LENGTH = 300; // Example maximum name length
   const MAX_DESCRIPTION_LENGTH = 100000; // Example maximum description length
   const [token, settoken] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const tokenac = sessionStorage.getItem('accessToken');
     settoken(tokenac)
@@ -70,8 +73,11 @@ export default function ModelEdit({ onReload, data, closeModal }) {
     setSelectedImages(list);
   };
 
-  const handleDeleteImageById = async (id) => {
+  const handleDeleteImageById = async (id,path) => {
+    setIsLoading(true);
     await callAPI(`/api/uploadImageProduct/${id}`, 'DELETE')
+    await deleteImageFromFirebaseStorage(path);
+    setIsLoading(false);
     getdataproductbyid()
   };
   const handleDeleteImage = (index) => {
@@ -123,7 +129,9 @@ export default function ModelEdit({ onReload, data, closeModal }) {
     const isConfirmed = await ModalAction("Bạn có chắc muốn cập nhật sản phẩm này?", "warning");
     if (isConfirmed) {
       try {
+        setIsLoading(true);
         const response = await ProductService.updateProduct(product.id, name, price, description, 0, valueCategoryItem, selectedImages, imagesave, token);
+        setIsLoading(false);
         dispatch(reloadPage(reloadold + 1));
         setproduct(response)
         ThongBao(response.message, response.status);
@@ -154,8 +162,8 @@ export default function ModelEdit({ onReload, data, closeModal }) {
               <div className={`${style.listImage}`}>
                 {product?.image_product?.map((image, index) => (
                   <div key={index} className={`${style.selectedImages}`}>
-                    <img src={`http://localhost:8080/api/uploadImageProduct/${image.url}`} alt={`Selected ${index}`} />
-                    <label onClick={() => handleDeleteImageById(image.id)}>
+                    <img src={image.url} alt={`Selected ${index}`} />
+                    <label onClick={() => handleDeleteImageById(image.id,image.url)}>
                       <i className="bx bx-trash"></i>
                     </label>
                   </div>
@@ -248,6 +256,7 @@ export default function ModelEdit({ onReload, data, closeModal }) {
           </span>
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

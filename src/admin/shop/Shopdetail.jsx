@@ -7,6 +7,7 @@ import style from "../../css/admin/shop/shopdetail.module.css";
 import { callAPI } from "../../service/API";
 import { ThongBao } from "../../service/ThongBao";
 import ModalAction from "../../service/ModalAction";
+import ModelDelete from "./ModelDelete";
 
 function ShopDetail() {
   const [shop, setshop] = useState({});
@@ -15,11 +16,17 @@ function ShopDetail() {
   const navigate = useNavigate();
   const data = useSelector(state => state.allDataShop);
   const [token, settoken] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
-    getShop();
+    if (id !== 0) {
+      getShop();
+    }else{
+      navigate('/admin/shops')
+    }
   }, [data]);
 
   const getShop = async () => {
+
     const tokenax = sessionStorage.getItem('accessToken');
     settoken(tokenax)
     if (Array.isArray(data)) {
@@ -43,6 +50,7 @@ function ShopDetail() {
         formData.append('id', shop.shop.id);
         formData.append('status', 1);
         await callAPI(`/api/auth/admin/update`, 'PUT', formData, config);
+        await callAPI(`/api/auth/sendEmail/${shop.infoAccount.email}?content=Cửa hàng của bạn đã được phê duyệt tại FE Shop`, 'GET', {}, config);
         navigate("/admin/shops");
         dispatch(getIdShop(0));
       } catch (error) {
@@ -50,6 +58,13 @@ function ShopDetail() {
       }
     }
 
+  };
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
   return (
     <div className={style.card}>
@@ -79,7 +94,11 @@ function ShopDetail() {
       </div>
       <div>
         <button className={style.buttonSubmit} onClick={handleSubmit}>Xác Nhận Duyệt</button>
+        <label className={style.column}>
+          <button onClick={() => { openModal(); }}>Không duyệt</button>
+        </label>
       </div>
+      {showModal && <ModelDelete status={showModal} toggleShow={closeModal} />}
     </div>
   );
 }

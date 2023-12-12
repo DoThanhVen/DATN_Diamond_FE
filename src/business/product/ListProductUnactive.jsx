@@ -8,7 +8,7 @@ import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
-const numberPage = 1;
+const numberPage = 10;
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -55,11 +55,11 @@ export default function ListProduct() {
   const [reloadinPage, setreload] = useState(0);
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
-
+  const [filterbyStatus, setFilterStatus] = useState("")
   useEffect(() => {
     getdataCategory();
     getAccountFromSession();
-  }, [reload, currentPage, reloadinPage, sortType]);
+  }, [reload, currentPage, reloadinPage, sortType,filterbyStatus]);
 
   function handleClickEditProduct(event) {
     const rowElement = event.currentTarget.parentElement.parentElement;
@@ -81,13 +81,10 @@ export default function ListProduct() {
     try {
       const response = await callAPI(
         `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=unactive`,
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}&isActive=unactive`,
         "GET"
       );
-
-
       setProducts(response.data.content);
- // Tính số trang dựa trên số sản phẩm và số sản phẩm trên mỗi trang
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -109,7 +106,7 @@ export default function ListProduct() {
   };
 
   //FORM SEARCH
-  const [valueOption, setValueOption] = useState("");
+  const [valueOption, setValueOption] = useState("id");
   const [textInput, setTextInput] = useState("");
 
   //LOẠI SẢN PHẨM
@@ -228,7 +225,22 @@ export default function ListProduct() {
           </select>
         ) : null}
       </div>
-
+      <div className={style.typeProduct}>
+            <label>Trạng thái:</label>
+            <select
+              value={filterbyStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+              }}
+              className={`ms-2 ${style.optionSelect}`}
+            >
+              <option value="">Tất cả</option>
+              <option value="0">Chờ Phê Duyệt</option>
+              <option value="1">Đang Hoạt Động</option>
+              <option value="2">Dừng Hoạt Động</option>
+              <option value="3">Cấm Hoạt Động</option>
+            </select>
+          </div>
       <div className={`${style.listProduct}`}>
         <div className={style.table}>
           <div className={style.tableHeading}>

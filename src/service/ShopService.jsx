@@ -44,10 +44,10 @@ class ShopService {
               "Authorization": `Bearer ${token}`
             }
           };
-        const response = await callAPI(`/api/auth/admin/update`, 'PUT',{
-            id:shop,
-            status:status
-        },config);
+          const formData=new FormData()
+          formData.append('id',shop);
+          formData.append('status',status)
+        const response = await callAPI(`/api/auth/admin/update`, 'PUT',formData,config);
            return response;
     }
     // deleteshop=async (id)=>{

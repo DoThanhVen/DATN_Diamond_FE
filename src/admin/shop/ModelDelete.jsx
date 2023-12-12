@@ -10,35 +10,40 @@ import {
   MDBModalFooter
 } from "mdb-react-ui-kit";
 import { useDispatch, useSelector } from "react-redux";
+import ShopService from "../../service/ShopService";
 import { useEffect } from "react";
-import { getIdAccountAdmin } from "../../service/Actions";
+import { getIdShop } from "../../service/Actions";
 import style from "../../css/admin/shop/editshop.module.css"
-import { callAPI } from "../../service/API";
 import ModalAction from "../../service/ModalAction";
+import { callAPI } from "../../service/API";
+import { useNavigate } from "react-router";
 
-export default function ModelEdit({ status, toggleShow }) {
-  const data = useSelector((state) => state.idAccountAdmin);
+export default function ModelDelete({ status, toggleShow }) {
+  const data = useSelector((state) => state.idShop);
   const [token, settoken] = useState(null);
-  const [statussave, setstatussave] = useState();
   const [content, setcontent] = useState('');
   const [account, setaccount] = useState({});
   const dispatch = useDispatch();
+  const navigate=useNavigate();
   useEffect(() => {
     if (data !== 0) {
-      getAccount();
+      getShop();
+    }else{
+      navigate('/admin/shops')
     }
   }, [data]);
-
-  const getAccount = async () => {
-    const tokenac = sessionStorage.getItem('accessToken');
-    settoken(tokenac)
-    const reponse = await callAPI(`/api/account/${data}`, 'GET');
+  const getShop = async () => {
+    const tokenax = sessionStorage.getItem('accessToken');
+    settoken(tokenax)
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${tokenax}`
+      }
+    };
+    const reponse = await callAPI(`/api/auth/getAccountbyIdShop/${data}`, 'GET',{},config);
     setaccount(reponse.data)
-    setstatussave(reponse.data.status)
   };
   const handlesubmit = async () => {
-    const formData = new FormData();
-    formData.append('status', statussave);
     const config = {
       headers: {
         "Authorization": `Bearer ${token}`
@@ -46,13 +51,13 @@ export default function ModelEdit({ status, toggleShow }) {
     };
     const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
     if (isConfirmed) {
-      const reponse = await callAPI(`/api/auth/account/adminupdate/${data}`, 'PUT', formData, config);
-      if (reponse) {
-        toggleShow();
-        dispatch(getIdAccountAdmin(0));
-        await callAPI(`/api/auth/sendEmail/${account.infoAccount.email}?content=${content}`, 'GET', {}, config);
-      }
-    }
+    const reponse = await callAPI(`/api/auth/adminDeleteShop/${data}`,'DELETE',{},config);
+    if (reponse) {
+      toggleShow();
+      dispatch(getIdShop(0));
+      await callAPI(`/api/auth/sendEmail/${account.infoAccount.email}?content=${content}`, 'GET',{},config);
+      navigate('/admin/shops')
+    }}
   };
   return (
     <>
@@ -60,7 +65,7 @@ export default function ModelEdit({ status, toggleShow }) {
         <MDBModalDialog>
           <MDBModalContent>
             <MDBModalHeader>
-              <MDBModalTitle>Cập nhật tài khoản</MDBModalTitle>
+              <MDBModalTitle>Không duyệt</MDBModalTitle>
               <MDBBtn
                 className="btn-close"
                 color="none"
@@ -68,17 +73,6 @@ export default function ModelEdit({ status, toggleShow }) {
               ></MDBBtn>
             </MDBModalHeader>
             <MDBModalBody>
-              <p>Trạng thái tài khoản</p>
-              <select className={style.inputEdit}
-                value={statussave}
-                onChange={(e) => {
-                  setstatussave(e.target.value);
-                }}
-              >
-                <option value={true}>Hoạt động</option>
-                <option value={false}>Cấm hoạt động</option>
-              </select>
-              <br />
               <br />
               <p>Lí do</p>
               <textarea style={{ width: '100%' }} value={content} onChange={(e) => { setcontent(e.target.value) }}></textarea>

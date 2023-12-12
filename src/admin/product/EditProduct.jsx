@@ -68,10 +68,26 @@ function ListProduct() {
             "Authorization": `Bearer ${token}`
           }
         };
-        const formData = new FormData();
-        formData.append('status', status);
-        const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData, config)
-        setreload(reload + 1)
+
+        const acc = await callAPI(`/api/auth/getAccountbyIdProduct/${id}`, 'GET', {}, config);
+        if (acc && acc.data !== null) {
+          const formData = new FormData();
+          formData.append('status', status);
+          const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData, config)
+          setreload(reload + 1)
+          switch (status) {
+            case 0:
+              await callAPI(`/api/auth/sendEmail/${acc.data.infoAccount.email}?content=Sản phẩm có mã ${id} đang được phê duyệt`, 'GET', {}, config);
+              break;
+            case 1:
+              await callAPI(`/api/auth/sendEmail/${acc.data.infoAccount.email}?content=Sản phẩm có mã ${id} đã được phê duyệt`, 'GET', {}, config);
+              break;
+            case 2:
+              await callAPI(`/api/auth/sendEmail/${acc.data.infoAccount.email}?content=Sản phẩm có mã ${id} đã bị cấm`, 'GET', {}, config);
+              break;
+            default:
+          }
+        }
       } catch (error) {
         console.log(error)
       }

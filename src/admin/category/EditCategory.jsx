@@ -11,6 +11,8 @@ import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
 import ModalAction from "../../service/ModalAction";
+import { deleteImageFromFirebaseStorage, uploadImageToFirebaseStorage } from "../../service/firebase";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function EditCategory() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -40,12 +42,14 @@ function EditCategory() {
   const [type_categoryItem, setTypeCateItem] = useState("");
   const [valueCategory, setValueCategory] = useState();
   const [categoryItem, setcategoryItem] = useState({});
-  const [image, setimage] = useState(null);
+  const [image, setimage] = useState("");
+  const [imageNew, setimageNew] = useState("");
   const [listCategory, setListcategory] = useState([]);
   const [reload, setreload] = useState(0);
-  const [imageload, setimageload] = useState("");
   const [category, setcategory] = useState({});
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   //GET DATA REDUX
   const data = useSelector(state => state.allDataCategory);
   const idCategory = useSelector(state => state.idCategoryUpdate);
@@ -85,7 +89,7 @@ function EditCategory() {
         "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB."
       );
     } else {
-      setimage(file);
+      setimageNew(file);
       const reader = new FileReader();
       reader.onload = event => {
         setSelectedImage(event.target.result);
@@ -99,7 +103,7 @@ function EditCategory() {
       const data = await CategoryService.getAllCategoryById(idCategory);
       dispatch(getIdcategoryUpdate(data.id));
       setTypeCate(data.type_category);
-      setimageload(data.image);
+      setimage(data.image);
       setcategory(data)
     } catch (error) {
       ThongBao("Có lỗi xảy ra. Thử lại", "error");
@@ -119,29 +123,23 @@ function EditCategory() {
       const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
       if (isConfirmed) {
         try {
+          setIsLoading(true);
+          const downloadURL = await uploadImageToFirebaseStorage(image);
           const response = await CategoryService.addCategory(
             type_category,
-            image,
+            downloadURL,
             accountLogin.id,
             token
           );
-          if (response.status === "success") {
+          setIsLoading(false);
+          if (response) {
             ThongBao(response.message, response.status);
             dispatch(getIdcategoryUpdate(0));
             dispatch(reloadPage(reloadold + 1));
             setTypeCate('');
             setimage(null);
             setSelectedImage(null);
-            setimageload("");
-            setcategory({})
-          } else {
-            ThongBao(response.message, response.status);
-            dispatch(getIdcategoryUpdate(0));
-            dispatch(reloadPage(reloadold + 1));
-            setTypeCate('');
-            setimage(null);
-            setSelectedImage(null);
-            setimageload("");
+            setimage("");
             setcategory({})
           }
         } catch (error) {
@@ -154,76 +152,60 @@ function EditCategory() {
 
   const handleUpdateCategory = async () => {
     const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
-    if (type_category !== category.type_category) {
-      if (type_category.trim() === "") {
-        ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
-      } else if (type_category.length > 24) {
-        ThongBao("Độ dài của loại sản phẩm không được quá 24 ký tự.", "error");
-      } else if (!isAlphaWithSpace(type_category)) {
-        ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
-      } else {
-        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-        if (isConfirmed) {
-          try {
+    if (type_category.trim() === "") {
+      ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
+    } else if (type_category.length > 24) {
+      ThongBao("Độ dài của loại sản phẩm không được quá 24 ký tự.", "error");
+    } else if (!isAlphaWithSpace(type_category)) {
+      ThongBao("Tên loại sản phẩm chứa kí tự không hợp lệ.", "error");
+    } else {
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        try {
+          if (selectedImage === null) {
+            setIsLoading(true);
             const result = await CategoryService.updateCategory(
               idCategory,
               type_category,
               image,
               token
             );
-            if (result.status === "success") {
+            setIsLoading(false);
+            if (result) {
               ThongBao(result.message, result.status);
               dispatch(getIdcategoryUpdate(0));
               dispatch(reloadPage(reloadold + 1));
               setTypeCate('');
               setimage(null);
               setSelectedImage(null);
-              setimageload("")
-              setcategory({})
-            } else {
-              ThongBao(result.message, result.status);
-              dispatch(getIdcategoryUpdate(0));
-              dispatch(reloadPage(reloadold + 1));
-              setTypeCate('');
-              setimage(null);
-              setSelectedImage(null);
-              setimageload("")
+              setimage("")
               setcategory({})
             }
-          } catch (error) {
-            ThongBao("Có lỗi xảy ra. Thử lại", "error");
+          } else {
+            setIsLoading(true);
+            const downloadURL = await uploadImageToFirebaseStorage(imageNew);
+            await deleteImageFromFirebaseStorage(image);
+            const result = await CategoryService.updateCategory(
+              idCategory,
+              type_category,
+              downloadURL,
+              token
+            );
+            setIsLoading(false);
+            if (result) {
+              ThongBao(result.message, result.status);
+              dispatch(getIdcategoryUpdate(0));
+              dispatch(reloadPage(reloadold + 1));
+              setTypeCate('');
+              setimage(null);
+              setSelectedImage(null);
+              setimage("")
+              setcategory({})
+            }
           }
+        } catch (error) {
+          ThongBao("Có lỗi xảy ra. Thử lại", "error");
         }
-      }
-    } else {
-      try {
-        const result = await CategoryService.updateCategory(
-          idCategory,
-          type_category,
-          image,
-          token
-        );
-        if (result.status === "success") {
-          ThongBao(result.message, result.status);
-          dispatch(getIdcategoryUpdate(0));
-          dispatch(reloadPage(reloadold + 1));
-          setTypeCate('');
-          setimage(null);
-          setSelectedImage(null);
-          setimageload("")
-          setcategory({})
-        } else {
-          ThongBao(result.message, result.status);
-          dispatch(getIdcategoryUpdate(0));
-          dispatch(reloadPage(reloadold + 1));
-          setTypeCate('');
-          setimage(null);
-          setSelectedImage(null);
-          setimageload("")
-          setcategory({})
-        }
-      } catch (error) {
-        ThongBao("Có lỗi xảy ra. Thử lại", "error");
       }
     }
   };
@@ -232,7 +214,10 @@ function EditCategory() {
     const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
     if (isConfirmed) {
       try {
+        setIsLoading(true);
+        await deleteImageFromFirebaseStorage(image);
         const reponse = await CategoryService.deleteCategory(idCategory, token);
+        setIsLoading(false);
         if (reponse.status === "success") {
           ThongBao(reponse.message, reponse.status);
           dispatch(getIdcategoryUpdate(0));
@@ -240,7 +225,7 @@ function EditCategory() {
           setTypeCate('');
           setimage(null);
           setSelectedImage(null);
-          setimageload("")
+          setimage("")
           setcategory({})
         } else {
           ThongBao(reponse.message, reponse.status);
@@ -396,10 +381,10 @@ function EditCategory() {
                   src={selectedImage}
                   alt="Hình Ảnh"
                 />
-                : imageload !== ""
+                : image !== ""
                   ? <img
                     className={style.image}
-                    src={`http://localhost:8080/api/uploadImageProduct/${imageload}`}
+                    src={image}
                     alt="Hình Ảnh"
                   />
                   : null}
@@ -409,7 +394,7 @@ function EditCategory() {
                   style={{ display: "none" }}
                   id="inputImage"
                   accept="image/*"
-                  defaultValue={imageload}
+                  defaultValue={image}
                   onChange={handleImageChange}
                 />
                 <label htmlFor="inputImage" className={style.button}>
@@ -436,7 +421,7 @@ function EditCategory() {
                 onClick={() => {
                   handleAddCategory();
                 }}
-               disabled={idCategory !== 0}
+                disabled={idCategory !== 0}
               >
                 <i className="bi bi-plus-lg" /> THÊM
               </button>
@@ -451,7 +436,7 @@ function EditCategory() {
                 setTypeCate('');
                 setimage(null);
                 setSelectedImage(null);
-                setimageload("");
+                setimage("");
                 setcategory({})
               }}>
                 <i className="bi bi-arrow-clockwise" /> LÀM MỚI
@@ -516,6 +501,7 @@ function EditCategory() {
           </div>
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

@@ -26,7 +26,6 @@ import LikeProduct from './page_user/user/LikeProduct'
 import Shop from './page_user/user/Shop'
 
 import NotFoundPage from './page_user/user/NotFoundPage'
-import { GetDataLogin } from './service/DataLogin'
 import VNPayBankSelection from './pay/pay'
 import ChatApp from './chatApp/chatApp'
 import { Provider } from "react-redux";
@@ -35,7 +34,7 @@ function App() {
 
 
   return (
- 
+    <Provider store={store}>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
@@ -72,7 +71,7 @@ function App() {
         <Route path="/chatApp" element={<ChatApp />} />
 
       </Routes>
-
+    </Provider>
   )
 }
 

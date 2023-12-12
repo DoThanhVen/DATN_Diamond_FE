@@ -116,7 +116,7 @@ function ListCategory() {
               <label className={style.column}>
                 <img
                   className={style.image}
-                  src={`http://localhost:8080/api/uploadImageProduct/${value.image}`}
+                  src={value.image}
                   alt="Hình Ảnh"
                 ></img>
               </label>

@@ -7,6 +7,12 @@ import moment from "moment";
 import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
+import ModalAction from "../../service/ModalAction";
+import { ThongBao } from "../../service/ThongBao";
+import axios from "axios";
+import LoadingOverlay from "../../service/loadingOverlay";
+import { deleteImageFromFirebaseStorage } from "../../service/firebase";
+import ProductService from "../../service/ProductService";
 
 const numberPage = 10;
 function formatCurrency(price, promotion) {
@@ -27,7 +33,7 @@ export default function ListProduct() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
     const log = sessionStorage.getItem('accessToken')
-
+    settoken(log)
     if (accountLogin !== null) {
       try {
         getdataProduct(currentPage, accountLogin.shop.id);
@@ -54,11 +60,13 @@ export default function ListProduct() {
   const [reloadinPage, setreload] = useState(0);
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
-
+  const [token, settoken] = useState();
+  const [filterbyStatus, setFilterStatus] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdataCategory();
     getAccountFromSession();
-  }, [reload, currentPage, reloadinPage, sortType]);
+  }, [reload, currentPage, reloadinPage, sortType, filterbyStatus]);
 
   function handleClickEditProduct(event) {
     const rowElement = event.currentTarget.parentElement.parentElement;
@@ -80,7 +88,7 @@ export default function ListProduct() {
     try {
       const response = await callAPI(
         `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
-        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&isActive=`,
+        }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}&isActive=`,
         "GET"
       );
       setProducts(response.data);
@@ -105,7 +113,7 @@ export default function ListProduct() {
   };
 
   //FORM SEARCH
-  const [valueOption, setValueOption] = useState("");
+  const [valueOption, setValueOption] = useState("id");
   const [textInput, setTextInput] = useState("");
 
   //LOẠI SẢN PHẨM
@@ -128,10 +136,106 @@ export default function ListProduct() {
   };
 
   const handleDelete = async (id) => {
-    await callAPI(`/api/product/${id}`, "DELETE");
-    getdataProduct();
+    const isConfirmed = await ModalAction("Bạn có chắc muốn xóa sản phẩm này?", "warning");
+    if (isConfirmed) {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
+      setIsLoading(true);
+      const reponse = await ProductService.getProductbyId(id);
+      reponse.image_product?.map(async (item) => {
+        await deleteImageFromFirebaseStorage(item.url)
+      })
+      const res = await callAPI(`/api/auth/product/delete/${id}`, "DELETE", {}, config);
+      setIsLoading(false);
+      if (res) {
+        ThongBao(res.message, res.status)
+        setreload(reloadinPage + 1)
+      }
+    }
   };
 
+  const exportExcel = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/auth/product/exportProductsToExcel', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      });
+
+      if (response.status === 200) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'products.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      } else {
+        console.error('Failed to export to Excel');
+      }
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+    }
+  };
+
+
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await axios.post(
+          'http://localhost:8080/api/auth/product/importProductsFromExcel',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log('Import successful!', response.data);
+        setreload(reloadinPage + 1)
+      } catch (error) {
+        console.error('Import failed!', error);
+      }
+    } else {
+      console.error('Please select a file to import!');
+    }
+  };
+
+  const shutdownProduct = async (id) => {
+    const isConfirmed = await ModalAction("Bạn có chắc muốn ngừng hoạt động sản phẩm này?", "warning");
+    if (isConfirmed) {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
+
+      const res = await callAPI(`/api/auth/product/shutdownProduct/${id}`, 'GET', {}, config)
+      if (res && res.status === 'success') {
+        ThongBao(res.message, res.status)
+        setreload(reloadinPage + 1)
+      }
+    }
+  }
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
@@ -223,8 +327,33 @@ export default function ListProduct() {
             <option value="desc">Giảm dần</option>
           </select>
         ) : null}
+        <button onClick={exportExcel}>Xuất Excel</button>
+        <div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <button onClick={handleButtonClick}>Nhập Excel</button>
+        </div>
       </div>
-
+      <div className={style.typeProduct}>
+        <label>Trạng thái:</label>
+        <select
+          value={filterbyStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+          }}
+          className={`ms-2 ${style.optionSelect}`}
+        >
+          <option value="">Tất cả</option>
+          <option value="0">Chờ Phê Duyệt</option>
+          <option value="1">Đang Hoạt Động</option>
+          <option value="2">Dừng Hoạt Động</option>
+          <option value="3">Cấm Hoạt Động</option>
+        </select>
+      </div>
       <div className={`${style.listProduct}`}>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -297,10 +426,32 @@ export default function ListProduct() {
                 {formatDate(value.create_date)}
               </label>
               <label className={style.column}>
-                <i
-                  className={`bi bi-pencil-square ${style.buttonEdit}`}
-                  onClick={handleClickEditProduct}
-                />
+                {value.status === 0 || value.status === 1 ? (
+                  <i
+                    className={`bi bi-pencil-square ${style.buttonEdit}`}
+                    onClick={handleClickEditProduct}
+                  />
+                ) : (
+                  null
+                )
+                }
+              </label>
+              <label className={style.column}>
+                {value.status === 0 ? (
+                  <i
+                    className={`bi bi-trash ${style.buttonDelete}`}
+                    onClick={() => handleDelete(value.id)}
+                  />
+                ) : (
+                  <span></span>
+                )}
+              </label>
+              <label className={style.column}>
+                {value.status === 1 ? (
+                  <button onClick={() => { shutdownProduct(value.id) }}>Ngừng hoạt động</button>
+                ) : (
+                  null
+                )}
               </label>
             </div>
           ))}
@@ -333,6 +484,7 @@ export default function ListProduct() {
           closeModal={closeModal}
         />
       )}
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

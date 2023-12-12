@@ -30,16 +30,15 @@ function ListStorge() {
   const navigate = new useNavigate();
   const [valueOption, setValueOption] = useState("");
   const [textInput, setTextInput] = useState("");
-
+  const [reloadinPage, setreload] = useState(0)
   useEffect(() => {
     getAccountFromSession();
-  }, [reload, currentPage, textInput]);
+  }, [reload, currentPage, reloadinPage]);
 
   const getdataProduct = async (page, idShop) => {
     try {
       const response = await callAPI(
-        `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${
-          (page - 1) * numberPage
+        `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${(page - 1)
         }&sizePage=${numberPage}`,
         "GET"
       );
@@ -71,7 +70,7 @@ function ListStorge() {
             type="text"
             onChange={(e) => setTextInput(e.target.value)}
           />
-          <button className={`${style.buttonSearch}`}>Tìm Kiếm</button>
+          <button className={`${style.buttonSearch}`} onClick={() => setreload(reloadinPage + 1)}>Tìm Kiếm</button>
         </div>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -84,17 +83,17 @@ function ListStorge() {
           </div>
           {products?.content?.map((value, index) => (
             <div key={value.id} className={style.tableBody}>
-              <label className={style.column}>{index+ 1 +(currentPage * 10 - numberPage)}</label>
+              <label className={style.column}>{index + 1 + (currentPage * 10 - numberPage)}</label>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
                 {value?.image_product.length > 0 ? (
-                    <div key={value?.image_product[0].id}>
-                      <img
-                        className={style.image}
-                        src={`http://localhost:8080/api/uploadImageProduct/${value?.image_product[0].url}`}
-                        alt="Hình Ảnh"
-                      ></img>
-                    </div>
+                  <div key={value?.image_product[0].id}>
+                    <img
+                      className={style.image}
+                      src={`http://localhost:8080/api/uploadImageProduct/${value?.image_product[0].url}`}
+                      alt="Hình Ảnh"
+                    ></img>
+                  </div>
                 ) : (
                   <img
                     className={style.image}

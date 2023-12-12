@@ -31,20 +31,19 @@ function ListProduct() {
   const [token, settoken] = useState(null);
   useEffect(() => {
     getdata(currentPage);
-  }, [data, currentPage, reload, sortType,filterbyStatus]);
+  }, [data, currentPage, reload, sortType, filterbyStatus]);
 
   const getdata = async (page) => {
     const tokenac = sessionStorage.getItem('accessToken');
     settoken(tokenac)
     try {
       const response = await callAPI(
-        `/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${
-          page - 1
+        `/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${page - 1
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}`,
         "GET"
       );
-        setProducts(response.data.content || []);
-        setTotalPages(response.data.totalPages || 1);
+      setProducts(response.data.content || []);
+      setTotalPages(response.data.totalPages || 1);
 
 
     } catch (error) {
@@ -65,21 +64,39 @@ function ListProduct() {
   };
 
   const handleUpdateStatus = async (id, status) => {
-    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-    if (isConfirmed) {
-    try {
-      const config = {
-        headers: {
-          "Authorization": `Bearer ${token}`
+    if (status !== 2) {
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        try {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const acc = await callAPI(`/api/auth/getAccountbyIdProduct/${id}`, 'GET', {}, config);
+          if (acc && acc.data !== null) {
+            const formData = new FormData();
+            formData.append('status', status);
+            const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData, config)
+            getdata(currentPage, filterbyStatus)
+            switch (status) {
+              case 0:
+                await callAPI(`/api/auth/sendEmail/${acc.data.infoAccount.email}?content=Sản phẩm có mã ${id} đã được phê duyệt`, 'GET', {}, config);
+                break;
+              case 1:
+                await callAPI(`/api/auth/sendEmail/${acc.data.infoAccount.email}?content=Sản phẩm có mã ${id} đã bị cấm hoạt động`, 'GET', {}, config);
+                break;
+              default:
+                break;
+            }
+          }
+        } catch (error) {
+          console.log(error);
         }
-      };
-      const formData = new FormData();
-      formData.append('status', status);
-      const res = await callAPI(`/api/auth/product/adminupdatestatus/${id}`, 'PUT', formData,config)
-      getdata(currentPage, filterbyStatus)
-    } catch (error) {
-      console.log(error);
-    }}
+      }
+    } else {
+      return;
+    }
   };
 
   function formatCurrency(price, promotion) {
@@ -170,6 +187,7 @@ function ListProduct() {
               <option value="0">Chờ Phê Duyệt</option>
               <option value="1">Đang Hoạt Động</option>
               <option value="2">Dừng Hoạt Động</option>
+              <option value="3">Cấm Hoạt Động</option>
             </select>
           </div>
         </div>
@@ -189,7 +207,7 @@ function ListProduct() {
             <div key={index} className={style.tableBody}>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
-                {value.image_product != null ? (
+                {value.image_product && value.image_product.length > 0 ? (
                   <img
                     key={value.image_product[0].id}
                     className={style.image}
@@ -218,15 +236,14 @@ function ListProduct() {
                 <i
                   className={`
     ${style.status}
-    ${
-      value.status === 0
-        ? `bi bi-exclamation-lg ${style.approval}`
-        : value.status === 1
-        ? `bi bi-check-lg ${style.active}`
-        : value.status === 2
-        ? `bi bi-x-lg ${style.ban}`
-        : `bx bxs-error-alt`
-    }
+    ${value.status === 0
+                      ? `bi bi-exclamation-lg ${style.approval}`
+                      : value.status === 1
+                        ? `bi bi-check-lg ${style.active}`
+                        : value.status === 2
+                          ? `bi bi-x-lg ${style.ban}`
+                          : value.status === 3 ? `bi bi-x-lg ${style.ban}` : `bx bxs-error-alt`
+                    }
   `}
                 ></i>
               </label>
@@ -239,22 +256,25 @@ function ListProduct() {
                   style={{
                     backgroundColor:
                       value.status === 0
-                        ? "blue"
+                        ? "#34219E"
                         : value.status === 1
-                        ? "red"
-                        : value.status === 2
-                        ? "green"
-                        : "#E74C3C"
+                          ? "green"
+                          : value.status === 2
+                            ? "red"
+                            : value.status === 3
+                              ? "red" : "#E74C3C"
                   }}
                   value={`${value.status}`}
                 >
                   {value.status === 0
-                    ? "ACCEPT"
+                    ? "Chờ Phê Duyệt"
                     : value.status === 1
-                    ? "BAN"
-                    : value.status === 2
-                    ? "ACTIVITY"
-                    : "Lỗi"}
+                      ? "Đang Hoạt Động"
+                      : value.status === 2
+                        ? "Dừng Hoạt Động"
+                        : value.status === 3
+                          ? "Cấm hoạt động"
+                          : "Lỗi"}
                 </label>
               </label>
               <label className={style.column}>

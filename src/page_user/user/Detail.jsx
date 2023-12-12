@@ -16,6 +16,8 @@ import style from "../css/user/detail.module.css";
 import { GetDataLogin } from "../../service/DataLogin.js";
 import { useDispatch } from "react-redux";
 import cartSilce from "../../Reducer/cartSilce";
+import { callAPI } from "../../service/API.js";
+import { ThongBao } from "../../service/ThongBao.js";
 const API_BASE_URL = "http://localhost:8080";
 
 function formatCurrency(price, promotion) {
@@ -52,12 +54,10 @@ function localStateReducer(state, action) {
 
 function ProductPage() {
   const navigate = useNavigate();
-
   const [accountLogin, setAccountLogin] = useState(null);
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
     if (accountLogin !== undefined) {
       try {
         setAccountLogin(accountLogin);
@@ -281,13 +281,34 @@ function ProductPage() {
 
   const dispatchs = useDispatch();
   const [quantity, setQuantity] = useState(1);
-  const handleAddCart = (e) => {
+
+
+  const handleAddCart = async () => {
+    let newProduct = null
+    let shop;
+    const response = await callAPI(`/api/shop/findByProduct/${product.id}`, 'GET')
+    if (response.status == 'SUCCESS') {
+      shop = response.data;
+    }
+    else {
+      return;
+    }
+
+    newProduct = {
+      ...product,
+      shop: shop
+    }
+    if (newProduct == null) {
+      alert('Đang có lỗi vui lòng thử lại sau')
+      return;
+    }
     dispatchs(
       cartSilce.actions.addToCart({
-        product: product,
+        product: newProduct,
         quantity: quantity
       })
     );
+    ThongBao("Thêm thành công", "success")
   };
 
   return (
@@ -305,8 +326,8 @@ function ProductPage() {
             <div className="row p-4">
               <aside className="col-lg-6">
                 {product &&
-                product.image_product &&
-                product.image_product.length > 0 ? (
+                  product.image_product &&
+                  product.image_product.length > 0 ? (
                   <Carousel>
                     {product.image_product.map((image, index) => (
                       <div

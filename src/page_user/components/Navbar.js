@@ -11,15 +11,22 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 import { cartSelector } from '../../actions/actions';
-import { useDispatch, useSelector } from 'react-redux';
-const MainNavbar = () => {
+import { useSelector } from 'react-redux';
 
+
+const MainNavbar = () => {
   const cart = useSelector(cartSelector);
   let total = 0;
-  cart&& cart.map((item,index) => {
+  let totalMoney = 0;
+  cart && cart.map((item, index) => {
     total = index + 1
+    totalMoney += item.product.price * item.quantity
   })
 
+  const searchParams = new URLSearchParams();
+  searchParams.append('keyword',"s")
+  searchParams.append('keyword',"s")
+  
   const [accountLogin, setAccountLogin] = useState(null);
 
   useEffect(() => {
@@ -31,7 +38,9 @@ const MainNavbar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate.push(`/search?name=${searchQuery}`);
+
+    console.log(searchParams.toString())
+    navigate(`/search?${searchParams.toString()}`);
   };
 
   const handleLogout = () => {
@@ -41,6 +50,7 @@ const MainNavbar = () => {
     }, 800);
     return () => clearTimeout(delay);
   };
+
   return (
     <>
       <header className="header shop">
@@ -67,8 +77,8 @@ const MainNavbar = () => {
                 <div className="right-content">
                   <ul className="list-main">
                     {accountLogin &&
-                    accountLogin.shop &&
-                    accountLogin.shop.status === 1 ? (
+                      accountLogin.shop &&
+                      accountLogin.shop.status === 1 ? (
                       <li>
                         <i className="ti-location-pin"></i>{" "}
                         <a href="/business">Kênh bán hàng</a>
@@ -144,6 +154,7 @@ const MainNavbar = () => {
                         placeholder="Search here..."
                         name="search"
                       />
+
                       <button value="search" type="submit">
                         <i className="ti-search"></i>
                       </button>
@@ -153,7 +164,7 @@ const MainNavbar = () => {
                 <div className="mobile-nav"></div>
               </div>
               <div className="col-lg-8 col-md-7 mt-4 col-12">
-                <Form role="search" onSubmit={handleSearch}>
+                <Form role="search" onSubmit={handleSearch} method="get">
                   <div className="input-group">
                     <FormControl
                       type="search"
@@ -161,6 +172,7 @@ const MainNavbar = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    
                     <Button variant="light" type="submit">
                       <i className="fa fa-search"></i>
                     </Button>
@@ -231,36 +243,36 @@ const MainNavbar = () => {
                         <a href="/cart">Xem giỏ hàng</a>
                       </div>
                       <ul className="shopping-list">
-                        {cart?.map((item,index) => (
+                        {cart?.map((item, index) => (
                           <li key={index}>
-                          <a
-                            href="#"
-                            className="remove"
-                            title="Remove this item"
-                          >
-                            <i className="fa fa-remove"></i>
-                          </a>
-                          <a className="cart-img" href="#">
-                            <img
-                              src="https://via.placeholder.com/70x70"
-                              alt="#"
-                            />
-                          </a>
-                          <h4>
-                            <a href="#">{item.product_name}</a>
-                          </h4>
-                          <p className="quantity">
-                            1 - <span className="amount">{item.quantity}</span>
-                          </p>
-                        </li>
+                            <a
+                              href="#"
+                              className="remove"
+                              title="Remove this item"
+                            >
+                              <i className="fa fa-remove"></i>
+                            </a>
+                            <a className="cart-img" href="#">
+                              <img
+                                src="https://via.placeholder.com/70x70"
+                                alt="#"
+                              />
+                            </a>
+                            <h4>
+                              <a href="#">{item.product.product_name}</a>
+                            </h4>
+                            <p className="quantity">
+                              {item.product.price} - <span className="amount">{item.quantity}</span>
+                            </p>
+                          </li>
                         ))}
-                        
-                       
+
+
                       </ul>
                       <div className="bottom">
                         <div className="total">
                           <span>Tổng</span>
-                          <span className="total-amount">$134.00</span>
+                          <span className="total-amount">{totalMoney}</span>
                         </div>
                         <a href="/checkout" className="btn animate">
                           Thanh toán

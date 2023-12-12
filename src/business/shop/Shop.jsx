@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { ThongBao } from "../../service/ThongBao";
 import { callAPI } from "../../service/API";
 import DataAddress from "../../service/AddressVietNam.json";
+import LoadingOverlay from "../../service/loadingOverlay";
+import { deleteImageFromFirebaseStorage, uploadImageToFirebaseStorage } from "../../service/firebase";
 function Shop() {
   //SELECT IMAGE
   const [selectedImage, setSelectedImage] = useState(null);
@@ -18,7 +20,10 @@ function Shop() {
   const [image, setimage] = useState()
   const navigate = new useNavigate();
   const listDataAddress = DataAddress;
-  const [reload, setreload] = useState(0)
+  const [reload, setreload] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imgLoad, setimgLoad] = useState(null);
+  const [imgOld, setImgOld] = useState(null);
   useEffect(() => {
     getData();
   }, [reload]);
@@ -47,8 +52,9 @@ function Shop() {
       setDistrict(res.addressShop.district)
       setWard(res.addressShop.ward)
       setAddress(res.addressShop.address)
-      if(res.image){
-        setSelectedImage(`http://localhost:8080/api/uploadImageProduct/${res.image}`)
+      if (res.image!=='null') {
+        setimgLoad(res.image)
+        setImgOld(res.image)
       }
     } catch (error) {
       console.log(error)
@@ -58,7 +64,7 @@ function Shop() {
   const handleSubmit = async () => {
     try {
       // Validation for shopName
-      const isValidShopName = /^[\p{L}0-9\s]+$/u.test(shopName) && !/[!@#$%^&*(),.?":{}|<>]/g.test(shopName) &&shopName.length<=30 ;
+      const isValidShopName = /^[\p{L}0-9\s]+$/u.test(shopName) && !/[!@#$%^&*(),.?":{}|<>]/g.test(shopName) && shopName.length <= 30;
 
 
       // Validation for address
@@ -67,7 +73,7 @@ function Shop() {
       // Validation for city, district, ward (checking for emptiness)
       const areFieldsEmpty = !city || !district || !ward;
 
-      if (!isValidShopName || shopName.trim()==='') {
+      if (!isValidShopName || shopName.trim() === '') {
         ThongBao("Tên cửa hàng không hợp lệ.", 'error');
         return; // Stop execution if validation fails
       }
@@ -81,32 +87,54 @@ function Shop() {
         ThongBao("Vui lòng chọn Tỉnh/Thành Phố.", 'error');
         return;
       }
-  
+
       if (!district || !listDataAddress.find(cityItem => cityItem.codename === city)?.districts.find(districtItem => districtItem.codename === district)) {
         ThongBao("Quận/Huyện không hợp lệ.", 'error');
         return;
       }
-  
+
       if (!ward || !listDataAddress.find(cityItem => cityItem.codename === city)?.districts.find(districtItem => districtItem.codename === district)?.wards.find(wardItem => wardItem.codename === ward)) {
         ThongBao("Phường/Xã/Trị Trấn không hợp lệ.", 'error');
         return;
       }
-      console.log('dis', district)
-      const formData = new FormData();
-      formData.append('shop_name', shopName);
-      formData.append('image', image);
-      formData.append('city', city);
-      formData.append('district', district);
-      formData.append('ward', ward);
-      formData.append('address', address);
+      if (selectedImage === null) {
+        setIsLoading(true)
+        const formData = new FormData();
+        formData.append('shop_name', shopName);
+        formData.append('image', imgLoad);
+        formData.append('city', city);
+        formData.append('district', district);
+        formData.append('ward', ward);
+        formData.append('address', address);
 
-      const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
-      console.log(res)
-      if (res.status === 'success') {
-        ThongBao(res.message, res.status);
-        setreload(reload + 1);
+        const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
+        setIsLoading(false)
+        if (res.status === 'success') {
+          ThongBao(res.message, res.status);
+          setreload(reload + 1);
+        } else {
+          ThongBao("Đã xảy ra lỗi.", 'error');
+        }
       } else {
-        ThongBao("Đã xảy ra lỗi.", 'error');
+        setIsLoading(true)
+        await deleteImageFromFirebaseStorage(imgOld);
+        const downloadURL = await uploadImageToFirebaseStorage(image);
+        const formData = new FormData();
+        formData.append('shop_name', shopName);
+        formData.append('image', downloadURL);
+        formData.append('city', city);
+        formData.append('district', district);
+        formData.append('ward', ward);
+        formData.append('address', address);
+
+        const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
+        setIsLoading(false)
+        if (res.status === 'success') {
+          ThongBao(res.message, res.status);
+          setreload(reload + 1);
+        } else {
+          ThongBao("Đã xảy ra lỗi.", 'error');
+        }
       }
     } catch (error) {
       console.log(error);
@@ -136,6 +164,7 @@ function Shop() {
     const reader = new FileReader();
     reader.onload = event => {
       setSelectedImage(event.target.result);
+      setimgLoad(event.target.result);
     };
     reader.readAsDataURL(file);
   };
@@ -147,8 +176,8 @@ function Shop() {
       <div className={style.formAction}>
         <label className={style.heading}>Thông tin cửa hàng</label>
         <div className={style.formImage}>
-          {selectedImage !== null ? (
-            <img className={style.image} src={selectedImage} alt="Hình Ảnh" />
+          {imgLoad !== null ? (
+            <img className={style.image} src={imgLoad} alt="Hình Ảnh" />
           ) : <img className={style.image} src="/images/image_shop.jpg" alt="Hình Ảnh" />}
           <div className={style.action}>
             <input
@@ -259,6 +288,7 @@ function Shop() {
           </button>
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

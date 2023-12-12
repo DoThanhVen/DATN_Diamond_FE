@@ -40,7 +40,7 @@ function ListShopWait() {
       const response = await callAPI(
         `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
-        "GET",{},config
+        "GET", {}, config
       );
       const responseData = response.data;
 
@@ -125,12 +125,11 @@ function ListShopWait() {
                 </span>
               </label>
               <label className={style.column}>
-                <img style={{width:'60%'}} src=
+                <img style={{ width: '60%' }} src=
                   {value.shop.image
                     ? `http://localhost:8080/api/uploadImageProduct/${value.shop.image}`
                     : "/images/image_shop.jpg"} alt="Hình ảnh" />
               </label>
-
               <label
                 className={style.column}
                 onClick={() => {
