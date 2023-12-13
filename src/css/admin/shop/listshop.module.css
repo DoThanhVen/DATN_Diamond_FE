@@ -1,0 +1,312 @@
+.listShopActive {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px 0px;
+
+    .heading {
+        margin-bottom: 40px;
+
+        .column {
+            .title {
+                font-size: 20px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+            }
+
+            .formSearch {
+                display: flex;
+                align-items: center;
+                margin-top: 10px;
+
+                .optionSelect {
+                    width: 150px;
+                    height: 50px;
+                    padding: 0 5px;
+                    border: 1px solid lightgrey;
+                    border-radius: 5px 0 0 5px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                .inputSearch {
+                    height: 50px;
+                    width: calc(100% - 150px - 100px);
+                    padding: 5px 10px;
+                    margin-left: -1px;
+                    border: 1px solid lightgrey;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                .buttonSearch {
+                    width: 100px;
+                    height: 50px;
+                    border: none;
+                    color: white;
+                    background-color: orangered;
+                    font-size: 15px;
+                    font-weight: bold;
+                    border-radius: 0 5px 5px 0;
+                }
+            }
+        }
+
+        .filter {
+            margin-top: 10px;
+        }
+    }
+
+    .table {
+        .tableHeading {
+            background-color: rgba(240, 240, 240, .8);
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody {
+            &:not(:last-child) {
+                border-bottom: 2px solid rgba(240, 240, 240, .8);
+            }
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody,
+        .tableHeading {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            font-size: 14px;
+
+            .column {
+                &:nth-child(1) {
+                    width: 40px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(2) {
+                    width: calc(100% - 730px);
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(3) {
+                    width: 120px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(4) {
+                    width: 150px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(5) {
+                    width: 160px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(6) {
+                    width: 120px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(7) {
+                    width: 150px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .status {
+                    width: 90%;
+                    padding: 3px 0;
+                    border-radius: 20px;
+                    color: white;
+                    font-size: 14px;
+                }
+
+                .image {
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                    border-radius: 10px
+                }
+            }
+        }
+    }
+
+    .buttonPage {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .buttonPage a {
+        background-color: lightgrey;
+        color: black;
+        margin: 0 5px;
+    }
+}
+
+.listShop {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+
+    .cardShop {
+        width: 30%;
+        height: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        margin-right: 20px;
+        border: 1px solid rgba(211, 211, 211, .5);
+
+        .heading {
+            display: flex;
+
+            .image {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+
+            .content {
+                display: flex;
+                flex-direction: column;
+                margin-left: 10px;
+
+                .shopName {
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+
+                .createDate {
+                    font-size: 13px;
+                    color: grey;
+                }
+            }
+
+        }
+
+        .address {
+            display: flex;
+            flex-direction: column;
+
+            .title {
+                margin: 10px 0;
+                font-weight: bold;
+            }
+
+            .content {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .content label {
+                font-size: 15px;
+            }
+        }
+
+        .status {
+            display: flex;
+            justify-content: end;
+            margin-top: 5px;
+
+            .statusShop {
+                padding: 5px 8px;
+                font-size: 14px;
+                color: white;
+                border-radius: 20px;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.buttonPage {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.buttonPage a {
+    background-color: lightgrey;
+    color: black;
+    margin: 0 5px;
+}
+
+.formSearch {
+    padding: 10px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.optionSelect {
+    width: 150px;
+    height: 50px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    font-size: 15px;
+}
+
+
+.optionSelect:focus {
+    outline: none;
+}
+
+.inputSearch {
+    height: 50px;
+    width: calc(100% - 150px - 100px);
+    padding: 5px 10px;
+    margin-left: -1px;
+    border: 1px solid lightgrey;
+}
+
+.inputSearch:focus {
+    outline: none;
+}
+
+.buttonSearch {
+    width: 100px;
+    height: 50px;
+    border: none;
+    color: white;
+    background-color: orangered;
+    font-size: 15px;
+}

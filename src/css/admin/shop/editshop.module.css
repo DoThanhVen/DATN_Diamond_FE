@@ -1,0 +1,224 @@
+.header {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+
+    .formSearch {
+        width: 93%;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .input {
+            width: calc(100% - 30px);
+            border: none;
+            padding: 5px 10px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .iconUser {
+        font-size: 18px;
+    }
+}
+
+.formAction {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px 30px;
+    margin-top: 20px;
+
+    .heading {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .formImage {
+        display: flex;
+        width: 100%;
+        padding-bottom: 20px;
+        border-bottom: 1px solid lightgrey;
+
+        .image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .action {
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+
+            .button {
+                width: 130px;
+                background-color: #0FA958;
+                color: white;
+                border: none;
+                padding: 8px;
+                border-radius: 5px;
+                display: grid;
+                place-items: center;
+                cursor: z;
+            }
+
+            .title {
+                color: #797979;
+                margin-top: 5px;
+            }
+        }
+    }
+
+    .formContent {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+
+        .contentRight,
+        .contentLeft {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+
+            .input {
+                width: 100%;
+                padding: 15px 10px;
+                margin-top: 10px;
+                border: 1px solid lightgrey;
+                border-radius: 5px;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    .formButton {
+        margin-top: 20px;
+
+        .button {
+            font-size: 14px;
+            width: 100px;
+            padding: 8px 5px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            margin-right: 5px;
+
+            &:nth-child(1),
+            &:nth-child(2) {
+                background-color: #0FA958;
+            }
+
+            &:nth-child(3) {
+                background-color: red;
+            }
+
+            &:last-child {
+                background-color: lightgrey;
+                color: grey;
+            }
+        }
+    }
+}
+
+.inputEdit {
+    width: 100%;
+    padding: 10px 10px !important;
+    border-radius: 5px;
+    border: 1px solid rgba(211, 211, 211, .5);
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.buttonEdit {
+    width: 120px;
+    border-radius: 5px;
+    padding: 10px;
+    border: none;
+
+    &:nth-child(1) {
+        background-color: green;
+    }
+
+    &:nth-child(2) {
+        background-color: red;
+    }
+}
+
+.content {
+
+    .heading {
+        display: flex;
+
+        .image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+
+            .shopName {
+                font-size: 20px;
+                font-weight: 600;
+            }
+
+            .createDate {
+                font-size: 13px;
+                color: grey;
+            }
+        }
+
+    }
+
+    .address {
+        margin-top: 10px;
+
+        .heading {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .address {
+            margin: 0;
+        }
+    }
+
+    .product {
+        margin-top: 20px;
+
+        .heading {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .infoProduct {
+            display: flex;
+            flex-direction: column;
+
+            .image {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+            }
+        }
+    }
+}

@@ -1,0 +1,221 @@
+.header {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+
+    .formSearch {
+        width: 93%;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .input {
+            width: calc(100% - 30px);
+            border: none;
+            padding: 5px 10px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .iconUser {
+        font-size: 18px;
+    }
+}
+
+.listBill {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px 30px;
+
+    .heading {
+        margin-bottom: 40px;
+
+        .column {
+            .title {
+                font-size: 20px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+            }
+
+            .formSearch {
+                display: flex;
+                align-items: center;
+                margin-top: 10px;
+
+                .optionSelect {
+                    width: 150px;
+                    height: 50px;
+                    padding: 0 5px;
+                    border: 1px solid lightgrey;
+                    border-radius: 5px 0 0 5px;
+                    font-size: 14px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                .inputSearch {
+                    height: 50px;
+                    width: calc(100% - 150px - 100px);
+                    padding: 5px 10px;
+                    margin-left: -1px;
+                    border: 1px solid lightgrey;
+                    font-size: 15px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                .buttonSearch {
+                    width: 100px;
+                    height: 50px;
+                    border: none;
+                    color: white;
+                    background-color: orangered;
+                    font-size: 15px;
+                    font-weight: bold;
+                    border-radius: 0 5px 5px 0;
+                }
+            }
+        }
+
+        .filter {
+            margin-top: 10px;
+        }
+    }
+
+    .table {
+        .tableHeading {
+            background-color: rgba(240, 240, 240, .8);
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody {
+            &:not(:last-child) {
+                border-bottom: 2px solid rgba(240, 240, 240, .8);
+            }
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody,
+        .tableHeading {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+
+            .column {
+                &:nth-child(1) {
+                    width: 40px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(2) {
+                    width: 100px;
+                    white-space: nowrap;
+                    text-align: center;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(3) {
+                    width: 120px;
+                    white-space: nowrap;
+                    text-align: center;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(4) {
+                    width: calc(100% - 750px);
+                    white-space: nowrap;
+                    text-align: center;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(5) {
+                    width: 120px;
+                    text-align: center;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(6) {
+                    width: 120px;
+                    text-align: center;
+                }
+
+                &:nth-child(7) {
+                    width: 130px;
+                    display: grid;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    .status {
+                        text-align: center;
+                        width: 100%;
+                        padding: 5px 0;
+                        border-radius: 20px;
+                        color: white;
+                    }
+                }
+
+                &:nth-child(8) {
+                    width: 120px;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .buttonPage {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        padding: 15px;
+
+        .btnActivePage {
+            background-color: lightgray;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .button {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin: 0 3px;
+        }
+    }
+}

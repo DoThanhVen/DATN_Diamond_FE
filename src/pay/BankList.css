@@ -1,0 +1,40 @@
+.bank-list {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.bank-item {
+  width: calc(25% - 20px); /* Thay đổi chiều rộng để hiển thị nhiều hơn ngân hàng trên mỗi hàng */
+  margin-bottom: 30px;
+  padding: 15px; /* Giảm padding để làm cho mỗi ngân hàng nhỏ hơn */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.bank-item img {
+  max-width: 60%; /* Giảm kích thước hình ảnh */
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.bank-item p {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.bank-note {
+  margin-top: 30px;
+  border-top: 2px dashed #ccc;
+  padding-top: 20px;
+}
+
+.bank-note p {
+  font-style: italic;
+  line-height: 1.5;
+}

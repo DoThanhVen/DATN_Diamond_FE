@@ -1,0 +1,24 @@
+.groupButtonAuth {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .button {
+        width: 100%;
+        max-width: 400px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        padding: 5px;
+        margin: 2px 0;
+
+        &:nth-child(1) {
+            background-color: rgb(141, 186, 201);
+        }
+
+        &:nth-child(2) {
+            background-color: blue;
+        }
+    }
+}
