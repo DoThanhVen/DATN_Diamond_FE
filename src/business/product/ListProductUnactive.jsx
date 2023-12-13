@@ -264,7 +264,7 @@ export default function ListProduct() {
                     <img
                       key={index}
                       className={style.image}
-                      src={`http://localhost:8080/api/uploadImageProduct/${item.url}`}
+                      src={item.url}
                       alt="Hình Ảnh"
                     />
                   ))
