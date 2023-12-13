@@ -11,9 +11,12 @@ import axios from "axios";
 import { ThongBao } from "../service/ThongBao";
 import { signInWithGoogle } from "../service/firebase";
 
-function utf8_to_b64(str) {
-  return window.btoa(unescape(encodeURIComponent(str)));
+function encodeObjectToBase64(obj) {
+  const jsonString = JSON.stringify(obj);
+  const base64String = btoa(unescape(encodeURIComponent(jsonString)));
+  return base64String;
 }
+
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -25,11 +28,9 @@ function Login() {
       username: username,
       password: password
     })
-    console.log(response)
     if (response.status === 'success') {
-      console.log(response.data.token)
       sessionStorage.setItem('accessToken', response.data.token)
-      const base64String = utf8_to_b64(JSON.stringify(response.data.data));
+      const base64String = encodeObjectToBase64(response.data.data);
       sessionStorage.setItem("accountLogin", base64String);
       navigate("/")
     } else {
@@ -105,7 +106,7 @@ function Login() {
       const response = await callAPI('/api/registerWithGoogle', 'POST', formData)
       if (response && response.status === 'success') {
         sessionStorage.setItem('accessToken', response.data.token)
-        const base64String = utf8_to_b64(JSON.stringify(response.data.data));
+        const base64String = encodeObjectToBase64(response.data.data);
         sessionStorage.setItem("accountLogin", base64String);
         navigate("/")
       } else {

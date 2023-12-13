@@ -10,17 +10,30 @@ import axios from "axios";
 import { ThongBao } from "../service/ThongBao";
 import { callAPI } from "../service/API";
 import { GetDataLogin } from "../service/DataLogin";
-function utf8_to_b64(str) {
-  return window.btoa(unescape(encodeURIComponent(str)));
+import moment from "moment";
+import { uploadImageToFirebaseStorage } from "../service/firebase";
+import LoadingOverlay from "../service/loadingOverlay";
+import ModalAction from "../service/ModalAction";
+function utf8_to_b64(obj) {
+  const jsonString = JSON.stringify(obj);
+  const base64String = btoa(unescape(encodeURIComponent(jsonString)));
+  return base64String;
 }
-
+function formatDate(date) {
+  return moment(date).format("DD-MM-YYYY HH:mm:ss");
+}
 function Profile_User() {
   const [accountLogin, setAccountLogin] = useState(null);
   const navigate = useNavigate();
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageNew, setimageNew] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [token, settoken] = useState(null);
+  const [reload,setreload]=useState(0)
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-
+    const tokenac = sessionStorage.getItem('accessToken');
+    settoken(tokenac)
     if (accountLogin !== null) {
       try {
         setAccountLogin(accountLogin);
@@ -37,24 +50,24 @@ function Profile_User() {
     if (data !== null) {
       try {
         setUsername(data.username);
-        if (data.fullname) {
-          setFullname(data.fullname);
+        if (data?.infoAccount.fullname) {
+          setFullname(data?.infoAccount.fullname);
         }
-        if (data.phone) {
-          setPhone(data.phone);
+        if (data?.infoAccount.phone) {
+          setPhone(data?.infoAccount.phone);
         }
-        if (data.id_card) {
-          setIdCard(data.id_card);
+        if (data?.infoAccount.id_card) {
+          setIdCard(data?.infoAccount.id_card);
         }
-        if (data.email) {
-          setEmail(data.email);
+        if (data?.infoAccount.email) {
+          setEmail(data?.infoAccount.email);
         }
-        setGender(data.gender);
-        if (data.city) {
-          setCity(data.city);
+        setGender(data?.infoAccount.gender);
+        if (data?.infoAccount.city) {
+          setCity(data?.infoAccount.city);
         }
-        if (data.address.length > 0) {
-          data.address.filter((value) => {
+        if (data.address_account.length > 0) {
+          data.address_account.filter((value) => {
             if (value.status) {
               setCity(value.city);
               setDistrict(value.district);
@@ -64,8 +77,8 @@ function Profile_User() {
             }
           });
         }
-        if (data.image) {
-          setImage(data.image);
+        if (data?.infoAccount.image) {
+          setImage(data?.infoAccount.image);
         }
       } catch (error) {
         console.log(error);
@@ -75,7 +88,7 @@ function Profile_User() {
 
   useEffect(() => {
     getAccountFromSession();
-  }, []);
+  }, [reload]);
 
   //SELECT IMAGE
   const [image, setImage] = useState("");
@@ -113,47 +126,97 @@ function Profile_User() {
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
-
-  const domain = process.env.REACT_APP_API || "http://localhost:8080";
-
   const handleUpdateProfile = async () => {
     if (
       fullname === "" ||
-      fullname === null ||
       phone === "" ||
-      phone === null ||
-      id_card === "" ||
-      id_card === null
+      id_card === ""
     ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      axios
-        .post(domain + "/api/account/updateprofile/" + username, {
-          fullname,
-          id_card,
-          phone,
-          gender,
-          email
-        })
-        .then((response) => {
-          if (response.data.status === "success") {
-            ThongBao(response.data.message, "success");
-            accountLogin.id_card = id_card;
-            accountLogin.phone = phone;
-            accountLogin.gender = gender;
-            accountLogin.email = email;
-            accountLogin.fullname = fullname;
-
-            console.log(accountLogin);
-            const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        if (selectedImage === null) {
+          setIsLoading(true);
+          const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
+            fullname,
+            id_card,
+            phone,
+            gender,
+            email,
+            image
+          }, config)
+          setIsLoading(false)
+          if (response.status === "success") {
+            ThongBao(response.message, "success");
+            accountLogin.infoAccount.id_card = id_card;
+            accountLogin.infoAccount.phone = phone;
+            accountLogin.infoAccount.gender = gender;
+            accountLogin.infoAccount.email = email;
+            accountLogin.infoAccount.fullname = fullname;
+            const base64String = utf8_to_b64(accountLogin);
             sessionStorage.setItem("accountLogin", base64String);
           } else {
-            ThongBao(response.data.message, "error");
+            ThongBao(response.message, "error");
           }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        } else {
+          if (imageNew === null) {
+            ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+          }
+          setIsLoading(true);
+          const downloadURL = await uploadImageToFirebaseStorage(imageNew);
+          const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
+            fullname,
+            id_card,
+            phone,
+            gender,
+            email,
+            image: downloadURL
+          }, config)
+          setIsLoading(false)
+          if (response.status === "success") {
+            ThongBao(response.message, "success");
+            accountLogin.infoAccount.id_card = id_card;
+            accountLogin.infoAccount.phone = phone;
+            accountLogin.infoAccount.gender = gender;
+            accountLogin.infoAccount.email = email;
+            accountLogin.infoAccount.fullname = fullname;
+            accountLogin.infoAccount.image = downloadURL;
+            const base64String = utf8_to_b64(accountLogin);
+            sessionStorage.setItem("accountLogin", base64String);
+          } else {
+            ThongBao(response.message, "error");
+          }
+        }
+      }
+    }
+  };
+  const handleImageChange = e => {
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const files = e.target.files;
+    const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
+    if (imageFiles.length === 0) {
+      ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
+      return;
+    }
+    if (imageFiles[0].size > 1000 * 1024) {
+      ThongBao(
+        "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB.",
+        "info"
+      );
+      return;
+    } else {
+      setimageNew(imageFiles[0]);
+      const reader = new FileReader();
+      reader.onload = event => {
+        setSelectedImage(event.target.result);
+      };
+      reader.readAsDataURL(imageFiles[0]);
     }
   };
 
@@ -161,53 +224,19 @@ function Profile_User() {
     if (oldPassword === "" || newPassword === "" || reNewPassword === "") {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      const formData = new FormData();
-      formData.append("oldPassword", oldPassword);
-      formData.append("newPassword", newPassword);
-      formData.append("reNewPassword", reNewPassword);
-      axios
-        .post(domain + `/api/account/changepass/${username}`, formData)
-        .then((response) => {
-          ThongBao(response.data.message, response.data.status);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  };
-
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Xử lý tệp ảnh đã chọn ở đây
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      //SAVE IMAGE
-      const formData = new FormData();
-      formData.append("image", file);
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
-      const response = await callAPI(
-        `/api/account/updateImage/${username}`,
-        "POST",
-        formData,
-        config
-      );
-      if (response) {
-        ThongBao(response.message, response.status);
-        console.log(response);
-        accountLogin.image = response.data.image;
-        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        sessionStorage.setItem("accountLogin", base64String);
-        const delay = setTimeout(() => {
-          window.location.reload();
-        }, 800);
-        return () => clearTimeout(delay);
-      } else {
-        ThongBao("Lỗi!", "error");
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const formData = new FormData();
+        formData.append("oldPassword", oldPassword);
+        formData.append("newPassword", newPassword);
+        formData.append("reNewPassword", reNewPassword);
+        const response = await callAPI(`/api/auth/account/changepass/${username}`, 'POST', formData, config);
+        ThongBao(response.message, response.status)
       }
     }
   };
@@ -216,20 +245,25 @@ function Profile_User() {
     if (city === "" || address === "" || district === "" || ward === "") {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      const response = await callAPI(
-        `/api/account/createAddress/${username}`,
-        "POST",
-        { city, district, ward, address }
-      );
-      if (response.status === "success") {
-        ThongBao(response.message, "success");
-        accountLogin.address = response.data;
-        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        sessionStorage.setItem("accountLogin", base64String);
-        const delay = setTimeout(() => {
-          window.location.reload();
-        }, 800);
-        return () => clearTimeout(delay);
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const response = await callAPI(
+          `/api/auth/account/createAddress/${username}`,
+          "POST",
+          { city, district, ward, address }, config
+        );
+        if (response.status === "success") {
+          ThongBao(response.message, "success");
+          accountLogin.address_account = response.data;
+          const base64String = utf8_to_b64(accountLogin);
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload+1)
+        }
       }
     }
   };
@@ -245,68 +279,83 @@ function Profile_User() {
     ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      const response = await callAPI(
-        `/api/account/updateAddress/${username}/${idAddressUse}`,
-        "POST",
-        { city, district, ward, address }
-      );
-      if (response.status === "success") {
-        ThongBao(response.message, "success");
-        accountLogin.address = response.data;
-        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        sessionStorage.setItem("accountLogin", base64String);
-        const delay = setTimeout(() => {
-          window.location.reload();
-        }, 800);
-        return () => clearTimeout(delay);
-      } else {
-        ThongBao("Lỗi!", "error");
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const response = await callAPI(
+          `/api/auth/account/updateAddress/${username}/${idAddressUse}`,
+          "POST",
+          { city, district, ward, address }, config
+        );
+        if (response.status === "success") {
+          ThongBao(response.message, "success");
+          accountLogin.address_account = response.data;
+          const base64String = utf8_to_b64(accountLogin);
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload+1)
+        } else {
+          ThongBao("Lỗi!", "error");
+        }
       }
     }
   };
 
   const handleSelectUseAddress = async (id, status) => {
-    if (!status) {
-      const response = await callAPI(
-        `/api/account/useAddress/${username}/${id}`,
-        "POST"
-      );
-      if (response.status === "success") {
-        setIdAddressUse(id);
-        ThongBao(response.message, "success");
-        accountLogin.address = response.data;
-        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        sessionStorage.setItem("accountLogin", base64String);
-        const delay = setTimeout(() => {
-          window.location.reload();
-        }, 800);
-        return () => clearTimeout(delay);
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      if (!status) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const response = await callAPI(
+          `/api/auth/account/useAddress/${username}/${id}`,
+          "POST", {}, config
+        );
+        if (response.status === "success") {
+          setIdAddressUse(id);
+          ThongBao(response.message, "success");
+          accountLogin.address_account = response.data;
+          const base64String = utf8_to_b64(accountLogin);
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload+1)
+        } else {
+          ThongBao("Lỗi!", "error");
+        }
       } else {
-        ThongBao("Lỗi!", "error");
+        ThongBao("Địa Chỉ Đã Được Sử Dụng!", "info");
       }
-    } else {
-      ThongBao("Địa Chỉ Đã Được Sử Dụng!", "info");
     }
   };
 
+
   const handleDeleteAddress = async (id) => {
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    if (isConfirmed) {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      };
     const response = await callAPI(
-      `/api/account/deleteAddress/${username}/${id}`,
-      "POST"
+      `/api/auth/account/deleteAddress/${username}/${id}`,
+      "POST",{},config
     );
     if (response.status === "success") {
       ThongBao(response.message, "success");
-      accountLogin.address = response.data;
-      const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+      accountLogin.address_account = response.data;
+      const base64String = utf8_to_b64(accountLogin);
       sessionStorage.setItem("accountLogin", base64String);
-      const delay = setTimeout(() => {
-        window.location.reload();
-      }, 800);
-      return () => clearTimeout(delay);
+      setreload(reload+1)
     } else {
       ThongBao("Lỗi!", "error");
     }
-  };
+  };}
   return (
     <>
       <nav>
@@ -320,38 +369,50 @@ function Profile_User() {
                 <div className="account-settings">
                   <div className="user-profile">
                     <div className="user-avatar" style={{ cursor: "pointer" }}>
-                      <img
-                        src={
-                          image
-                            ? `http://localhost:8080/api/uploadImageProduct/${image}`
-                            : "https://bootdey.com/img/Content/avatar/avatar7.png"
-                        }
-                        alt="user"
-                        onClick={handleImageClick}
-                      />
+                      {accountLogin && accountLogin?.infoAccount?.image !== '' && accountLogin?.infoAccount?.image !== null && selectedImage === null ? (
+                        <img
+                          src={
+                            accountLogin?.infoAccount?.image
+                          }
+                          alt="user"
+                          onClick={handleImageClick}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            selectedImage
+                              ? selectedImage
+                              : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                          }
+                          alt="user"
+                          onClick={handleImageClick}
+                        />
+                      )}
+
                       <input
                         type="file"
                         accept="/image/*"
                         ref={fileInputRef}
                         style={{ display: "none" }}
-                        onChange={handleFileChange}
+                        onChange={handleImageChange}
                       />
                     </div>
                     <h5 className="user-name">{username}</h5>
                     <h6 className="user-date">
-                      Ngày tạo: {accountLogin && accountLogin.create_date}
+                      Ngày tạo: {formatDate(accountLogin?.create_date)}
                     </h6>
                   </div>
                   <div className="about">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
-                    >
-                      Đổi mật khẩu
-                    </button>
-
+                    {accountLogin && accountLogin.provider === 'myweb' ? (
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                      >
+                        Đổi mật khẩu
+                      </button>
+                    ) : null}
                     <div
                       className="modal fade"
                       id="exampleModal"
@@ -515,7 +576,7 @@ function Profile_User() {
                             id="gridRadios1"
                             onChange={() => setGender(true)}
                             defaultChecked={
-                              accountLogin && accountLogin.gender === true
+                              accountLogin && accountLogin?.infoAccount.gender === true
                             }
                           />
                           <label
@@ -536,7 +597,7 @@ function Profile_User() {
                             id="gridRadios2"
                             onChange={() => setGender(false)}
                             defaultChecked={
-                              accountLogin && accountLogin.gender === false
+                              accountLogin && accountLogin?.infoAccount.gender === false
                             }
                           />
                           <label
@@ -598,13 +659,13 @@ function Profile_User() {
                       {listDataAddress.map((valueCity, index) =>
                         valueCity.codename === city
                           ? valueCity.districts.map((valueDistrict, index) => (
-                              <option
-                                key={valueDistrict.codename}
-                                value={valueDistrict.codename}
-                              >
-                                {valueDistrict.name}
-                              </option>
-                            ))
+                            <option
+                              key={valueDistrict.codename}
+                              value={valueDistrict.codename}
+                            >
+                              {valueDistrict.name}
+                            </option>
+                          ))
                           : null
                       )}
                     </select>
@@ -622,19 +683,19 @@ function Profile_User() {
                       {listDataAddress.map((valueCity, index) =>
                         valueCity.codename === city
                           ? valueCity.districts.map((valueDistrict, index) =>
-                              valueDistrict.codename === district
-                                ? valueDistrict.wards.map(
-                                    (valueWard, index) => (
-                                      <option
-                                        key={valueWard.codename}
-                                        value={valueWard.codename}
-                                      >
-                                        {valueWard.name}
-                                      </option>
-                                    )
-                                  )
-                                : null
-                            )
+                            valueDistrict.codename === district
+                              ? valueDistrict.wards.map(
+                                (valueWard, index) => (
+                                  <option
+                                    key={valueWard.codename}
+                                    value={valueWard.codename}
+                                  >
+                                    {valueWard.name}
+                                  </option>
+                                )
+                              )
+                              : null
+                          )
                           : null
                       )}
                     </select>
@@ -679,55 +740,51 @@ function Profile_User() {
               </div>
               <div className={style.listAddress}>
                 {accountLogin &&
-                  accountLogin.address.map((value, index) =>
+                  accountLogin.address_account.map((value, index) =>
                     listDataAddress.map((valueCity, index) =>
                       valueCity.codename === value.city
                         ? valueCity.districts.map((valueDistrict, index) =>
-                            valueDistrict.codename === value.district
-                              ? valueDistrict.wards.map((valueWard, index) =>
-                                  valueWard.codename === value.ward ? (
-                                    <div
-                                      key={valueCity.codename}
-                                      className={`${style.address} ${
-                                        value.status ? style.active : ""
-                                      }`}
+                          valueDistrict.codename === value.district
+                            ? valueDistrict.wards.map((valueWard, index) =>
+                              valueWard.codename === value.ward ? (
+                                <div
+                                  key={valueCity.codename}
+                                  className={`${style.address} ${value.status ? style.active : ""
+                                    }`}
+                                >
+                                  <div className={style.value}>
+                                    {valueCity.name}, {valueDistrict.name},{" "}
+                                    {valueWard.name}, {value.address}
+                                  </div>
+                                  <div className={style.groupButton}>
+                                    <span
+                                      className={`${style.status} ${value.status ? style.active : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleSelectUseAddress(
+                                          value.id,
+                                          value.status
+                                        )
+                                      }
                                     >
-                                      <div className={style.value}>
-                                        {valueCity.name}, {valueDistrict.name},{" "}
-                                        {valueWard.name}, {value.address}
-                                      </div>
-                                      <div className={style.groupButton}>
-                                        <span
-                                          className={`${style.status} ${
-                                            value.status ? style.active : ""
-                                          }`}
-                                          onClick={() =>
-                                            handleSelectUseAddress(
-                                              value.id,
-                                              value.status
-                                            )
-                                          }
-                                        >
-                                          {value.status
-                                            ? "Đang Dùng"
-                                            : "Sử Dụng"}
-                                        </span>
-                                        <i
-                                          className={`bi bi-dash-lg ${
-                                            style.remove
-                                          } ${
-                                            value.status ? style.active : ""
-                                          }`}
-                                          onClick={() =>
-                                            handleDeleteAddress(value.id)
-                                          }
-                                        ></i>
-                                      </div>
-                                    </div>
-                                  ) : null
-                                )
-                              : null
-                          )
+                                      {value.status
+                                        ? "Đang Dùng"
+                                        : "Sử Dụng"}
+                                    </span>
+                                    <i
+                                      className={`bi bi-dash-lg ${style.remove
+                                        } ${value.status ? style.active : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleDeleteAddress(value.id)
+                                      }
+                                    ></i>
+                                  </div>
+                                </div>
+                              ) : null
+                            )
+                            : null
+                        )
                         : null
                     )
                   )}
@@ -739,6 +796,7 @@ function Profile_User() {
       <div id="footer">
         <Footer />
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </>
   );
 }

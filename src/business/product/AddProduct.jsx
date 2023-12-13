@@ -86,6 +86,7 @@ function AddProduct() {
         "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB.",
         "info"
       );
+      return;
     } else {
       const filesave = imageFiles[0];
       const listsave = [...imagesave];

@@ -83,18 +83,26 @@ function EditCategory() {
   );
 
   const handleImageChange = e => {
-    const file = e.target.files[0];
-    if (file.size > 800 * 1024) {
-      alert(
-        "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB."
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const files = e.target.files;
+    const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
+    if (imageFiles.length === 0) {
+      ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
+      return;
+    }
+    if (imageFiles[0].size > 1000 * 1024) {
+      ThongBao(
+        "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB.",
+        "info"
       );
+      return;
     } else {
-      setimageNew(file);
+      setimageNew(imageFiles[0]);
       const reader = new FileReader();
       reader.onload = event => {
         setSelectedImage(event.target.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(imageFiles[0]);
     }
   };
 

@@ -11,6 +11,9 @@ import style from "../page_user/css/user/saleRegistration.module.css";
 import { ThongBao } from "../service/ThongBao";
 import { callAPI } from "../service/API";
 import { GetDataLogin } from "../service/DataLogin";
+import { uploadImageToFirebaseStorage } from "../service/firebase";
+import LoadingOverlay from "../service/loadingOverlay";
+import ModalAction from "../service/ModalAction";
 
 function utf8_to_b64(str) {
   return window.btoa(unescape(encodeURIComponent(str)));
@@ -20,23 +23,33 @@ export default function SalesRegistration() {
   const listDataAddress = DataAddress;
   const [accountLogin, setAccountLogin] = useState(null);
   const [reload, setreload] = useState(0);
+  const [image, setimage] = useState(null);
+  const [token, settoken] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
+    const accessToken = sessionStorage.getItem('accessToken');
+    settoken(accessToken)
     if (accountLogin === null) {
       navigate("/login");
     } else {
       try {
         setAccountLogin(accountLogin);
-        getDataShop(accountLogin.username);
+        getDataShop(accountLogin.username, accessToken);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  const getDataShop = async username => {
-    const response = await callAPI(`/api/account/shop/${username}`, "GET");
+  const getDataShop = async (username, token) => {
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    };
+    const response = await callAPI(`/api/auth/account/shop/${username}`, "GET", {}, config);
     if (response.data) {
       setSelectedImage(response.data.image);
       setShop_name(response.data.shop_name);
@@ -78,75 +91,63 @@ export default function SalesRegistration() {
     setWard("");
   };
 
-  const domain = process.env.REACT_APP_API || "http://localhost:8080";
   const handleSaleRegis = async () => {
     if (
       shop_name === "" ||
       city === "" ||
       district === "" ||
       ward === "" ||
-      address === ""
+      address === "" ||
+      image === null
     ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
-      await axios
-        .post(
-          domain +
-            "/api/account/saleregis/" +
-            accountLogin.username +
-            "/" +
-            shop_name,
-          {
-            city,
-            district,
-            ward,
-            address
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
           }
-        )
-        .then(response => {
-          ThongBao(response.data.message, response.data.status);
-          accountLogin.shop = response.data.data;
-          const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-          sessionStorage.setItem("accountLogin", base64String);
-          setreload(reload + 1);
-        })
-        .catch(error => {
-          console.log(error);
-        });
+        };
+        setIsLoading(true);
+        const imageUrl = await uploadImageToFirebaseStorage(image);
+        const res = await callAPI(`/api/auth/account/saleregis/${accountLogin.username}/${shop_name}?image=${imageUrl}`, 'POST', {
+          city,
+          district,
+          ward,
+          address
+        }, config);
+        setIsLoading(false);
+        ThongBao(res.message, res.status);
+        accountLogin.shop = res.data;
+        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+        sessionStorage.setItem("accountLogin", base64String);
+        setreload(reload + 1);
+      }
     }
   };
 
-  const handleFileChange = async event => {
-    const file = event.target.files[0];
-    if (file) {
-      // Xử lý tệp ảnh đã chọn ở đây
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      //SAVE IMAGE
-      const formData = new FormData();
-      formData.append("image", file);
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
-      const response = await callAPI(
-        `/api/account/shop/updateImage/${accountLogin.username}`,
-        "POST",
-        formData,
-        config
+  const handleImageChange = e => {
+    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const files = e.target.files;
+    const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
+    if (imageFiles.length === 0) {
+      ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
+      return;
+    }
+    if (imageFiles[0].size > 1000 * 1024) {
+      ThongBao(
+        "Kích thước ảnh quá lớn. Vui lòng chọn ảnh có kích thước nhỏ hơn 1MB.",
+        "info"
       );
-      if (response) {
-        ThongBao(response.message, response.status);
-        if (response.status === "success") {
-          const delay = setTimeout(() => {
-            window.location.reload();
-          }, 800);
-          return () => clearTimeout(delay);
-        }
-      } else {
-        ThongBao("Lỗi!", "error");
-      }
+      return;
+    } else {
+      setimage(imageFiles[0]);
+      const reader = new FileReader();
+      reader.onload = event => {
+        setSelectedImage(event.target.result);
+      };
+      reader.readAsDataURL(imageFiles[0]);
     }
   };
 
@@ -160,171 +161,172 @@ export default function SalesRegistration() {
           {accountLogin && accountLogin.shop
             ? <div className={`text-danger p-4 text-center`}>Bạn đã đăng kí kênh bán hàng, vui lòng chờ phê duyệt!</div>
             : <div className="row gutters">
-                <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
-                  <div className="card-profile h-100">
-                    <div className="card-body">
-                      <div className="account-settings">
-                        <div className="user-profile">
-                          <div
-                            className="user-avatar"
-                            style={{ cursor: "pointer" }}
+              <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                <div className="card-profile h-100">
+                  <div className="card-body">
+                    <div className="account-settings">
+                      <div className="user-profile">
+                        <div
+                          className="user-avatar"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <img
+                            src={
+                              selectedImage
+                                ? selectedImage
+                                : "https://bootdey.com/img/Content/avatar/avatar7.png"
+                            }
+                            alt="user"
+                            onClick={handleImageClick}
+                          />
+                          <input
+                            type="file"
+                            accept="/image/*"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={handleImageChange}
+                          />
+                        </div>
+                        <h5 className="user-name">Hình ảnh</h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div className="card-profile h-100">
+                  <div className="card-body">
+                    <div className="row gutters">
+                      <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h6 className="mt-3 mb-2 text-primary">
+                          Thông tin cửa hàng
+                        </h6>
+                      </div>
+                      <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <input
+                            type="name"
+                            className={`form-control ${style.input}`}
+                            id="ciTy"
+                            value={shop_name}
+                            onChange={e => setShop_name(e.target.value)}
+                            placeholder="Tên Cửa Hàng"
+                          />
+                        </div>
+                      </div>
+                      <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <select
+                            value={city}
+                            onChange={e => handleChangeCity(e.target.value)}
+                            className={style.input}
                           >
-                            <img
-                              src={
-                                selectedImage
-                                  ? `http://localhost:8080/api/uploadImageProduct/${selectedImage}`
-                                  : "https://bootdey.com/img/Content/avatar/avatar7.png"
-                              }
-                              alt="user"
-                              onClick={handleImageClick}
-                            />
-                            <input
-                              type="file"
-                              accept="/image/*"
-                              ref={fileInputRef}
-                              style={{ display: "none" }}
-                              onChange={handleFileChange}
-                            />
-                          </div>
-                          <h5 className="user-name">Hình ảnh</h5>
+                            <option value="">Tỉnh/Thành Phố</option>
+                            {listDataAddress.map((valueCity, index) =>
+                              <option
+                                key={valueCity.codename}
+                                value={valueCity.codename}
+                              >
+                                {valueCity.name}
+                              </option>
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <select
+                            value={district}
+                            onChange={e =>
+                              handleChangeDistrict(e.target.value)}
+                            className={style.input}
+                          >
+                            <option value="">Quận/Huyện</option>
+                            {listDataAddress.map(
+                              (valueCity, index) =>
+                                valueCity.codename === city
+                                  ? valueCity.districts.map(
+                                    (valueDistrict, index) =>
+                                      <option
+                                        key={valueDistrict.codename}
+                                        value={valueDistrict.codename}
+                                      >
+                                        {valueDistrict.name}
+                                      </option>
+                                  )
+                                  : null
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <select
+                            value={ward}
+                            onChange={e => setWard(e.target.value)}
+                            className={style.input}
+                          >
+                            <option value="">Phường/Xã/Trị Trấn</option>
+                            {listDataAddress.map(
+                              (valueCity, index) =>
+                                valueCity.codename === city
+                                  ? valueCity.districts.map(
+                                    (valueDistrict, index) =>
+                                      valueDistrict.codename === district
+                                        ? valueDistrict.wards.map(
+                                          (valueWard, index) =>
+                                            <option
+                                              key={valueWard.codename}
+                                              value={valueWard.codename}
+                                            >
+                                              {valueWard.name}
+                                            </option>
+                                        )
+                                        : null
+                                  )
+                                  : null
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <input
+                            type="text"
+                            className={`form-control ${style.input}`}
+                            id="adress"
+                            value={address}
+                            onChange={e => setAddress(e.target.value)}
+                            placeholder="Số Nhà"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row gutters mt-4">
+                      <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div className="text-right">
+                          <button
+                            type="button"
+                            id="submit"
+                            name="submit"
+                            className="btn btn-success"
+                            onClick={handleSaleRegis}
+                          >
+                            Đăng ký
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-                  <div className="card-profile h-100">
-                    <div className="card-body">
-                      <div className="row gutters">
-                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                          <h6 className="mt-3 mb-2 text-primary">
-                            Thông tin cửa hàng
-                          </h6>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <input
-                              type="name"
-                              className={`form-control ${style.input}`}
-                              id="ciTy"
-                              value={shop_name}
-                              onChange={e => setShop_name(e.target.value)}
-                              placeholder="Tên Cửa Hàng"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={city}
-                              onChange={e => handleChangeCity(e.target.value)}
-                              className={style.input}
-                            >
-                              <option value="">Tỉnh/Thành Phố</option>
-                              {listDataAddress.map((valueCity, index) =>
-                                <option
-                                  key={valueCity.codename}
-                                  value={valueCity.codename}
-                                >
-                                  {valueCity.name}
-                                </option>
-                              )}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={district}
-                              onChange={e =>
-                                handleChangeDistrict(e.target.value)}
-                              className={style.input}
-                            >
-                              <option value="">Quận/Huyện</option>
-                              {listDataAddress.map(
-                                (valueCity, index) =>
-                                  valueCity.codename === city
-                                    ? valueCity.districts.map(
-                                        (valueDistrict, index) =>
-                                          <option
-                                            key={valueDistrict.codename}
-                                            value={valueDistrict.codename}
-                                          >
-                                            {valueDistrict.name}
-                                          </option>
-                                      )
-                                    : null
-                              )}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <select
-                              value={ward}
-                              onChange={e => setWard(e.target.value)}
-                              className={style.input}
-                            >
-                              <option value="">Phường/Xã/Trị Trấn</option>
-                              {listDataAddress.map(
-                                (valueCity, index) =>
-                                  valueCity.codename === city
-                                    ? valueCity.districts.map(
-                                        (valueDistrict, index) =>
-                                          valueDistrict.codename === district
-                                            ? valueDistrict.wards.map(
-                                                (valueWard, index) =>
-                                                  <option
-                                                    key={valueWard.codename}
-                                                    value={valueWard.codename}
-                                                  >
-                                                    {valueWard.name}
-                                                  </option>
-                                              )
-                                            : null
-                                      )
-                                    : null
-                              )}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <input
-                              type="text"
-                              className={`form-control ${style.input}`}
-                              id="adress"
-                              value={address}
-                              onChange={e => setAddress(e.target.value)}
-                              placeholder="Số Nhà"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row gutters mt-4">
-                        <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                          <div className="text-right">
-                            <button
-                              type="button"
-                              id="submit"
-                              name="submit"
-                              className="btn btn-success"
-                              onClick={handleSaleRegis}
-                            >
-                              Đăng ký
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>}
+              </div>
+            </div>}
         </div>
         <div id="footer">
           <Footer />
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

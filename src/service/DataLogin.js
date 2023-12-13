@@ -1,16 +1,14 @@
 export const GetDataLogin = () => {
   const account = sessionStorage.getItem("accountLogin");
-
   if (account !== undefined) {
     try {
-      const decodedCookie = decodeURIComponent(account);
-      const decodedString = window.atob(decodedCookie);
-      const parsedAccount = JSON.parse(decodedString);
-      return parsedAccount;
+      const decodedString = decodeURIComponent(escape(atob(account)));
+      const decodedObject = JSON.parse(decodedString);
+      return decodedObject;
     } catch (error) {
       return null;
     }
-  }else{
+  } else {
     return null;
   }
 };
