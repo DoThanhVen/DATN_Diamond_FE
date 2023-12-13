@@ -47,7 +47,7 @@ export default function ModelEdit({ status, toggleShow }) {
     const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
     if (isConfirmed) {
       const reponse = await callAPI(`/api/auth/account/adminupdate/${data}`, 'PUT', formData, config);
-      if (reponse) {
+      if (reponse&&reponse.status==='success') {
         toggleShow();
         dispatch(getIdAccountAdmin(0));
         await callAPI(`/api/auth/sendEmail/${account.infoAccount.email}?content=${content}`, 'GET', {}, config);

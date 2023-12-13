@@ -46,7 +46,7 @@ function ListShop() {
       const response = await callAPI(
         `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
-        "GET",{},config
+        "GET", {}, config
       );
       const responseData = response.data;
       const listShop = responseData && responseData.content.map((value) => value.shop);
@@ -119,7 +119,7 @@ function ListShop() {
                 className={style.image}
                 src={
                   value.image
-                    ? `http://localhost:8080/api/uploadImageProduct/${value.image}`
+                    ? value.image
                     : "/images/image_shop.jpg"
                 }
                 alt="Hình Ảnh"

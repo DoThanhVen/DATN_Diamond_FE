@@ -144,7 +144,7 @@ function Shop() {
 
 
   const handleImageChange = e => {
-    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const allowedFormats = ['image/jpeg', 'image/png'];
     const file = e.target.files[0]; // Lấy chỉ tệp đầu tiên
     if (!file) {
       return; // Không có tệp nào được chọn

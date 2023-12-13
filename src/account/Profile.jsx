@@ -197,7 +197,7 @@ function Profile_User() {
     }
   };
   const handleImageChange = e => {
-    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
     const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
     if (imageFiles.length === 0) {

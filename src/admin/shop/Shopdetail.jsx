@@ -49,6 +49,7 @@ function ShopDetail() {
         const formData = new FormData();
         formData.append('id', shop.shop.id);
         formData.append('status', 1);
+        formData.append('isCheck', 'detail');
         await callAPI(`/api/auth/admin/update`, 'PUT', formData, config);
         await callAPI(`/api/auth/sendEmail/${shop.infoAccount.email}?content=Cửa hàng của bạn đã được phê duyệt tại FE Shop`, 'GET', {}, config);
         navigate("/admin/shops");
@@ -75,7 +76,7 @@ function ShopDetail() {
           className={style.shopImage}
           src=
           {shop?.shop?.image
-            ? `http://localhost:8080/api/uploadImageProduct/${shop.shop.image}`
+            ? shop.shop.image
             : "/images/image_shop.jpg"}
           alt="Shop"
           style={{ maxWidth: "100%" }}

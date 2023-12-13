@@ -145,7 +145,7 @@ function ListAccount() {
                   className={style.image}
                   src={
                     value.infoAccount?.image
-                      ? `http://localhost:8080/api/uploadImageProduct/${value.infoAccount?.image}`
+                      ? value.infoAccount?.image
                       : "https://bootdey.com/img/Content/avatar/avatar7.png"
                   }
                   alt="Hình Ảnh"

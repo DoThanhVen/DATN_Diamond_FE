@@ -24,9 +24,9 @@ const MainNavbar = () => {
   })
 
   const searchParams = new URLSearchParams();
-  searchParams.append('keyword',"s")
-  searchParams.append('keyword',"s")
-  
+  searchParams.append('keyword', "s")
+  searchParams.append('keyword', "s")
+
   const [accountLogin, setAccountLogin] = useState(null);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const MainNavbar = () => {
                   <ul className="list-main">
                     {accountLogin &&
                       accountLogin.shop &&
-                      accountLogin.shop.status === 1 ? (
+                      accountLogin?.shop?.status === 1 || accountLogin?.shop?.status === 2 ? (
                       <li>
                         <i className="ti-location-pin"></i>{" "}
                         <a href="/business">Kênh bán hàng</a>
@@ -172,7 +172,7 @@ const MainNavbar = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    
+
                     <Button variant="light" type="submit">
                       <i className="fa fa-search"></i>
                     </Button>

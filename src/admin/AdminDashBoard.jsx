@@ -137,8 +137,8 @@ function AdminDashboard() {
                   accountLogin &&
                   accountLogin.infoAccount &&
                   accountLogin.infoAccount.image
-                    ? `http://localhost:8080/api/uploadImageProduct/${accountLogin
-                        .infoAccount.image}`
+                    ? accountLogin
+                        .infoAccount.image
                     : "https://bootdey.com/img/Content/avatar/avatar7.png"
                 }
                 alt="Hình Ảnh"

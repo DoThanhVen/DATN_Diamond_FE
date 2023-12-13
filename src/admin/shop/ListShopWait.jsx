@@ -127,7 +127,7 @@ function ListShopWait() {
               <label className={style.column}>
                 <img style={{ width: '60%' }} src=
                   {value.shop.image
-                    ? `http://localhost:8080/api/uploadImageProduct/${value.shop.image}`
+                    ? value.shop.image
                     : "/images/image_shop.jpg"} alt="Hình ảnh" />
               </label>
               <label

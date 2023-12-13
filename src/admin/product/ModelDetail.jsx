@@ -77,7 +77,7 @@ export default function ModelDetail({ status, toggleShow }) {
                       className={style.image}
                       src={
                         datafind[0].image
-                          ? `http://localhost:8080/api/uploadImageProduct/${datafind[0].image}`
+                          ? datafind[0].image
                           : "/images/image_shop.jpg"
                       }
                       alt="Hình Ảnh"
@@ -150,7 +150,7 @@ export default function ModelDetail({ status, toggleShow }) {
                                 className={style.image}
                                 src={
                                   value.image
-                                    ? `http://localhost:8080/api/uploadImageProduct/${value.url}`
+                                    ? value.url
                                     : "/images/nullImage.png"
                                 }
                                 alt="Hình Ảnh"

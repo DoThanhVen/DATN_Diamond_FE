@@ -128,7 +128,7 @@ export default function SalesRegistration() {
   };
 
   const handleImageChange = e => {
-    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
     const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
     if (imageFiles.length === 0) {
@@ -158,9 +158,9 @@ export default function SalesRegistration() {
           <MainNavbar />
         </nav>
         <div className="container mt-4">
-          {accountLogin && accountLogin.shop
+          {accountLogin && accountLogin.shop.status === 0
             ? <div className={`text-danger p-4 text-center`}>Bạn đã đăng kí kênh bán hàng, vui lòng chờ phê duyệt!</div>
-            : <div className="row gutters">
+            : accountLogin && accountLogin.shop.status === 1 ? <div className="row gutters">
               <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                 <div className="card-profile h-100">
                   <div className="card-body">
@@ -320,7 +320,9 @@ export default function SalesRegistration() {
                   </div>
                 </div>
               </div>
-            </div>}
+            </div> : (
+              <div className={`text-danger p-4 text-center`}>Cửa hàng của bạn đã bị cấm hoạt động. Liên hệ Admin để được giải quyết!</div>
+            )}
         </div>
         <div id="footer">
           <Footer />

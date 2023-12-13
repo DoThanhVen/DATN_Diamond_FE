@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import style from "../css/business/nav.module.css";
 import Nav from "react-bootstrap/Nav";
 import { GetDataLogin } from "../service/DataLogin";
+import { ThongBao } from "../service/ThongBao";
 
 function Navbar() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -17,13 +18,21 @@ function Navbar() {
     const accountLogin = GetDataLogin();
 
     if (accountLogin !== null) {
+      console.log(accountLogin)
       const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin' || role.authority === 'ROLE_Bussiness');
+      const isStatus = accountLogin.shop.status===1;
       if (isAdmin) {
-        try {
-          setAccountLogin(accountLogin);
-        } catch (error) {
-          console.log(error);
+        if (isStatus) {
+          try {
+            setAccountLogin(accountLogin);
+          } catch (error) {
+            console.log(error);
+          }
+        }else{
+          ThongBao("Cửa hàng của bạn đã bị cấm hoạt động. Liên hệ Admin để được giải quyết","error")
+          navigate("/");
         }
+
       } else {
         navigate("/not-found");
       }

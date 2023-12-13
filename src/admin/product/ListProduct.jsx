@@ -211,7 +211,7 @@ function ListProduct() {
                   <img
                     key={value.image_product[0].id}
                     className={style.image}
-                    src={`http://localhost:8080/api/uploadImageProduct/${value.image_product[0].url}`}
+                    src={value.image_product[0].url}
                     alt="Hình Ảnh"
                   />
                 ) : (

@@ -83,7 +83,7 @@ function EditCategory() {
   );
 
   const handleImageChange = e => {
-    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
+    const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
     const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
     if (imageFiles.length === 0) {
@@ -121,7 +121,7 @@ function EditCategory() {
   //Category
   const handleAddCategory = async () => {
     const isAlphaWithSpace = (str) => /^[A-Za-z\sáÁàÀảẢãÃạẠăĂắẮằẰẳẲẵẴặẶâÂấẤầẦẩẨẫẪậẬđĐéÉèÈẻẺẽẼẹẸêÊếẾềỀểỂễỄệỆíÍìÌỉỈĩĨịỊóÓòÒỏỎõÕọỌôÔốỐồỒổỔỗỖộỘơƠớỚờỜởỞỡỠợỢúÚùÙủỦũŨụỤưỨỨừỪửỬữỮựỰýÝỳỲỷỶỹỸỵỴ]+$/.test(str);
-    if (type_category.trim() === "" || image === null) {
+    if (type_category.trim() === "" || imageNew === null) {
       ThongBao("Vui lòng điền đầy đủ dữ liệu.", "error");
     } else if (type_category.length > 24) {
       ThongBao("Độ dài của loại sản phẩm không được quá 24 ký tự.", "error");
@@ -132,7 +132,7 @@ function EditCategory() {
       if (isConfirmed) {
         try {
           setIsLoading(true);
-          const downloadURL = await uploadImageToFirebaseStorage(image);
+          const downloadURL = await uploadImageToFirebaseStorage(imageNew);
           const response = await CategoryService.addCategory(
             type_category,
             downloadURL,

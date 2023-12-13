@@ -47,6 +47,7 @@ class ShopService {
           const formData=new FormData()
           formData.append('id',shop);
           formData.append('status',status)
+          formData.append('isCheck','model')
         const response = await callAPI(`/api/auth/admin/update`, 'PUT',formData,config);
            return response;
     }

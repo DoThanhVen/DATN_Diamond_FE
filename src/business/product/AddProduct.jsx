@@ -74,8 +74,8 @@ function AddProduct() {
   };
 
   const handleImageChange = e => {
-    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/jxr', 'image/vnd.wap.wbmp'];
     const files = e.target.files;
+    const allowedFormats = ['image/jpeg', 'image/png'];
     const imageFiles = Array.from(files).filter(file => allowedFormats.includes(file.type));
     if (imageFiles.length === 0) {
       ThongBao("Vui lòng chỉ chọn tệp hình ảnh có định dạng phù hợp.", "info");
@@ -134,7 +134,7 @@ function AddProduct() {
       ThongBao(`Mô tả sản phẩm không được vượt quá ${MAX_DESCRIPTION_LENGTH} ký tự.`, "error");
       return;
     }
-    const isConfirmed =await ModalAction("Bạn có chắc muốn thêm sản phẩm này?", "warning");
+    const isConfirmed = await ModalAction("Bạn có chắc muốn thêm sản phẩm này?", "warning");
     if (isConfirmed) {
       try {
         setIsLoading(true);
