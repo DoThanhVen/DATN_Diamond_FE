@@ -13,8 +13,10 @@ import { idShop } from "./service/Reducers";
 import { getreloadPage } from "./service/Reducers";
 import { idAccountAdmin } from "./service/Reducers";
 import { idProductAdmin } from "./service/Reducers";
+import cartSlice from './Reducer/cartSilce';
 const allReducers = combineReducers({
-  allData, idCategoryUpdate, allDataCategory, idCategoryItemUpdate, allDataShop, idShop, getreloadPage, idAccountAdmin, idProductAdmin
+  allData, idCategoryUpdate, allDataCategory, idCategoryItemUpdate, allDataShop, idShop, getreloadPage, idAccountAdmin, idProductAdmin,
+    cart : cartSlice.reducer
 });
 
 const store = createStore(allReducers);

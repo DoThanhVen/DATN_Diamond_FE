@@ -14,14 +14,12 @@ export default createSlice({
     reducers: {
         
         addToCart: (state, action) => {
-            console.log("add2")
             const exist = state.filter((cart) => cart.product.id === action.payload.product.id);
             console.log(exist)
             if (exist <= 0) {
                 state.push(action.payload)
             } else {
                 const itemCart = exist.find((cart) => cart.size === action.payload.size);
-                console.log(itemCart)
                 if (!itemCart) {
                     state.push(action.payload)
                 } else {
