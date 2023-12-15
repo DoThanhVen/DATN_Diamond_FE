@@ -5,8 +5,10 @@ import { useSelector } from "react-redux";
 import { callAPI } from "../../service/API";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function HistoryAdd() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
@@ -32,10 +34,12 @@ function HistoryAdd() {
 
   const getdataProducts = async (idShop) => {
     try { 
+      setIsLoading(true)
       const response = await callAPI(
         `/api/product/getByShop?shop=${idShop}&sizePage=10000`,
         "GET"
       );
+      setIsLoading(false)
       const allProducts = response.content?.flatMap((product) => {
         return product.listStorage.map((storageItem) => ({
           ...product,
@@ -74,14 +78,14 @@ function HistoryAdd() {
         {listProducts.map((product, index) => (
           <div key={product.id} className={style.tableBody}>
             <>
-              <label className={style.column}>{index}</label>
+              <label className={style.column}>{index + 1}</label>
               <label className={style.column}>{product.id}</label>
               <label className={style.column}>
                 {product?.image_product.length > 0 ? (
                     <img
                       key={product?.image_product[0].id}
                       className={style.image}
-                      src={`http://localhost:8080/api/uploadImageProduct/${product?.image_product[0].url}`}
+                      src={product?.image_product[0].url}
                       alt="Hình Ảnh"
                     />
                 ) : (
@@ -106,6 +110,7 @@ function HistoryAdd() {
           </div>
         ))}
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </div>
   );
 }

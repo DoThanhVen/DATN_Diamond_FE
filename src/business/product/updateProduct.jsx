@@ -35,11 +35,13 @@ export default function ModelEdit({ onReload, data, closeModal }) {
     , []);
 
   const getdataproductbyid = async () => {
+    setIsLoading(true)
     const reponse = await ProductService.getProductbyId(data.id)
     setproduct(reponse)
     setname(reponse.product_name)
     setprice(reponse.price)
     setValueCategoryItem(reponse.categoryItem_product.id)
+    setIsLoading(false)
   }
 
 

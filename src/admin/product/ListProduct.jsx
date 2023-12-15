@@ -9,6 +9,7 @@ import moment from "moment";
 import ModelDetail from "./ModelDetail";
 import { getIdProductAdmin } from "../../service/Actions";
 import ModalAction from "../../service/ModalAction";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
@@ -29,6 +30,7 @@ function ListProduct() {
   const [sortType, setsortType] = useState('')
   const [filterbyStatus, setFilterStatus] = useState("")
   const [token, settoken] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType, filterbyStatus]);
@@ -37,14 +39,17 @@ function ListProduct() {
     const tokenac = sessionStorage.getItem('accessToken');
     settoken(tokenac)
     try {
+      setIsLoading(true);
       const response = await callAPI(
         `/api/product/getAll?key=${keyfind}&keyword=${keyword}&offset=${page - 1
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}`,
         "GET"
       );
-      setProducts(response.data.content || []);
-      setTotalPages(response.data.totalPages || 1);
-
+      if (response) {
+        setProducts(response.data.content || []);
+        setTotalPages(response.data.totalPages || 1);
+        setIsLoading(false);
+      }
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -311,6 +316,7 @@ function ListProduct() {
         </div>
       </div>
       {showModal && <ModelDetail status={showModal} toggleShow={closeModal} />}
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

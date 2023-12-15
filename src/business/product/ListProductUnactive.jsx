@@ -8,6 +8,7 @@ import { Pagination } from "@mui/material";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
+import LoadingOverlay from "../../service/loadingOverlay";
 const numberPage = 10;
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -56,10 +57,11 @@ export default function ListProduct() {
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
   const [filterbyStatus, setFilterStatus] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdataCategory();
     getAccountFromSession();
-  }, [reload, currentPage, reloadinPage, sortType,filterbyStatus]);
+  }, [reload, currentPage, reloadinPage, sortType, filterbyStatus]);
 
   function handleClickEditProduct(event) {
     const rowElement = event.currentTarget.parentElement.parentElement;
@@ -79,11 +81,13 @@ export default function ListProduct() {
 
   const getdataProduct = async (page, idShop) => {
     try {
+      setIsLoading(true)
       const response = await callAPI(
         `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}&isActive=unactive`,
         "GET"
       );
+      setIsLoading(false)
       setProducts(response.data.content);
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
@@ -226,21 +230,21 @@ export default function ListProduct() {
         ) : null}
       </div>
       <div className={style.typeProduct}>
-            <label>Trạng thái:</label>
-            <select
-              value={filterbyStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-              }}
-              className={`ms-2 ${style.optionSelect}`}
-            >
-              <option value="">Tất cả</option>
-              <option value="0">Chờ Phê Duyệt</option>
-              <option value="1">Đang Hoạt Động</option>
-              <option value="2">Dừng Hoạt Động</option>
-              <option value="3">Cấm Hoạt Động</option>
-            </select>
-          </div>
+        <label>Trạng thái:</label>
+        <select
+          value={filterbyStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+          }}
+          className={`ms-2 ${style.optionSelect}`}
+        >
+          <option value="">Tất cả</option>
+          <option value="0">Chờ Phê Duyệt</option>
+          <option value="1">Đang Hoạt Động</option>
+          <option value="2">Dừng Hoạt Động</option>
+          <option value="3">Cấm Hoạt Động</option>
+        </select>
+      </div>
       <div className={`${style.listProduct}`}>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -349,6 +353,7 @@ export default function ListProduct() {
           closeModal={closeModal}
         />
       )}
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

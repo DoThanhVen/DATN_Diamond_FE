@@ -19,7 +19,7 @@ function Navbar() {
 
     if (accountLogin !== null) {
       console.log(accountLogin)
-      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin' || role.authority === 'ROLE_Bussiness');
+      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Bussiness');
       const isStatus = accountLogin.shop.status===1;
       if (isAdmin) {
         if (isStatus) {
@@ -103,6 +103,7 @@ function Navbar() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("accountLogin");
+    sessionStorage.removeItem("accessToken")
     const delay = setTimeout(() => {
       navigate("/");
     }, 800);
@@ -114,7 +115,7 @@ function Navbar() {
       <div id={style.businessDashBoard}>
         <div className={`${style.header}`}>
           <div className={`${style.logo}`}>
-            <img src="/images/diamond.png" alt="Hình Ảnh" />
+            <img src="/images/LogoFEADS.png" alt="Hình Ảnh" />
             <Nav.Link href="/business">Kênh Người Bán</Nav.Link>
           </div>
           <div className={`${style.others}`}>
@@ -125,14 +126,14 @@ function Navbar() {
                   accountLogin &&
                     accountLogin.infoAccount &&
                     accountLogin.infoAccount.image
-                    ? `http://localhost:8080/api/uploadImageProduct/${accountLogin
+                    ? `${accountLogin
                       .infoAccount.image}`
                     : "https://bootdey.com/img/Content/avatar/avatar7.png"
                 }
                 alt="Hình Ảnh"
               />
               <label className={`${style.label} ms-2`}>
-                {accountLogin && accountLogin.fullname}
+                {accountLogin && accountLogin.infoAccount.fullname}
               </label>
             </div>
             <div

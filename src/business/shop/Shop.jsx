@@ -45,14 +45,16 @@ function Shop() {
 
   const getDataShop = async (idshop) => {
     try {
+      setIsLoading(true)
       const res = await callAPI(`/api/shop/${idshop}`, 'GET');
+      setIsLoading(false)
       setshop(res)
       setShopName(res.shop_name)
       setCity(res.addressShop.city)
       setDistrict(res.addressShop.district)
       setWard(res.addressShop.ward)
       setAddress(res.addressShop.address)
-      if (res.image!=='null') {
+      if (res.image !== 'null') {
         setimgLoad(res.image)
         setImgOld(res.image)
       }

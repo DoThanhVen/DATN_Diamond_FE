@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ModelEdit from "./ModelEdit";
 import { getIdAccountAdmin } from "../../service/Actions";
 import { Pagination } from "@mui/material";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
@@ -23,7 +24,7 @@ function ListAccount() {
   const [reload, setreload] = useState(0);
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdata(currentPage);
   }, [data, currentPage, reload, sortType]);
@@ -36,8 +37,12 @@ function ListAccount() {
           "Authorization": `Bearer ${token}`
         }
       };
-      const response = await callAPI(`/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET",{},config);
+      setIsLoading(true);
+      const response = await callAPI(`/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET", {}, config);
       const responseData = response.data;
+      if (response) {
+        setIsLoading(false)
+      }
       if (filterStatus === undefined || filterStatus === "") {
         setAccounts(responseData.content || []);
         setTotalPages(responseData.totalPages || 1);
@@ -204,6 +209,7 @@ function ListAccount() {
         </div>
       </div>
       {showModal && <ModelEdit status={showModal} toggleShow={closeModal} />}
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

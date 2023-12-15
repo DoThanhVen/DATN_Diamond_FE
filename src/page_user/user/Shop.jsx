@@ -6,13 +6,15 @@ import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import ListGroup from "react-bootstrap/ListGroup";
-import { useNavigate } from 'react-router';
+import { useNavigate } from "react-router";
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/user/product.css";
 import "../css/user/home.css";
 import "../css/user/slider.css";
 import "../css/user/shop.css";
+import style from "../css/user/product.module.css";
+import listDataAddress from "../../service/AddressVietNam.json"
 
 import {
   FormControl,
@@ -20,8 +22,10 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  colors,
+  colors
 } from "@mui/material";
+import LazyLoad from "react-lazy-load";
+import { GetDataLogin } from "../../service/DataLogin";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -29,15 +33,23 @@ function valuetext(value) {
   return `${value}°C`;
 }
 
-function productReducer(state, action) {
+function formatCurrency(price, promotion) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0
+  });
+  return formatter.format(price - price * (promotion / 100));
+}
 
+function productReducer(state, action) {
   switch (action.type) {
     case "SET_VALUE":
       return {
         ...state,
         value1: action.value1,
         valueMin: action.valueMin,
-        valueMax: action.valueMax,
+        valueMax: action.valueMax
       };
     case "SET_CATEGORY_ITEM":
       return { ...state, categoryItem: action.categoryItem };
@@ -59,7 +71,29 @@ function productReducer(state, action) {
 }
 
 function Shop() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [accountLogin, setAccountLogin] = useState(null);
+  const [token, settoken] = useState(null);
+
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+    const tokenac = sessionStorage.getItem('accessToken');
+    console.log(accountLogin)
+    settoken(tokenac)
+    if (accountLogin !== null) {
+      try {
+        setAccountLogin(accountLogin);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+  useEffect(() => {
+    getAccountFromSession();
+  }, []);
+
   const [localState, dispatch] = useReducer(productReducer, {
     value1: [0, 1000000],
     valueMin: 0,
@@ -70,7 +104,7 @@ function Shop() {
     dateSorting: "ascending",
     priceSorting: "ascending",
     ratingFilter: "5",
-    shop: null,
+    shop: null
   });
 
   const {
@@ -83,7 +117,7 @@ function Shop() {
     dateSorting,
     priceSorting,
     ratingFilter,
-    shop,
+    shop
   } = localState;
 
   const handleChange1 = (event, newValue) => {
@@ -91,7 +125,7 @@ function Shop() {
       type: "SET_VALUE",
       value1: newValue,
       valueMin: newValue[0],
-      valueMax: newValue[1],
+      valueMax: newValue[1]
     });
   };
 
@@ -154,8 +188,9 @@ function Shop() {
     shopData,
     localState.priceSorting,
     localState.valueMin,
-    localState.valueMax,
+    localState.valueMax
   ]);
+
 
   return (
     <>
@@ -174,7 +209,7 @@ function Shop() {
                   />{" "}
                 </a>
               </div>
-              <div className="col-sm-7">
+              <div className="col-sm-7 d-flex align-items-center">
                 <ul className="profile-info-sections">
                   <li>
                     <div className="profile-name">
@@ -189,29 +224,34 @@ function Shop() {
                         ></a>
                       </strong>
                       <span>
-                        {shopData[2].ward} - {shopData[2].district}
+                        {listDataAddress.map((valueCity, index) =>
+                          shopData[2] && valueCity.codename === shopData[2].city
+                            ? valueCity.name
+                            : null
+                        )}
                       </span>
                     </div>
                   </li>
-                  <li>
-                    <div className="profile-stat">
-                      <h3>643</h3>
-                      <span>
-                        <a href="#">followers</a>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="profile-stat">
-                      <h3>108</h3>
-                      <span>
-                        <a href="#">following</a>
-                      </span>
-                     
-                        <p style={{fontSize:'20px',color:'red'}} onClick={()=>{navigate(`/test?ShopName=${shopData[1]}`)}}>Nhắn tin với người bán</p>
-                      
-                    </div>
-                  </li>
+                  {
+                    accountLogin?.shop?.shop_name !== shopData[1] ? (
+                      <li>
+                        <i
+                          className="bi bi-chat-dots"
+                          style={{
+                            fontSize: "25px",
+                            color: "red",
+                            cursor: "pointer"
+                          }}
+                          onClick={() => {
+                            navigate(`/chatPage?ShopName=${shopData[1]}`);
+                          }}
+                        ></i>
+                      </li>
+                    ) : (
+                      null
+                    )
+                  }
+
                 </ul>
               </div>
               <div className="col-sm-3"></div>
@@ -220,163 +260,155 @@ function Shop() {
           </div>
         </div>
       )}
-
-      <div className="product mt-4">
-        <section className="product spad">
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-3 col-md-5">
-                <div
-                  className="sidebar mt-4"
-                  style={{ position: "sticky", top: "20px" }}
-                >
-                  <div className="sidebar__item mt-4">
-                    <h5>Giá</h5>
-                    <div className="price-range-wrap pb-4">
-                      <Box sx={{ width: 300 }}>
-                        <Slider
-                          getAriaLabel={() => "Temperature range"}
-                          value={value1}
-                          onChange={handleChange1}
-                          valueLabelDisplay="auto"
-                          getAriaValueText={valuetext}
-                          min={0}
-                          max={1000000}
-                        />
-                        <Typography variant="body2">
-                          <span style={{ color: "#FF0000" }}>Value:</span>
-                          {value1[0]} - {value1[1]}
-                        </Typography>
-                      </Box>
-                    </div>
-                    <div className="sidebar__item sidebar__item__color--option">
-                      <h5>Sắp xếp giá</h5>
-                      <RadioGroup
-                        aria-label="priceSorting"
-                        name="priceSorting"
-                        value={priceSorting}
-                        onChange={handlePriceSortingChange}
-                      >
-                        <FormControlLabel
-                          value="ascending"
-                          control={<Radio />}
-                          label="Sắp xếp theo tăng dần"
-                        />
-                        <FormControlLabel
-                          value="descending"
-                          control={<Radio />}
-                          label="Sắp xếp theo giảm dần"
-                        />
-                      </RadioGroup>
-                    </div>
-
-                    <div className="sidebar__item sidebar__item__color--option">
-                      <h5>Đánh giá</h5>
-                      <RadioGroup
-                        aria-label="ratingFilter"
-                        name="ratingFilter"
-                        value={ratingFilter}
-                        onChange={handleRatingFilterChange}
-                      >
-                        {[5, 4, 3, 2, 1].map((rating) => (
-                          <FormControlLabel
-                            key={rating}
-                            value={String(rating)}
-                            control={<Radio />}
-                            label={`${rating} sao`}
-                          />
-                        ))}
-                      </RadioGroup>
-                    </div>
-                  </div>
-                </div>
+      <div className={style.container}>
+        <div className={style.sidebar}>
+          <div
+            className="sidebar mt-4 bg-white p-2"
+            style={{ position: "sticky", top: "20px" }}
+          >
+            <div className="hero__categories">
+              <div className="hero__categories__all">
+                <i className="fa fa-bars"></i>
+                <span>Danh mục sản phẩm</span>
               </div>
-              <div className="col-lg-9 col-md-7">
-                <div className="product__discount">
-                  <div>
-                    <div className=" ">
-                      <div className="all-items">
-                        <div className="container bg-white">
-                          <nav className="navbar navbar-expand-md navbar-light bg-white">
-                            <div className="container-fluid p-0">
-                              <a
-                                className="navbar-brand text-uppercase fw-800"
-                                href="/#"
-                              >
-                                <span className="border-red pe-2">
-                                  DANH SÁCH SẢN PHẨM
-                                </span>
-                              </a>
-                              <button
-                                className="navbar-toggler"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#myNav"
-                                aria-controls="myNav"
-                                aria-expanded="false"
-                                aria-label="Toggle navigation"
-                              >
-                                <span className="fas fa-bars"></span>
-                              </button>
-                              <div
-                                className="collapse navbar-collapse"
-                                id="myNav"
-                              ></div>
-                            </div>
-                          </nav>
+              <ListGroup variant="flush">
+                <ListGroup.Item
+                  onClick={() => {
+                    // Xử lý khi người dùng chọn "Tất cả sản phẩm"
+                    dispatch({
+                      type: "SET_SELECTED_CATEGORY",
+                      selectedCategory: null // Đặt selectedCategory thành null để hiển thị tất cả sản phẩm
+                    });
+                  }}
+                >
+                  Tất cả sản phẩm
+                </ListGroup.Item>
+                {Array.isArray(categoryItem) &&
+                  categoryItem.map((item) => (
+                    <ListGroup.Item
+                      key={item.id}
+                      onClick={() => {
+                        // Xử lý khi người dùng chọn một danh mục khác
+                        dispatch({
+                          type: "SET_SELECTED_CATEGORY",
+                          selectedCategory: item
+                        });
+                      }}
+                      className={item === selectedCategory ? "active" : ""}
+                    >
+                      {item.type_category_item}
+                    </ListGroup.Item>
+                  ))}
+              </ListGroup>
+            </div>
+            <div className="sidebar__item mt-4">
+              <div className="price-range-wrap d-flex justify-content-center pb-4">
+                <Box sx={{ width: 250 }}>
+                  <Slider
+                    getAriaLabel={() => "Temperature range"}
+                    value={value1}
+                    onChange={handleChange1}
+                    valueLabelDisplay="auto"
+                    getAriaValueText={valuetext}
+                    min={0}
+                    max={1000000}
+                  />
+                  <Typography variant="body2">
+                    <span style={{ color: "#FF0000" }}>Giá:</span> {value1[0]} -{" "}
+                    {value1[1]}
+                  </Typography>
+                </Box>
+              </div>
+              <div className="sidebar__item sidebar__item__color--option">
+                <h5>Sắp xếp giá</h5>
+                <RadioGroup
+                  aria-label="priceSorting"
+                  name="priceSorting"
+                  value={priceSorting}
+                  onChange={handlePriceSortingChange}
+                >
+                  <FormControlLabel
+                    value="ascending"
+                    control={<Radio />}
+                    label="Sắp xếp theo tăng dần"
+                  />
+                  <FormControlLabel
+                    value="descending"
+                    control={<Radio />}
+                    label="Sắp xếp theo giảm dần"
+                  />
+                </RadioGroup>
+              </div>
 
-                          <div className="row">
-                            {products.map((product) => (
-                              <div
-                                key={product[0]}
-                                className="col-lg-3 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3"
-                              >
-                                <div className="product">
-                                  {product[5].map((image, imageIndex) => (
-                                    <img
-                                      key={image.id}
-                                      src={`/images/${image.url}`}
-                                      alt={`Image ${imageIndex}`}
-                                    />
-                                  ))}
-                                  <ul className="d-flex align-items-center justify-content-center list-unstyled icons">
-                                    <li className="icon">
-                                      <span className="fas fa-expand-arrows-alt"></span>
-                                    </li>
-                                    <li className="icon mx-3">
-                                      <span className="far fa-heart"></span>
-                                    </li>
-                                    <li className="icon">
-                                      <span className="fas fa-shopping-bag"></span>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div className="tag bg-red">sale</div>
-                                <div className="title pt-4 pb-1">
-                                  <Link to={`/product/${product[0]}`}>
-                                    {product[1]}
-                                  </Link>
-                                </div>
-                                <div className="d-flex align-content-center justify-content-center">
-                                  <span className="fas fa-star"></span>
-                                  <span className="fas fa-star"></span>
-                                  <span className="fas fa-star"></span>
-                                  <span className="fas fa-star"></span>
-                                  <span className="fas fa-star"></span>
-                                </div>
-                                <div className="price">{product[2]}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="sidebar__item m-0 sidebar__item__color--option">
+                <h5>Đánh giá</h5>
+                <RadioGroup
+                  aria-label="ratingFilter"
+                  name="ratingFilter"
+                  value={ratingFilter}
+                  onChange={handleRatingFilterChange}
+                >
+                  <FormControlLabel
+                    value="5"
+                    control={<Radio />}
+                    label="5 sao"
+                  />
+                  <FormControlLabel
+                    value="4"
+                    control={<Radio />}
+                    label="4 sao"
+                  />
+                  <FormControlLabel
+                    value="3"
+                    control={<Radio />}
+                    label="3 sao"
+                  />
+                  <FormControlLabel
+                    value="2"
+                    control={<Radio />}
+                    label="2 sao"
+                  />
+                  <FormControlLabel
+                    value="1"
+                    control={<Radio />}
+                    label="1 sao"
+                  />
+                </RadioGroup>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+        <div className={style.content}>
+          <div className={style.listProduct}>
+            <label className={style.heading}>DANH SÁCH SẢN PHẨM</label>
+            <div className={style.list_product}>
+              {products.map((value, index) => (
+                value[4] === 1 ? (<LazyLoad
+                  once={true}
+                  key={value[0]}
+                  className={style.item_product}
+                >
+                  <Link to={`/product/${value[0]}`}>
+                    <img
+                      key={value.id}
+                      src={`${value[5][0].url} ? ${value[5][0].url} : "/images/nullImage.png`}
+                      alt={`Image ${value[5][0].url}`}
+                      className={style.image}
+                    />
+                    <div className={style.name}>{value[1]}</div>
+                    <div className={style.info}>
+                      <label className={style.price}>
+                        {formatCurrency(value[2], 0)}
+                      </label>
+                      <label className={style.amount_sell}>Đã bán 999</label>
+                    </div>
+                    <div className={style.show_detail}>Xem chi tiết</div>
+                  </Link>
+                </LazyLoad>) : null
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
       <div id="footer">
         <Footer />

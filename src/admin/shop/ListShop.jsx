@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
 import { GetDataLogin } from "../../service/DataLogin";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
@@ -29,7 +30,7 @@ function ListShop() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const data = useSelector((state) => state.idShop);
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdata(currentPage);
   }, [reload, currentPage, sortType, data]);
@@ -43,18 +44,19 @@ function ListShop() {
           "Authorization": `Bearer ${token}`
         }
       };
+      setIsLoading(true);
       const response = await callAPI(
         `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
         "GET", {}, config
       );
       const responseData = response.data;
+      setIsLoading(false);
       const listShop = responseData && responseData.content.map((value) => value.shop);
       const filteredListShop = listShop.filter(shop => shop !== null);
 
       const newData = filteredListShop.filter((shop) => shop.status === Number(1) || shop.status === Number(2));
       setListShop(newData || []);
-      console.log('listShop2', newData)
       setTotalPages(responseData.totalPages || 1);
       dispatch(getAllShop(responseData.content));
 
@@ -222,6 +224,7 @@ function ListShop() {
         />
       </div>
       {showModal && <ModelAccess status={showModal} toggleShow={closeModal} />}
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

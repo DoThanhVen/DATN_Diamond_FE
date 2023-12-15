@@ -23,7 +23,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {e.preventDefault()
     const response = await callAPI(`/api/login`, 'POST', {
       username: username,
       password: password
@@ -36,65 +36,6 @@ function Login() {
     } else {
       ThongBao(response.message, response.status)
     }
-
-    // axios
-    //   .post(domain + `/api/account/login`, {
-    //     username,
-    //     password
-    //   })
-    //   .then((response) => {
-    //     if(response.data.status === "success"){
-    //       const data = {
-    //         id_account: response.data.data.id,
-    //         username: response.data.data.username,
-    //         create_date: response.data.data.create_date,
-    //         role: response.data.data.listRole.map((value) => value.role.role_name),
-    //         gender: response.data.data.infoAccount.gender,
-    //         address: []
-    //       };
-    //       //INFO ACCOUNT
-    //       if (response.data.data.infoAccount && response.data.data.infoAccount.fullname) {
-    //         data.fullname = response.data.data.infoAccount.fullname;
-    //       }
-
-    //       if (response.data.data.infoAccount && response.data.data.infoAccount.image) {
-    //         data.image = response.data.data.infoAccount.image;
-    //       }
-
-    //       if (response.data.data.infoAccount && response.data.data.infoAccount.id_card) {
-    //         data.id_card = response.data.data.infoAccount.id_card;
-    //       }
-
-    //       if (response.data.data.infoAccount && response.data.data.infoAccount.phone) {
-    //         data.phone = response.data.data.infoAccount.phone;
-    //       }
-
-    //       if (response.data.data.infoAccount && response.data.data.infoAccount.email) {
-    //         data.email = response.data.data.infoAccount.email;
-    //       }
-
-    //       if (response.data.data.shop) {
-    //         data.shop = response.data.data.shop;
-    //       }
-
-    //       if (response.data.data.address_account) {
-    //         response.data.data.address_account.forEach((value) => {
-    //           data.address.push(value);
-    //         });
-    //       }
-
-    //       //ENCODE
-    //       const base64String = utf8_to_b64(JSON.stringify(data));
-
-    //       sessionStorage.setItem("accountLogin",base64String);
-    //       navigate("/");
-    //     }else{
-    //       ThongBao(response.data.message,"error")
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
   };
 
   const Login = async () => {
@@ -157,9 +98,9 @@ function Login() {
                         </div>
                         <div className="d-flex justify-content-between align-items-center ">
                           <button
-                            type="button"
+                            type="submit"
                             className="btn btn-primary"
-                            onClick={() => handleLogin()}
+                            onClick={(e) => handleLogin(e)}
                           >
                             Đăng nhập
                           </button>
@@ -177,10 +118,6 @@ function Login() {
                           <button type="button" className={style.button} onClick={Login}>
                             <i className="bi bi-google"></i> Đăng nhập với
                             Google
-                          </button>
-                          <button type="submit" className={style.button}>
-                            <i className="bi bi-facebook"></i> Đăng nhập với
-                            Facebook
                           </button>
                         </div>
                       </form>

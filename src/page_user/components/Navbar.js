@@ -8,7 +8,6 @@ import "./nav.css";
 import "../css/user/responsive.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 import { cartSelector } from '../../actions/actions';
 import { useSelector } from 'react-redux';
@@ -26,7 +25,7 @@ const MainNavbar = () => {
   const searchParams = new URLSearchParams();
   searchParams.append('keyword', "s")
   searchParams.append('keyword', "s")
-  const [isAdmin,setIsAdmin]=useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [accountLogin, setAccountLogin] = useState(null);
 
   const getAccountFromSession = () => {
@@ -34,11 +33,11 @@ const MainNavbar = () => {
 
     if (accountLogin !== null) {
       const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin');
-          setAccountLogin(accountLogin);
-          if(isAdmin){
-          setIsAdmin(true)
-          }
-    } 
+      setAccountLogin(accountLogin);
+      if (isAdmin) {
+        setIsAdmin(true)
+      }
+    }
   };
 
   useEffect(() => {
@@ -149,7 +148,7 @@ const MainNavbar = () => {
                 >
                   <a href="/">
                     <img
-                      src="/images/Diamond.png"
+                      src="/images/LogoFEADS.png"
                       alt=""
                       style={{ width: "115px" }}
                     />
@@ -224,6 +223,14 @@ const MainNavbar = () => {
                         >
                           Danh sách yêu thích
                         </Nav.Link>
+                        {accountLogin ? (
+                          <Nav.Link
+                            href="/chatPage"
+                            style={{ fontSize: "14px" }}
+                          >
+                            Tin nhắn
+                          </Nav.Link>
+                        ) : (null)}
                         <Nav.Link href="/policy" style={{ fontSize: "14px" }}>
                           Chính sách
                         </Nav.Link>

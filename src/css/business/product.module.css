@@ -371,7 +371,7 @@
                 }
 
                 &:nth-child(4) {
-                    width: calc(100% - 740px);
+                    width: calc(100% - 670px);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -414,8 +414,20 @@
                 &:nth-child(9) {
                     width: 30px;
                 }
+
                 &:nth-child(10) {
-                    width: 30px;
+                    width: 100px;
+                    display: flex;
+                    justify-content: start;
+                    padding: 0 4px;
+
+                    .button_ban {
+                        width: 100%;
+                        font-size: 13px;
+                        border-radius: 8px;
+                        padding: 2px;
+                        background-color: red;
+                    }
                 }
 
                 .image {
@@ -449,7 +461,6 @@
         color: black;
         margin: 0 5px;
     }
-
 }
 
 .typeProduct {
@@ -470,4 +481,13 @@
         margin-right: 5px;
         border-radius: 10px;
     }
+}
+
+.input {
+    font-size: 15px;
+}
+
+.buttonDelete {
+    cursor: pointer;
+    color: red;
 }

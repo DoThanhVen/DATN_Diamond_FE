@@ -342,8 +342,7 @@ function ProductPage() {
                       >
                         <img
                           src={
-                            "http://localhost:8080/api/uploadImageProduct/" +
-                            image.url
+                            image.url ? image.url : "/images/nullImage.png"
                           }
                           alt={`Image ${index}`}
                         />
@@ -449,7 +448,7 @@ function ProductPage() {
                   <img
                     src={
                       shopData[4]
-                        ? `http://localhost:8080/api/uploadImageProduct/${shopData[4]}`
+                        ? `${shopData[4]}`
                         : "https://bootdey.com/img/Content/avatar/avatar7.png"
                     }
                     className="rounded-circle shop-image"
@@ -556,15 +555,15 @@ function ProductPage() {
                   <div className="">
                     <div className="card-body">
                       <h4 className="card-title">Sản phẩm tương tự</h4>
-
                       {localState.similarProducts &&
                         localState.similarProducts.map((product, index) => (
+                          product.status === 1 ? (
                           <div className="d-flex mb-3 mt-4" key={index}>
-                            <Link to={`/product/${product.id}`}>
+                            <Link className={`me-2`} to={`/product/${product.id}`}>
                               {product.image_product &&
                                 product.image_product.length > 0 && (
                                   <img
-                                    src={`${API_BASE_URL}/api/uploadImageProduct/${product.image_product[0].url}`}
+                                    src={`${product.image_product[0].url}`}
                                     style={{ minWidth: "96px", height: "96px" }}
                                     className="img-md"
                                     alt={`Similar Product ${index + 1}`}
@@ -583,6 +582,7 @@ function ProductPage() {
                               </strong>
                             </div>
                           </div>
+                          ) : null
                         ))}
                     </div>
                   </div>

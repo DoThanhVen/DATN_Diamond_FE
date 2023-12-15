@@ -65,7 +65,7 @@ function App() {
         {/* Mdung test pay */}
         <Route path="/pay" element={<VNPayBankSelection />} />
 
-        <Route path="/chatApp" element={<ChatApp />} />
+        <Route path="/chatPage" element={<ChatApp />} />
 
       </Routes>
   )

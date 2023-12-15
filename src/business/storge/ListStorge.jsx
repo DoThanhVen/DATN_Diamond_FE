@@ -7,6 +7,7 @@ import getAccountFromCookie from "../../service/getAccountLogin";
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
+import LoadingOverlay from "../../service/loadingOverlay";
 function ListStorge() {
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
@@ -31,17 +32,20 @@ function ListStorge() {
   const [valueOption, setValueOption] = useState("");
   const [textInput, setTextInput] = useState("");
   const [reloadinPage, setreload] = useState(0)
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getAccountFromSession();
   }, [reload, currentPage, reloadinPage]);
 
   const getdataProduct = async (page, idShop) => {
     try {
+      setIsLoading(true)
       const response = await callAPI(
         `/api/product/getByShop?key=${valueOption}&keyword=${textInput}&shop=${idShop}&offset=${(page - 1)
         }&sizePage=${numberPage}`,
         "GET"
       );
+      setIsLoading(false)
       setProducts(response);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
@@ -90,7 +94,7 @@ function ListStorge() {
                   <div key={value?.image_product[0].id}>
                     <img
                       className={style.image}
-                      src={`http://localhost:8080/api/uploadImageProduct/${value?.image_product[0].url}`}
+                      src={value?.image_product[0].url}
                       alt="Hình Ảnh"
                     ></img>
                   </div>
@@ -136,6 +140,7 @@ function ListStorge() {
           />
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

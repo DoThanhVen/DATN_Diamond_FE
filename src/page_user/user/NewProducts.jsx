@@ -72,7 +72,7 @@ function NewProducts() {
                 ? (() => {
                     try {
                       const images = JSON.parse(product[5]);
-                      const lastImage = images[images.length - 1];
+                      const lastImage = images[0];
 
                       return (
                         <img

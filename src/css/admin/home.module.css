@@ -1,37 +1,66 @@
 .card_info {
     display: grid;
     grid-gap: 5px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 
     .card {
-        height: 150px;
+        height: 200px;
         border-radius: 10px;
         background-color: white;
         display: flex;
         flex-direction: column;
-        padding: 20px;
-        justify-content: center;
+        padding: 50px 20px 20px 20px;
         margin: 0 2px;
+        position: relative;
 
         .icon {
-            font-size: 30px;
-            color: white;
-            width: 50px;
-            height: 100px;
-            background-color: yellow;
+            position: absolute;
+            background-color: green;
+            width: 45px;
+            height: 45px;
+            top: 10px;
+            left: 10px;
             border-radius: 50%;
             display: grid;
             place-items: center;
+
+            .icon_edit {
+                font-size: 25px;
+                color: white;
+            }
         }
 
-        .label {
-            color: gray;
-            font-size: 17px;
-            margin: 10px 0;
+        .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .label {
+                color: black;
+                font-size: 17px;
+                font-weight: 600;
+                margin: 10px 0;
+            }
+
+            .amount {
+                font-weight: 600;
+            }
         }
 
-        .amount {
-            font-weight: 600;
+        .list_status {
+            .status {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .label {
+                    font-size: 15px;
+                }
+
+                .amount {
+                    font-weight: 600;
+                }
+            }
         }
     }
 }

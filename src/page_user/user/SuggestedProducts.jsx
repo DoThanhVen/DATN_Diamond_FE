@@ -11,7 +11,7 @@ const SidebarM = () => {
   useEffect(() => {
     // Gọi API
     axios
-      .get(`${API_BASE_URL}/api/category`)
+      .get(`${API_BASE_URL}/api/category?sizePage=100000`)
       .then((response) => {
         setCategories(response.data.content);
       })

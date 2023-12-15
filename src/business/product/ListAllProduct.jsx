@@ -86,11 +86,13 @@ export default function ListProduct() {
 
   const getdataProduct = async (page, idShop) => {
     try {
+      setIsLoading(true);
       const response = await callAPI(
         `/api/product/search?key=${valueOption}&keyword=${textInput}&category=${valueCategoryItem}&shop=${idShop}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&status=${filterbyStatus}&isActive=`,
         "GET"
       );
+      setIsLoading(false);
       setProducts(response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
@@ -327,16 +329,6 @@ export default function ListProduct() {
             <option value="desc">Giảm dần</option>
           </select>
         ) : null}
-        <button onClick={exportExcel}>Xuất Excel</button>
-        <div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-          <button onClick={handleButtonClick}>Nhập Excel</button>
-        </div>
       </div>
       <div className={style.typeProduct}>
         <label>Trạng thái:</label>
@@ -354,6 +346,22 @@ export default function ListProduct() {
           <option value="3">Cấm Hoạt Động</option>
         </select>
       </div>
+      <div className={style.groupButtonExcel}>
+        <button onClick={exportExcel} className={style.export_excel}>
+          Xuất Excel
+        </button>
+        <div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <button onClick={handleButtonClick} className={style.import_excel}>
+            Nhập Excel
+          </button>
+        </div>
+      </div>
       <div className={`${style.listProduct}`}>
         <div className={style.table}>
           <div className={style.tableHeading}>
@@ -366,10 +374,11 @@ export default function ListProduct() {
             <label className={style.column}>Trạng thái</label>
             <label className={style.column}>Ngày tạo</label>
             <label className={style.column} />
+            <label className={style.column} />
           </div>
           {products?.content?.map((value, index) => (
             <div key={index} className={style.tableBody}>
-              <label className={style.column}>{index}</label>
+              <label className={style.column}>{((currentPage - 1) * 10) + index + 1}</label>
               <label className={style.column}>{value.id}</label>
               <label className={style.column}>
                 {Array.isArray(value.image_product) ? (
@@ -377,7 +386,7 @@ export default function ListProduct() {
                     <img
                       key={index}
                       className={style.image}
-                      src={item.url}
+                      src={item.url ? item.url : "/images/nullImage.png"}
                       alt="Hình Ảnh"
                     />
                   ))
@@ -416,7 +425,7 @@ export default function ListProduct() {
                     : value.status === 1
                       ? "Đang Hoạt Động"
                       : value.status === 2
-                        ? "Dừng Hoạt Động"
+                        ? "Ngừng Hoạt Động"
                         : value.status === 3
                           ? "Cấm hoạt động"
                           : "Lỗi"}
@@ -442,16 +451,9 @@ export default function ListProduct() {
                     className={`bi bi-trash ${style.buttonDelete}`}
                     onClick={() => handleDelete(value.id)}
                   />
-                ) : (
-                  <span></span>
-                )}
-              </label>
-              <label className={style.column}>
-                {value.status === 1 ? (
-                  <button onClick={() => { shutdownProduct(value.id) }}>Ngừng hoạt động</button>
-                ) : (
-                  null
-                )}
+                ) : value.status === 1 ? (
+                  <button className={style.button_ban} onClick={() => { shutdownProduct(value.id) }}>Ngừng hoạt động</button>
+                ) : <span/>}
               </label>
             </div>
           ))}

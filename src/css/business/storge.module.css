@@ -267,7 +267,7 @@
             border: none;
             padding: 5px 10px;
             font-size: 15px;
-            
+
             &:focus {
                 outline: none;
             }
@@ -308,7 +308,7 @@
             border-radius: 5px;
             border: 1px solid lightgrey;
             font-size: 15px;
-            
+
             &:focus {
                 outline: none;
             }
@@ -326,16 +326,7 @@
             border: none;
             color: white;
             margin-right: 5px;
-
-            &:nth-child(1),
-            &:nth-child(2) {
-                background-color: #0fa958;
-            }
-
-            &:last-child {
-                background-color: lightgrey;
-                color: grey;
-            }
+            background-color: green;
         }
     }
 }

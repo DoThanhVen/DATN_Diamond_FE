@@ -134,7 +134,7 @@ function AddProduct() {
       ThongBao(`Mô tả sản phẩm không được vượt quá ${MAX_DESCRIPTION_LENGTH} ký tự.`, "error");
       return;
     }
-    if (imagesave.length <1) {
+    if (imagesave.length < 1) {
       ThongBao(`Vui lòng chọn hình ảnh.`, "error");
       return;
     }
@@ -214,6 +214,7 @@ function AddProduct() {
         <input
           type="text"
           placeholder="Tên sản phẩm..."
+          className={style.input}
           onChange={e => {
             setname(e.target.value);
           }}
@@ -223,6 +224,7 @@ function AddProduct() {
         <label>Giá sản phẩm</label>
         <input
           type="number"
+          className={style.input}
           placeholder="Giá sản phẩm..."
           onChange={e => {
             setprice(e.target.value);
@@ -266,6 +268,7 @@ function AddProduct() {
         <label>Số lượng</label>
         <input
           type="number"
+          className={style.input}
           placeholder="Số lượng..."
           onChange={e => {
             setQuantityValue(e.target.value);

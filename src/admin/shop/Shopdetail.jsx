@@ -8,29 +8,33 @@ import { callAPI } from "../../service/API";
 import { ThongBao } from "../../service/ThongBao";
 import ModalAction from "../../service/ModalAction";
 import ModelDelete from "./ModelDelete";
+import listDataAddress from "../../service/AddressVietNam";
+import LoadingOverlay from "../../service/loadingOverlay";
 
 function ShopDetail() {
   const [shop, setshop] = useState({});
   const dispatch = useDispatch();
-  const id = useSelector(state => state.idShop);
+  const id = useSelector((state) => state.idShop);
   const navigate = useNavigate();
-  const data = useSelector(state => state.allDataShop);
+  const data = useSelector((state) => state.allDataShop);
   const [token, settoken] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (id !== 0) {
       getShop();
-    }else{
-      navigate('/admin/shops')
+    } else {
+      navigate("/admin/shops");
     }
   }, [data]);
 
   const getShop = async () => {
-
-    const tokenax = sessionStorage.getItem('accessToken');
-    settoken(tokenax)
+    const tokenax = sessionStorage.getItem("accessToken");
+    settoken(tokenax);
     if (Array.isArray(data)) {
-      const foundAccount = data.find(item => item.shop && item.shop.id === id);
+      const foundAccount = data.find(
+        (item) => item.shop && item.shop.id === id
+      );
       if (foundAccount) {
         setshop(foundAccount);
       }
@@ -38,27 +42,36 @@ function ShopDetail() {
   };
 
   const handleSubmit = async () => {
-    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+    const isConfirmed = await ModalAction(
+      "Bạn có chắc muốn thực hiện hành động này?",
+      "warning"
+    );
     if (isConfirmed) {
       try {
         const config = {
           headers: {
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         };
+        setIsLoading(true)
         const formData = new FormData();
-        formData.append('id', shop.shop.id);
-        formData.append('status', 1);
-        formData.append('isCheck', 'detail');
-        await callAPI(`/api/auth/admin/update`, 'PUT', formData, config);
-        await callAPI(`/api/auth/sendEmail/${shop.infoAccount.email}?content=Cửa hàng của bạn đã được phê duyệt tại FE Shop`, 'GET', {}, config);
+        formData.append("id", shop.shop.id);
+        formData.append("status", 1);
+        formData.append("isCheck", "detail");
+        await callAPI(`/api/auth/admin/update`, "PUT", formData, config);
+        await callAPI(
+          `/api/auth/sendEmail/${shop.infoAccount.email}?content=Cửa hàng của bạn đã được phê duyệt tại FE Shop`,
+          "GET",
+          {},
+          config
+        );
+        setIsLoading(false)
         navigate("/admin/shops");
         dispatch(getIdShop(0));
       } catch (error) {
-        ThongBao("Có lỗi xảy ra.", "error")
+        ThongBao("Có lỗi xảy ra.", "error");
       }
     }
-
   };
   const openModal = () => {
     setShowModal(true);
@@ -69,37 +82,77 @@ function ShopDetail() {
   };
   return (
     <div className={style.card}>
-      <Link to="/admin/shops" className={style.back}><i className="bi bi-box-arrow-left"></i></Link>
+      <Link to="/admin/shops" className={style.back}>
+        <i className="bi bi-box-arrow-left"></i>
+      </Link>
       <h2 className={style.heading}>Chi tiết cửa hàng</h2>
       <div>
         <img
           className={style.shopImage}
-          src=
-          {shop?.shop?.image
-            ? shop.shop.image
-            : "/images/image_shop.jpg"}
+          src={"/images/image_shop.jpg"}
           alt="Shop"
           style={{ maxWidth: "100%" }}
         />
       </div>
-      <label className={style.title}>Tên cửa hàng: {shop.shop?.shop_name}</label>
       <label className={style.title}>
-        Chủ sở hữu: {shop.username}
+        Tên cửa hàng: {shop.shop?.shop_name}
       </label>
+      <label className={style.title}>Chủ sở hữu: {shop.username}</label>
       <label className={style.title}>Địa chỉ:</label>
       <div className={style.address}>
-        <label>Tỉnh/Thành phố: {shop.shop?.addressShop?.city}</label>
-        <label>Quận/Huyện: {shop.shop?.addressShop?.district}</label>
-        <label>Xã/Phường: {shop.shop?.addressShop?.ward}</label>
+        <label>
+          Tỉnh/Thành phố:{" "}
+          {listDataAddress.map((valueCity, index) =>
+            valueCity.codename === shop.shop?.addressShop?.city
+              ? valueCity.name
+              : null
+          )}
+        </label>
+        <label>
+          Quận/Huyện:
+          {listDataAddress.map((valueCity, index) =>
+            valueCity.codename === shop.shop?.addressShop?.city
+              ? valueCity.districts.map((valueDistrict, index) =>
+                  valueDistrict.codename === shop.shop?.addressShop?.district
+                    ? valueDistrict.name
+                    : null
+                )
+              : null
+          )}
+        </label>
+        <label>
+          Xã/Phường:{" "}
+          {listDataAddress.map((valueCity, index) =>
+            valueCity.codename === shop.shop?.addressShop?.city
+              ? valueCity.districts.map((valueDistrict, index) =>
+                  valueDistrict.codename === shop.shop?.addressShop?.district
+                    ? valueDistrict.wards.map((valueWard, index) =>
+                        valueWard.codename === shop.shop?.addressShop?.ward
+                          ? valueWard.name
+                          : null
+                      )
+                    : null
+                )
+              : null
+          )}
+        </label>
         <label>Số nhà: {shop.shop?.addressShop?.address}</label>
       </div>
       <div>
-        <button className={style.buttonSubmit} onClick={handleSubmit}>Xác Nhận Duyệt</button>
-        <label className={style.column}>
-          <button onClick={() => { openModal(); }}>Không duyệt</button>
-        </label>
+        <button className={style.buttonAccept} onClick={handleSubmit}>
+          Xác Nhận Duyệt
+        </button>
+        <button
+          className={style.buttonDenied}
+          onClick={() => {
+            openModal();
+          }}
+        >
+          Không duyệt
+        </button>
       </div>
       {showModal && <ModelDelete status={showModal} toggleShow={closeModal} />}
+      <LoadingOverlay isLoading={isLoading} />
     </div>
   );
 }

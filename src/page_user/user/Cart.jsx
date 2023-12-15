@@ -6,12 +6,11 @@ import { cartSelector } from "../../actions/actions";
 import cartSilce from "../../Reducer/cartSilce";
 import "../css/user/cart.css";
 import "../css/user/home.css";
-import axios from "axios";
 
 function Cart() {
   const cart = useSelector(cartSelector);
   const dispatch = useDispatch();
-  console.log(cart);
+
   // Sử dụng useState để quản lý giá trị số
 
   // Hàm tăng giá trị số
@@ -25,7 +24,6 @@ function Cart() {
       })
     );
   };
-  console.log(cart);
   // Hàm giảm giá trị số
   const decreaseCount = (index) => {
     // if (count > 1) {
@@ -119,7 +117,7 @@ function Cart() {
                           <li className="list-inline-item">
                             <button
                               onClick={() => {
-                                console.log(index);
+                                
                                 dispatch(
                                   cartSilce.actions.removeItemToCart({
                                     index: index

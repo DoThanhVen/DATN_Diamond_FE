@@ -6,6 +6,7 @@ import { getAllCategory, getIdcategoryItemUpdate, getIdcategoryUpdate, reloadPag
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
 import moment from "moment";
+import LoadingOverlay from "../../service/loadingOverlay";
 function ListCategory() {
   const [listCategory, setlistcategory] = useState([])
   const reload = useSelector((state) => state.getreloadPage);
@@ -18,16 +19,18 @@ function ListCategory() {
   const [reloadinPage, setreload] = useState(0)
   const [sortBy, setsortBy] = useState('')
   const [sortType, setsortType] = useState('')
-
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getdataCategory(currentPage)
   }, [reload,currentPage, reloadinPage, sortType]);
 
   const getdataCategory = async (page) => {
+    setIsLoading(true);
     const response = await callAPI(`/api/category?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}`, "GET");
     setlistcategory(response.content || []);
     setTotalPages(response.totalPages || 1);
+    setIsLoading(false);
     dispatch(getAllCategory(response.content))
   }
 
@@ -169,6 +172,7 @@ function ListCategory() {
           />
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

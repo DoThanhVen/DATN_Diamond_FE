@@ -115,6 +115,7 @@ function AdminDashboard() {
   
   const handleLogout = () => {
     sessionStorage.removeItem("accountLogin");
+    sessionStorage.removeItem("accessToken")
     const delay = setTimeout(() => {
       navigate("/");
     }, 800);
@@ -126,7 +127,7 @@ function AdminDashboard() {
       <div id={style.adminDashBoard}>
       <div className={`${style.header}`}>
           <div className={`${style.logo}`}>
-            <img src="/images/diamond.png" alt="Hình Ảnh" />
+            <img src="/images/LogoFEADS.png" alt="Hình Ảnh" />
             <Nav.Link href="/admin">Kênh Quản Trị</Nav.Link>
           </div>
           <div className={`${style.others}`}>

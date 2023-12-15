@@ -8,6 +8,7 @@ import { Nav } from "react-bootstrap";
 import moment from "moment";
 import { callAPI } from "../../service/API";
 import { Pagination } from "@mui/material";
+import LoadingOverlay from "../../service/loadingOverlay";
 function ListShopWait() {
   const [ListShopWait, setListShopwait] = useState([]);
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ function ListShopWait() {
   const [reload, setreload] = useState(0);
   const [sortBy, setsortBy] = useState("");
   const [sortType, setsortType] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getdata(currentPage);
   }, [reload, currentPage, sortType, data]);
@@ -37,13 +38,14 @@ function ListShopWait() {
           "Authorization": `Bearer ${token}`
         }
       };
+      setIsLoading(true);
       const response = await callAPI(
         `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
         "GET", {}, config
       );
       const responseData = response.data;
-
+      setIsLoading(false);
       const listFilter = responseData.content.filter((a) => {
         return a.shop !== null && a.shop.status === 0;
       });
@@ -162,6 +164,7 @@ function ListShopWait() {
           />
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }

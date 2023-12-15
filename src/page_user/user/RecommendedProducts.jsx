@@ -63,7 +63,7 @@ const RecommendedProducts = () => {
                   {value.image_product && (
                     <div>
                       <img
-                        src={`http://localhost:8080/api/uploadImageProduct/${value.image_product[0].url}`}
+                        src={`${value.image_product[0].url}`}
                         className={style.image}
                         alt={`Image ${value.image_product[0].url}`}
                       />
