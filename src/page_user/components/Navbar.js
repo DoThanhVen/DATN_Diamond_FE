@@ -26,11 +26,23 @@ const MainNavbar = () => {
   const searchParams = new URLSearchParams();
   searchParams.append('keyword', "s")
   searchParams.append('keyword', "s")
-
+  const [isAdmin,setIsAdmin]=useState(false)
   const [accountLogin, setAccountLogin] = useState(null);
 
+  const getAccountFromSession = () => {
+    const accountLogin = GetDataLogin();
+
+    if (accountLogin !== null) {
+      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin');
+          setAccountLogin(accountLogin);
+          if(isAdmin){
+          setIsAdmin(true)
+          }
+    } 
+  };
+
   useEffect(() => {
-    setAccountLogin(GetDataLogin());
+    getAccountFromSession()
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,10 +75,7 @@ const MainNavbar = () => {
                 <div className="top-left">
                   <ul className="list-main">
                     <li>
-                      <i className="ti-headphone-alt"></i>+ 099 900 0999
-                    </li>
-                    <li>
-                      <i className="ti-email"></i> diamondshop@gmail.com
+                      <i className="ti-email"></i> feads.bussiness@gmail.com
                     </li>
                   </ul>
                 </div>
@@ -76,6 +85,14 @@ const MainNavbar = () => {
                 {/* Top Right */}
                 <div className="right-content">
                   <ul className="list-main">
+                    {accountLogin && isAdmin ? (
+                      <li>
+                        <i className="ti-location-pin"></i>{" "}
+                        <a href="/admin">Kênh quản trị</a>
+                      </li>
+                    ) : (
+                      null
+                    )}
                     {accountLogin &&
                       accountLogin.shop &&
                       accountLogin?.shop?.status === 1 || accountLogin?.shop?.status === 2 ? (

@@ -36,7 +36,7 @@ const SidebarM = () => {
               >
                 <img
                   key={category.id}
-                  src={`${API_BASE_URL}/api/uploadImageProduct/${category.image}`}
+                  src={`${category.image}`}
                   alt="Hình Ảnh"
                   className={`${style.image} me-2`}
                 ></img>

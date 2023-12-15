@@ -24,6 +24,7 @@
     padding: 0 5px;
     border: 1px solid lightgrey;
     border-radius: 5px 0 0 5px;
+    font-size: 15px;
 }
 
 .optionSelectType {
@@ -32,6 +33,7 @@
     padding: 0 5px;
     border: 1px solid lightgrey;
     border-radius: 5px;
+    font-size: 15px;
 }
 
 .optionSelectType:nth-child(2) {
@@ -50,6 +52,7 @@
     margin-left: -1px;
     border: 1px solid lightgrey;
     border-radius: 0 5px 5px 0;
+    font-size: 15px;
 }
 
 .inputSearch:focus {
@@ -303,7 +306,6 @@
     background-color: #f0f0f0;
 }
 
-
 /*SCSS*/
 .listProduct {
     background-color: white;
@@ -312,7 +314,7 @@
 
     .table {
         .tableHeading {
-            background-color: rgba(240, 240, 240, .8);
+            background-color: rgba(240, 240, 240, 0.8);
 
             .column {
                 padding: 10px 0;
@@ -321,7 +323,7 @@
 
         .tableBody {
             &:not(:last-child) {
-                border-bottom: 2px solid rgba(240, 240, 240, .8);
+                border-bottom: 2px solid rgba(240, 240, 240, 0.8);
             }
 
             .column {
@@ -349,34 +351,71 @@
 
                 &:nth-child(1) {
                     width: 40px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(2) {
                     width: 100px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(3) {
                     width: 80px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(4) {
-                    width: 200px;
+                    width: calc(100% - 740px);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(5) {
                     width: 100px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(6) {
                     width: 100px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &:nth-child(7) {
-                    width: 140px;
+                    width: 130px;
+                    display: grid;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+
+                    .status {
+                        width: 100%;
+                        padding: 3px 0;
+                        border-radius: 20px;
+                        color: white;
+                        font-size: 14px;
+                    }
                 }
 
                 &:nth-child(8) {
-                    width: 150px;
+                    width: 130px;
+                }
+
+                &:nth-child(9) {
+                    width: 30px;
+                }
+                &:nth-child(10) {
+                    width: 30px;
                 }
 
                 .image {
@@ -392,52 +431,16 @@
                 }
             }
         }
-
-        .tableBody {
-
-            .column {
-
-                &:nth-child(4),
-                &:nth-child(3) {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                &:nth-child(7),
-                &:nth-child(6),
-                &:nth-child(5) {
-                    display: flex;
-                    justify-content: center;
-                }
-
-                .status {
-                    width: 85%;
-                    padding: 3px 0;
-                    border-radius: 20px;
-                    color: white;
-                    font-size: 14px;
-                }
-
-                .updateStatus {
-                    width: 90%;
-                    font-size: 14px;
-                    padding: 5px 0;
-                    color: white;
-                    border-radius: 0;
-                }
-
-            }
-        }
     }
 
     .buttonPage {
         display: flex;
         justify-content: center;
         margin-top: 20px;
-        .btnActivePage{
+
+        .btnActivePage {
             background-color: blue;
-            color:white
+            color: white;
         }
     }
 
@@ -447,4 +450,24 @@
         margin: 0 5px;
     }
 
+}
+
+.typeProduct {
+    margin: 10px 0;
+
+    .optionSelect {
+        border-radius: 5px;
+    }
+}
+
+.groupButtonExcel {
+    display: flex;
+
+    .import_excel,
+    .export_excel {
+        font-size: 15px;
+        width: 100px;
+        margin-right: 5px;
+        border-radius: 10px;
+    }
 }

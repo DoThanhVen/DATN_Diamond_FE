@@ -10,7 +10,7 @@ function Footer() {
           <div className={`content`}>
             <ul className={`menu`}>
               <li className={`menu-item`}>
-                <a href="#">Giới thiệu về Diamond Fashion</a>
+                <a href="#">Giới thiệu về FE ADS</a>
               </li>
             </ul>
           </div>
@@ -40,10 +40,7 @@ function Footer() {
                 Hiệp, Quận 12, TP.Hồ Chí Minh
               </li>
               <li className={`menu-item`}>
-                <b>Phone: </b>0999000999
-              </li>
-              <li className={`menu-item`}>
-                <b>Email: </b>diamondshop@gmail.com
+                <b>Email: </b>feads.bussiness@gmail.com
               </li>
             </ul>
           </div>

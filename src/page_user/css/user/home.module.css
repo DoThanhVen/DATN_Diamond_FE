@@ -89,14 +89,13 @@
             .list_item_new,
             .list_all_recommended {
                 width: 100%;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
+                display: grid;
+                grid-gap: 10px;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 padding: 20px 0 20px 0;
 
                 .item_new_product,
                 .item_recommended {
-                    width: calc(20% - 8px);
                     position: relative;
                     transition: all .3s ease-in-out;
                     background-color: white;

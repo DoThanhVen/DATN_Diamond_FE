@@ -67,7 +67,7 @@
                 }
 
                 &:nth-child(4) {
-                    width: 200px;
+                    width: calc(100% - 660px);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -97,8 +97,16 @@
                     text-overflow: ellipsis;
                     text-align: center;
                 }
-                
-                .image{
+
+                &:nth-child(8) {
+                    width: 50px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                .image {
                     width: 80px;
                     height: 80px;
                     border-radius: 10px;
@@ -174,8 +182,8 @@
         border: 1px solid lightgrey;
         font-size: 15px;
     }
-    
-    
+
+
     .optionSelect:focus {
         outline: none;
     }

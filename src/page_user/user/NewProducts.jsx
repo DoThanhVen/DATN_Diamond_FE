@@ -77,13 +77,17 @@ function NewProducts() {
                       return (
                         <img
                           key={lastImage.id}
-                          src={`${API_BASE_URL}/api/uploadImageProduct/${lastImage.url}`}
-                          alt={`Last Image`}
+                          src={`${lastImage.url}`}
+                          alt={`Image`}
                           className={style.image}
                         />
                       );
                     } catch (error) {
-                      return null;
+                      return <img
+                      src={`/images/nullimage.png`}
+                      alt={`Image`}
+                      className={style.image}
+                    />;
                     }
                   })()
                 : null}

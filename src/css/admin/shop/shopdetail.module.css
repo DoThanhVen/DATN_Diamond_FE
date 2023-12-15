@@ -32,13 +32,23 @@
         margin-left: 20px;
     }
 
-    .buttonSubmit {
+    .buttonAccept {
+        background-color: green;
+    }
+
+    .buttonDenied {
+        background-color: red;
+    }
+
+    .buttonAccept,
+    .buttonDenied {
         width: 150px;
         padding: 10px;
         border-radius: 5px;
-        background-color: blue;
+        font-size: 15px;
         border: none;
         color: white;
         margin-top: 10px;
+        margin-right: 5px;
     }
 }

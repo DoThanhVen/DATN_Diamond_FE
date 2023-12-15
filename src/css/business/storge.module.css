@@ -24,6 +24,7 @@
                 height: 50px;
                 padding: 0 5px;
                 border: 1px solid lightgrey;
+                font-size: 15px;
             }
 
 
@@ -111,7 +112,7 @@
                         }
 
                         &:nth-child(4) {
-                            width: 320px;
+                            width: calc(100% - 560px);
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
@@ -129,12 +130,6 @@
                             width: 140px;
                         }
 
-                        &:nth-child(8) {
-                            width: 150px;
-                        }
-
-                        &:nth-child(9) {}
-
                         .image {
                             width: 100px;
                             height: 100px;
@@ -150,6 +145,7 @@
                 }
             }
         }
+
         &.listAll {
             .table {
                 .tableHeading {
@@ -270,7 +266,8 @@
             width: calc(100% - 30px);
             border: none;
             padding: 5px 10px;
-
+            font-size: 15px;
+            
             &:focus {
                 outline: none;
             }
@@ -310,7 +307,8 @@
             padding: 5px 10px;
             border-radius: 5px;
             border: 1px solid lightgrey;
-
+            font-size: 15px;
+            
             &:focus {
                 outline: none;
             }
