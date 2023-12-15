@@ -49,36 +49,37 @@ function Profile_User() {
   const setDataLogin = (data) => {
     if (data !== null) {
       try {
+        console.log(data)
         setUsername(data.username);
-        if (data?.infoAccount.fullname) {
-          setFullname(data?.infoAccount.fullname);
+        if (data?.infoAccount?.fullname) {
+          setFullname(data?.infoAccount?.fullname);
         }
-        if (data?.infoAccount.phone) {
-          setPhone(data?.infoAccount.phone);
+        if (data?.infoAccount?.phone) {
+          setPhone(data?.infoAccount?.phone);
         }
-        if (data?.infoAccount.id_card) {
-          setIdCard(data?.infoAccount.id_card);
+        if (data?.infoAccount?.id_card) {
+          setIdCard(data?.infoAccount?.id_card);
         }
-        if (data?.infoAccount.email) {
-          setEmail(data?.infoAccount.email);
+        if (data.infoAccount.email) {
+          setEmail(data.infoAccount.email);
         }
-        setGender(data?.infoAccount.gender);
-        if (data?.infoAccount.city) {
-          setCity(data?.infoAccount.city);
+        setGender(data?.infoAccount?.gender);
+        if (data?.infoAccount?.city) {
+          setCity(data?.infoAccount?.city);
         }
-        if (data.address_account.length > 0) {
-          data.address_account.filter((value) => {
-            if (value.status) {
-              setCity(value.city);
-              setDistrict(value.district);
-              setWard(value.ward);
-              setAddress(value.address);
-              setIdAddressUse(value.id);
+        if (data?.address_account.length > 0) {
+          data?.address_account.filter((value) => {
+            if (value?.status) {
+              setCity(value?.city);
+              setDistrict(value?.district);
+              setWard(value?.ward);
+              setAddress(value?.address);
+              setIdAddressUse(value?.id);
             }
           });
         }
-        if (data?.infoAccount.image) {
-          setImage(data?.infoAccount.image);
+        if (data?.infoAccount?.image) {
+          setImage(data?.infoAccount?.image);
         }
       } catch (error) {
         console.log(error);
@@ -369,10 +370,10 @@ function Profile_User() {
                 <div className="account-settings">
                   <div className="user-profile">
                     <div className="user-avatar" style={{ cursor: "pointer" }}>
-                      {accountLogin && accountLogin?.infoAccount?.image !== '' && accountLogin?.infoAccount?.image !== null && selectedImage === null ? (
+                      {accountLogin &&  accountLogin.infoAccount&& accountLogin.infoAccount.image !== '' && accountLogin.infoAccount.image !== null && selectedImage === null ? (
                         <img
                           src={
-                            accountLogin?.infoAccount?.image
+                            accountLogin.infoAccount.image
                           }
                           alt="user"
                           onClick={handleImageClick}
@@ -523,7 +524,7 @@ function Profile_User() {
                         type="text"
                         className="form-control"
                         id="fullName"
-                        defaultValue={fullname}
+                        value={fullname}
                         onChange={(e) => setFullname(e.target.value)}
                       />
                     </div>
@@ -535,7 +536,7 @@ function Profile_User() {
                         type="text"
                         className="form-control"
                         id="phone"
-                        defaultValue={phone}
+                        value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
                     </div>
@@ -559,7 +560,7 @@ function Profile_User() {
                         type="url"
                         className="form-control"
                         id="email"
-                        defaultValue={id_card}
+                        value={id_card}
                         onChange={(e) => setIdCard(e.target.value)}
                       />
                     </div>
@@ -576,7 +577,7 @@ function Profile_User() {
                             id="gridRadios1"
                             onChange={() => setGender(true)}
                             defaultChecked={
-                              accountLogin && accountLogin?.infoAccount.gender === true
+                              accountLogin && accountLogin?.infoAccount?.gender === true
                             }
                           />
                           <label
@@ -597,7 +598,7 @@ function Profile_User() {
                             id="gridRadios2"
                             onChange={() => setGender(false)}
                             defaultChecked={
-                              accountLogin && accountLogin?.infoAccount.gender === false
+                              accountLogin && accountLogin?.infoAccount?.gender === false
                             }
                           />
                           <label
@@ -740,7 +741,7 @@ function Profile_User() {
               </div>
               <div className={style.listAddress}>
                 {accountLogin &&
-                  accountLogin.address_account.map((value, index) =>
+                  accountLogin?.address_account?.map((value, index) =>
                     listDataAddress.map((valueCity, index) =>
                       valueCity.codename === value.city
                         ? valueCity.districts.map((valueDistrict, index) =>

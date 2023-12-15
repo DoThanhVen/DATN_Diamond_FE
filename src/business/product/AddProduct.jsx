@@ -134,6 +134,10 @@ function AddProduct() {
       ThongBao(`Mô tả sản phẩm không được vượt quá ${MAX_DESCRIPTION_LENGTH} ký tự.`, "error");
       return;
     }
+    if (imagesave.length <1) {
+      ThongBao(`Vui lòng chọn hình ảnh.`, "error");
+      return;
+    }
     const isConfirmed = await ModalAction("Bạn có chắc muốn thêm sản phẩm này?", "warning");
     if (isConfirmed) {
       try {

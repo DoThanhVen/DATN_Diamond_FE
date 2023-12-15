@@ -31,6 +31,7 @@ export default function SalesRegistration() {
     const accountLogin = GetDataLogin();
     const accessToken = sessionStorage.getItem('accessToken');
     settoken(accessToken)
+    console.log(accountLogin)
     if (accountLogin === null) {
       navigate("/login");
     } else {
@@ -92,37 +93,42 @@ export default function SalesRegistration() {
   };
 
   const handleSaleRegis = async () => {
-    if (
-      shop_name === "" ||
-      city === "" ||
-      district === "" ||
-      ward === "" ||
-      address === "" ||
-      image === null
-    ) {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else {
-      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-      if (isConfirmed) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        };
-        setIsLoading(true);
-        const imageUrl = await uploadImageToFirebaseStorage(image);
-        const res = await callAPI(`/api/auth/account/saleregis/${accountLogin.username}/${shop_name}?image=${imageUrl}`, 'POST', {
-          city,
-          district,
-          ward,
-          address
-        }, config);
-        setIsLoading(false);
-        ThongBao(res.message, res.status);
-        accountLogin.shop = res.data;
-        const base64String = utf8_to_b64(JSON.stringify(accountLogin));
-        sessionStorage.setItem("accountLogin", base64String);
-        setreload(reload + 1);
+    if (accountLogin.infoAccount.id_card === null || accountLogin.infoAccount.image === null || accountLogin.infoAccount.phone === null) {
+      ThongBao("Vui lòng nhập đầy đủ thông tin tài khoản trước khi đăng kí Cửa hàng!", "error");
+    }
+    else {
+      if (
+        shop_name === "" ||
+        city === "" ||
+        district === "" ||
+        ward === "" ||
+        address === "" ||
+        image === null
+      ) {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          setIsLoading(true);
+          const imageUrl = await uploadImageToFirebaseStorage(image);
+          const res = await callAPI(`/api/auth/account/saleregis/${accountLogin.username}/${shop_name}?image=${imageUrl}`, 'POST', {
+            city,
+            district,
+            ward,
+            address
+          }, config);
+          setIsLoading(false);
+          ThongBao(res.message, res.status);
+          accountLogin.shop = res.data;
+          const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload + 1);
+        }
       }
     }
   };
@@ -158,9 +164,9 @@ export default function SalesRegistration() {
           <MainNavbar />
         </nav>
         <div className="container mt-4">
-          {accountLogin && accountLogin.shop.status === 0
+          {accountLogin && accountLogin.shop && accountLogin.shop.status === 0
             ? <div className={`text-danger p-4 text-center`}>Bạn đã đăng kí kênh bán hàng, vui lòng chờ phê duyệt!</div>
-            : accountLogin && accountLogin.shop.status === 1 ? <div className="row gutters">
+            : <div className="row gutters">
               <div className="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
                 <div className="card-profile h-100">
                   <div className="card-body">
@@ -320,9 +326,7 @@ export default function SalesRegistration() {
                   </div>
                 </div>
               </div>
-            </div> : (
-              <div className={`text-danger p-4 text-center`}>Cửa hàng của bạn đã bị cấm hoạt động. Liên hệ Admin để được giải quyết!</div>
-            )}
+            </div>}
         </div>
         <div id="footer">
           <Footer />

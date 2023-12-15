@@ -9,6 +9,7 @@ import { ThongBao } from "../service/ThongBao";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { callAPI } from "../service/API";
+import LoadingOverlay from "../service/loadingOverlay";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -21,7 +22,9 @@ export default function Register() {
   const [code, setCode] = useState("");
   const navigate = useNavigate();
   const domain = process.env.REACT_APP_API || "http://localhost:8080";
-
+  const [disableButton, setDisableButton] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const clearInput = () => {
     setUsername("");
     setPassword("");
@@ -33,6 +36,27 @@ export default function Register() {
     Cookies.remove("codeRegister");
   };
 
+  useEffect(() => {
+    let intervalId;
+    if (countdown > 0) {
+      intervalId = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          return prevCountdown - 1;
+        });
+      }, 1000);
+    } else {
+      setDisableButton(false);
+      clearInterval(intervalId);
+    }
+    if (countdown === 0) {
+      setDisableButton(false);
+    } else {
+      setDisableButton(true);
+    }
+    return () => clearInterval(intervalId);
+  }, [countdown]);
+
+
   const handleValidate = async (e) => {
     if (
       username === "" ||
@@ -42,9 +66,11 @@ export default function Register() {
     ) {
       ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
     } else {
+      setIsLoading(true);
       axios
         .post(domain + "/api/account/" + email)
         .then((response) => {
+          setIsLoading(false);
           if (response.data.success) {
             ThongBao(response.data.message, "success");
             const timeCookie = new Date();
@@ -54,6 +80,8 @@ export default function Register() {
             });
             setCheckEmail(email);
             setValidateCode(response.data.data);
+            setDisableButton(true);
+            setCountdown(5 * 60);
           } else {
             ThongBao(response.data.message, "error");
           }
@@ -83,12 +111,12 @@ export default function Register() {
       } else {
         if (password === repassword) {
           if (code === validateCode) {
-            const response =await callAPI(`/api/register`, 'POST', {
+            const response = await callAPI(`/api/register`, 'POST', {
               username: username,
               password: password,
-              email:email
+              email: email
             })
-            if (response.status==='success') {
+            if (response.status === 'success') {
               ThongBao(response.message, response.status);
               clearInput();
               const delay = setTimeout(() => {
@@ -98,7 +126,6 @@ export default function Register() {
             } else {
               ThongBao(response.message, response.status);
             }
-
           } else {
             ThongBao("Mã xác nhận không chính xác!", "error");
           }
@@ -201,8 +228,9 @@ export default function Register() {
                             type="button"
                             className="btn btn-primary w-100"
                             onClick={() => handleValidate()}
+                            disabled={disableButton}
                           >
-                            Gửi mã
+                            GỬI MÃ {countdown > 0 ? `(${Math.floor(countdown / 60)}:${countdown % 60})` : ""}
                           </button>
                         </div>
                         <div className="col-12">
@@ -243,6 +271,7 @@ export default function Register() {
       <div id="footer">
         <Footer />
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </div>
   );
 }

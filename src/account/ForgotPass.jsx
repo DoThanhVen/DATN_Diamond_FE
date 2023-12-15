@@ -1,30 +1,72 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { Pattern, Update } from "@mui/icons-material";
-import { callAPI } from "../service/API";
 import { ThongBao } from "../service/ThongBao";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import LoadingOverlay from "../service/loadingOverlay";
 
 function ForgotPass() {
   const [email, setEmail] = useState("");
   const [newpassword, setNewPassword] = useState("");
   const [renewpassword, setReNewPassword] = useState("");
   const [valicode, setValiCode] = useState("");
-  const [code, setCode] = useState("");
-
+  const [disableButton, setDisableButton] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(false);
   const domain = process.env.REACT_APP_API || "http://localhost:8080";
+  const [emailDisabled, setEmailDisabled] = useState(false);
+  const loadCountdownFromStorage = () => {
+    const savedCountdown = sessionStorage.getItem("countdown");
+    if (savedCountdown) {
+      setCountdown(parseInt(savedCountdown, 10));
+    }
+  };
+
+  const saveCountdownToStorage = (countdownValue) => {
+    sessionStorage.setItem("countdown", countdownValue.toString());
+  };
+
+  useEffect(() => {
+    loadCountdownFromStorage();
+  }, []);
+
+  useEffect(() => {
+    const mail = sessionStorage.getItem("email");
+    let intervalId;
+    if (countdown > 0) {
+      intervalId = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          saveCountdownToStorage(prevCountdown - 1);
+          return prevCountdown - 1;
+        });
+      }, 1000);
+      setEmail(mail);
+    } else {
+      setDisableButton(false);
+      clearInterval(intervalId);
+    }
+    if (countdown === 0) {
+      setEmailDisabled(false);
+      setDisableButton(false);
+    } else {
+      setEmailDisabled(true);
+      setDisableButton(true);
+    }
+    return () => clearInterval(intervalId);
+  }, [countdown]);
+
 
   const handleForgot = async () => {
     if (email === "") {
       ThongBao("Vui lòng nhập địa chỉ email của bạn!", "error");
     } else {
+      setIsLoading(true)
       axios
         .post(domain + "/api/account/forgot", { email })
         .then((response) => {
+          setIsLoading(false)
           ThongBao(response.data.message, response.data.status);
           if (response.data.status === "success") {
             const timeCookie = new Date();
@@ -32,16 +74,20 @@ function ForgotPass() {
             Cookies.set("codeForgot", response.data.data, {
               expires: timeCookie
             });
-            setCode(Cookies.get("codeForgot"));
+            setDisableButton(true);
+            setCountdown(5 * 60);
+            setEmailDisabled(true);
+            sessionStorage.setItem("email", email);
           }
+
         })
         .catch((error) => {
           console.log(error);
         });
     }
   };
-
   const handleChangePass = async () => {
+    const code = Cookies.get("codeForgot");
     if (code !== "" && Cookies.get("codeForgot") === undefined) {
       ThongBao("Mã OTP đã hết hạn!", "error");
     } else if (valicode === "" || newpassword === "" || renewpassword === "") {
@@ -105,8 +151,16 @@ function ForgotPass() {
                       className="form-control"
                       type="text"
                       id="email"
+                      value={email}
                       required=""
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (sessionStorage.getItem("email")) {
+                          sessionStorage.removeItem("email")
+                        }
+                      }
+                      }
+                      disabled={emailDisabled}
                     />
                     <small className="form-text text-muted">
                       Nhập địa chỉ email bạn đã sử dụng khi đăng ký. Sau đó,
@@ -117,8 +171,9 @@ function ForgotPass() {
                       className="btn btn-success px-4"
                       type="button"
                       onClick={handleForgot}
+                      disabled={disableButton || emailDisabled}
                     >
-                      GỬI MÃ
+                      GỬI MÃ {countdown > 0 ? `(${Math.floor(countdown / 60)}:${countdown % 60})` : ""}
                     </button>
                   </div>
                   <div className="form-group">
@@ -166,6 +221,7 @@ function ForgotPass() {
           </div>
         </div>
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </React.Fragment>
   );
 }
