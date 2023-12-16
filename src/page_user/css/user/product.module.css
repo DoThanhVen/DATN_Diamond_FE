@@ -1,0 +1,123 @@
+.container {
+    display: flex;
+    padding: 20px 40px;
+    justify-content: space-between;
+
+    .sidebar {
+        width: 280px;
+    }
+
+    .content {
+        width: calc(100% - 320px);
+
+        .listProduct {
+            margin-top: 25px;
+
+            .heading {
+                width: 100%;
+                background-color: white;
+                padding: 15px;
+                position: relative;
+
+                &::after {
+                    position: absolute;
+                    content: "";
+                    width: 100%;
+                    height: 3px;
+                    background-color: blue;
+                    bottom: 0;
+                    left: 0;
+                }
+            }
+
+            .list_product {
+                width: 100%;
+                padding: 20px 0 20px 0;
+                margin: 0 auto;
+                display: grid;
+                grid-gap: 10px;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
+
+                .item_product {
+                    position: relative;
+                    transition: all 0.3s ease-in-out;
+                    background-color: white;
+
+                    .image {
+                        width: 100%;
+                        height: 220px;
+                        object-fit: cover;
+                    }
+
+                    .status {
+                        position: absolute;
+                        left: 5px;
+                        top: 5px;
+                        color: white;
+                        font-variant: small-caps;
+                        background-color: green;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        display: grid;
+                        place-items: center;
+                    }
+
+                    .name {
+                        text-align: left;
+                        color: black;
+                        padding: 5px;
+                        font-size: 15px;
+                        max-width: 100%;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .info {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 5px 5px;
+                        align-items: end;
+
+                        .price {
+                            color: blue;
+                        }
+
+                        .amount_sell {
+                            color: grey;
+                            font-size: 13px;
+                        }
+                    }
+
+                    .show_detail {
+                        position: absolute;
+                        width: calc(100% + 2px);
+                        height: 35px;
+                        background-color: blue;
+                        display: grid;
+                        place-items: center;
+                        color: white;
+                        opacity: 0;
+                        visibility: hidden;
+                        bottom: 0;
+                        left: -1px;
+                        z-index: 9999 !important;
+                        transition: all 0.3s ease-in-out;
+                    }
+                    
+                    &:hover {
+                        border: 1px solid blue;
+                        transform: translateY(-5px);
+                        
+                        .show_detail {
+                            opacity: 1;
+                            visibility: visible;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}

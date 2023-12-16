@@ -1,0 +1,8 @@
+export const INCREASE_COUNT = 'INCREASE_COUNT';
+export const DECREASE_COUNT = 'DECREASE_COUNT';
+export const SET_SHOW_ALL_COMMENTS = 'SET_SHOW_ALL_COMMENTS';
+export const SET_PRODUCT = 'SET_PRODUCT';
+export const SET_SHOP_NAME = 'SET_SHOP_NAME';
+export const SET_SHOP_ADDRESS = 'SET_SHOP_ADDRESS';
+export const SET_CITY = 'SET_CITY';
+export const SET_COUNT = 'SET_COUNT';

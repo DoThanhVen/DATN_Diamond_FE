@@ -1,0 +1,260 @@
+html {
+    background-color: rgb(245, 245, 245);
+}
+
+.showNav {
+    font-size: 30px;
+    border-radius: 50%;
+    padding: 10px;
+    color: black;
+    background-color: white;
+    filter: drop-shadow(0 1px 2px grey);
+    position: fixed;
+    bottom: 10px;
+    left: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 1s ease-in-out;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.header {
+    height: 70px;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 0 5px lightgrey;
+    z-index: 9;
+    display: flex;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        margin-left: 20px;
+    }
+
+    .logo img {
+        width: 100px;
+    }
+
+    .logo a {
+        font-size: 20px;
+        color: black;
+        opacity: 0.8;
+    }
+
+    .others {
+        display: flex;
+        align-items: center;
+
+        .account {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 5px 5px;
+            border-radius: 40px;
+            transition: all .3s ease-in;
+            cursor: pointer;
+
+            &:hover {
+                background-color: rgba(211, 211, 211, .5);
+            }
+
+            .customerName {
+                font-size: 14px;
+            }
+
+            .image {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .label {
+                font-size: 14px;
+            }
+        }
+
+    }
+}
+
+.logout {
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+        color: #8F6D02;
+    }
+}
+
+.notifycation {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    margin: 0 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all .3s ease-in;
+
+    &:hover {
+        background-color: rgba(211, 211, 211, .5);
+    }
+
+    .i {
+        font-size: 22px;
+    }
+
+    .span {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        width: 20px;
+        height: 20px;
+        background-color: orangered;
+        color: white;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+    }
+
+    .card {
+        position: absolute;
+        width: 400px;
+        background-color: white;
+        top: 40px;
+        right: 0;
+        border-radius: 5px;
+        box-shadow: 0 0 10px lightgrey;
+
+        .cardHeader {
+            border-bottom: 1px solid lightgrey;
+            font-size: 15px;
+        }
+
+        .cardBody {
+            max-height: 300px;
+            overflow: auto;
+            padding: 0 !important;
+
+            .cardContent {
+                display: flex;
+
+                .image {
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                }
+
+                .content {
+                    width: calc(100% - 100px);
+                    margin: 0;
+                    padding: 0 !important;
+
+                    .title {
+                        padding: 0;
+                        margin-top: 10px;
+                        font-weight: 600;
+                    }
+
+                    .substance {
+                        padding: 0;
+                        font-size: 14px;
+                        color: grey;
+                    }
+
+                    .time {
+                        display: flex;
+                        padding: 0;
+                    }
+
+                    .time * {
+                        padding: 0;
+                        font-size: 14px;
+                        color: grey;
+                        padding-right: 7px;
+                    }
+                }
+            }
+        }
+
+        .cardFooter {
+            border-top: 1px solid lightgrey;
+        }
+    }
+
+    .card * {
+        padding: 10px;
+    }
+}
+
+
+.content {
+    margin-top: 70px;
+    width: calc(100% - 250px);
+    padding: 20px;
+    transition: all .5s ease-in;
+    float: right;
+}
+
+.menu {
+    margin-top: 70px;
+    width: 250px;
+    height: 100vh;
+    padding: 20px 10px;
+    background-color: white;
+    transition: all .5s ease-in;
+    float: left;
+    position: fixed;
+
+    &.active {
+        transform: translateX(0);
+        z-index: 5;
+    }
+
+    .li {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menuItem {
+        padding: 20px 15px;
+        font-size: 16px;
+        color: black;
+    }
+}
+
+/*RESPONSIVE*/
+@media screen and (max-width: 567px) {
+    .header {
+        .logo a {
+            display: none;
+        }
+
+        .logo {
+            width: auto;
+        }
+    }
+}
+
+@media screen and (max-width:754px) {
+    .showNav {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .menu {
+        transform: translateX(-100%);
+    }
+
+    .content {
+        width: 100%;
+    }
+}
