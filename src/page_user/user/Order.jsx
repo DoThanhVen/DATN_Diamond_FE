@@ -2,34 +2,41 @@ import React, { useEffect, useState } from "react";
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
+import { ThongBao } from "../../service/ThongBao";
+import { GetDataLogin } from "../../service/DataLogin";
+import { callAPI } from "../../service/API";
+import { useNavigate } from "react-router";
 function OrderList() {
-  const [orders, setOrders] = useState();
+  const [orders, setOrders] = useState([]);
   const [load, isLoad] = useState(false);
 
-  const fectAPI = () => {
-    axios
-      .get(`http://localhost:8080/api/order/find/account/${5}`)
-      .then((response) => {
-        console.log(response.data.data);
-        setOrders(response.data.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
   };
+  const fectAPI = async () => {
+    const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}`, 'GET', {}, config);
+    setOrders(response.data)
+
+  };
+
   useEffect(() => {
     fectAPI();
   }, [load]);
-  const handelRemoveOrder = (id) => {
-    axios
-      .put(`http://localhost:8080/api/order/update/${id}/account/${5}?status=8`)
-      .then((response) => {
-        console.log(response.data.message);
-        isLoad(!load);
-      })
-      .catch((error) => {
-        // console.error(error);
-      });
+
+  const handelRemoveOrder = async (id) => {
+    const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=8`, 'PUT', {}, config);
+    if(response.status === 'SUCCESS'){
+      isLoad(!load);
+      ThongBao("Huỷ thành công!", "Thông báo")
+    }else {
+      ThongBao("Lỗi","error")
+    }
   };
   const ButtonCancel = ({ id, status }) => {
     if (status == 1) {
@@ -46,11 +53,9 @@ function OrderList() {
     }
   };
   const convertDate = (date) => {
-    console.log(new Date(date));
     let fm = new Date(date).toLocaleDateString("vi-VI", { timeZone: "UTC" });
     return fm;
   };
-  console.log(orders);
   return (
     <>
       <nav>
@@ -75,12 +80,11 @@ function OrderList() {
                       </tr>
                     </thead>
                     <tbody>
-                      {orders?.content.map((item) => (
+                      {orders?.map((item) => (
                         <tr key={item.id}>
                           <td className="text-start">HD23{item.id}</td>
                           <td className="text-start">
-                            {item.address.address},{item.address.ward},
-                            {item.address.district},{item.address.city},
+                            {item?.address_order}
                           </td>
                           <td className="text-start">
                             {convertDate(item.create_date)}
@@ -100,7 +104,7 @@ function OrderList() {
                             </a>{" "}
                           </td>
                           <td>
-                            <ButtonCancel
+                            <ButtonCancel onClick
                               id={item.id}
                               status={
                                 item?.status[item.status.length - 1].status.id
@@ -123,5 +127,287 @@ function OrderList() {
     </>
   );
 }
-
 export default OrderList;
+
+// import React, { useEffect, useState } from "react";
+// import MainNavbar from "../components/Navbar";
+// import Footer from "../components/Footer";
+// import { GetDataLogin } from "../../service/DataLogin";
+// import { callAPI } from "../../service/API";
+// import { ThongBao } from "../../service/ThongBao";
+
+// function OrderList() {
+//   // const [selectedTab, setSelectedTab] = useState("chuaGiao"); // Default tab
+//   const [orders, setOrders] = useState([]);
+//   const [load, isLoad] = useState(false);
+
+
+//   const accountLogin = GetDataLogin();
+//   const accessToken = sessionStorage.getItem('accessToken')
+//   const config = {
+//     headers: {
+//       "Authorization": `Bearer ${accessToken}`
+//     }
+//   };
+//   const fectAPI = async () => {
+//     const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}`, 'GET', {}, config);
+//     setOrders(response.data)
+
+//   };
+
+//   useEffect(() => {
+//     fectAPI();
+//   }, [load]);
+
+//   const handelRemoveOrder = async (id) => {
+//     const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=6`, 'PUT', {}, config);
+//     if (response.status == 'SUCCESS') {
+//       isLoad(!load);
+//       ThongBao("Huỷ thành công!", "Thông báo")
+//     } else {
+//       ThongBao("Lỗi", "error")
+//     }
+//   };
+//   const handleTabChange = (tab) => {
+//     // setSelectedTab(tab);
+//   };
+
+//   //   const toggleDetailVisibility = (itemID) => {
+//   //     setDetailsVisibleForItem(detailsVisibleForItem === itemID ? null : itemID);
+//   //   };
+
+//   // const renderTableContent = () => {
+//   //   const data = {
+//   //     chuaGiao: [
+//   //       {
+//   //         id: "ID001",
+//   //         name: "Product 1",
+//   //         image: "https://www.bootdey.com/image/380x380/008B8B/000000",
+//   //         description: "Description for Product 1",
+//   //         store: "Store A",
+//   //         price: "$15,000",
+//   //         quantity: 2,
+//   //         status: "chưa giải quyết",
+//   //         additionalDetails: { totalPrice: "$30,000" },
+//   //       },
+//   //       {
+//   //         id: "ID007",
+//   //         name: "Product 8",
+//   //         image: "https://www.bootdey.com/image/380x380/008B8B/000000",
+//   //         description: "Description for Product 1",
+//   //         store: "Store F",
+//   //         price: "$15,000",
+//   //         quantity: 4,
+//   //         status: "chưa giải quyết",
+//   //         additionalDetails: { totalPrice: "$30,000" },
+//   //       },
+//   //     ],
+//   //     daGiao: [
+//   //       {
+//   //         id: "ID002",
+//   //         name: "Product 2",
+//   //         image: "https://www.bootdey.com/image/380x380/008B8B/000000",
+//   //         description: "Description for Product 2",
+//   //         store: "Store B",
+//   //         price: "$20,000",
+//   //         quantity: 1,
+//   //         status: "đã giao",
+//   //         additionalDetails: { totalPrice: "$20,000" },
+//   //       },
+//   //     ],
+//   //     daHuy: [
+//   //       // Data for Đã hủy tab
+//   //       {
+//   //         id: "ID003",
+//   //         name: "Product 3",
+//   //         image: "https://www.bootdey.com/image/380x380/008B8B/000000",
+//   //         description: "Description for Product 3",
+//   //         store: "Store C",
+//   //         price: "$10,000",
+//   //         quantity: 3,
+//   //         status: "đã hủy",
+//   //         additionalDetails: { totalPrice: "$30,000" },
+//   //       },
+//   //     ],
+//   //   };
+
+//   //   const handleCancelOrder = (itemID) => {
+//   //     // Implement the logic for canceling the order
+//   //     console.log(`Cancel order clicked for item ${itemID}`);
+//   //   };
+
+//   //   return (
+
+//   //   );
+//   // };
+
+//   const getStatusBadgeClass = (status) => {
+//     switch (status) {
+//       case "chưa giải quyết":
+//         return "bg-warning text-dark";
+//       case "đã giao":
+//         return "bg-success text-white";
+//       case "đã hủy":
+//         return "bg-danger text-white";
+//       default:
+//         return "";
+//     }
+//   };
+
+//   const handleBuyAgain = (itemID) => {
+//     console.log(` ${itemID}`);
+//   };
+//   console.log(orders)
+//   return (
+//     <>
+//       <nav>
+//         <MainNavbar />
+//       </nav>
+//       <div className="container mb-4">
+//         <div className="row">
+//           <div className="col-xl-12 mt-4">
+//             <div className="card">
+//               <div className="card-body">
+//                 <h5 className="header-title pb-3 mt-0">Đơn hàng của tôi</h5>
+
+//                 {/* Tab navigation */}
+//                 <ul className="nav nav-tabs">
+//                   <li className="nav-item">
+//                     <button
+//                       className={`nav-link ${'chuaGiao' === "chuaGiao" ? "active" : ""
+//                         }`}
+//                       onClick={() => handleTabChange("chuaGiao")}
+//                       style={{
+//                         backgroundColor:
+//                           "chuaGiao" === "chuaGiao" ? "red" : "",
+//                         color: "chuaGiao" === "chuaGiao" ? "white" : "",
+//                         borderRadius: 0,
+//                       }}
+//                     >
+//                       Chưa giao
+//                     </button>
+//                   </li>
+//                   <li className="nav-item">
+//                     <button
+//                       className={`nav-link ${"daGiao" === "daGiao" ? "active" : ""
+//                         }`}
+//                       onClick={() => handleTabChange("daGiao")}
+//                       style={{
+//                         backgroundColor: "daGiao" === "daGiao" ? "red" : "",
+//                         color: "daGiao" === "daGiao" ? "white" : "",
+//                         borderRadius: 0,
+//                       }}
+//                     >
+//                       Đã giao
+//                     </button>
+//                   </li>
+//                   <li className="nav-item">
+//                     <button
+//                       className={`nav-link ${"daHuy" === "daHuy" ? "active" : ""
+//                         }`}
+//                       onClick={() => handleTabChange("daHuy")}
+//                       style={{
+//                         backgroundColor: "daHuy" === "daHuy" ? "red" : "",
+//                         color: "daHuy" === "daHuy" ? "white" : "",
+//                         borderRadius: 0,
+//                       }}
+//                     >
+//                       Đã hủy
+//                     </button>
+//                   </li>
+//                 </ul>
+//                 <div className="table-responsive">
+//                   <table className="table table-hover mb-0">
+//                     <tbody>
+//                       {orders?.map((item) => (
+//                         <React.Fragment key={item.id}>
+//                           <tr>
+//                             <td className="text-start" colSpan="2">
+//                               <div>
+//                                 <img
+//                                   src={''}
+//                                   style={{ width: "80px", height: "80px" }}
+//                                   alt=""
+//                                   className="avatar-lg rounded"
+//                                 />
+//                               </div>
+//                               <div className="mt-4">
+//                                 <div className="col-lg-8 mb-4 d-flex">
+//                                   <img
+//                                     src="images/banner_style.jpg"
+//                                     className="rounded-circle shop-image"
+//                                     alt="Diamond_Fashion"
+//                                     style={{
+//                                       width: "50px",
+//                                       height: "50px",
+//                                       borderRadius: "50%",
+//                                     }}
+//                                   />
+//                                   <div className="shop-name ms-4 ">
+//                                     <b>{}</b> <br />
+//                                     <span>Địa chỉ shop</span>
+//                                   </div>
+//                                 </div>
+//                               </div>
+//                             </td>
+
+//                             <td className="text-start">
+//                               <p>Số lượng: {item.quantity}</p>
+//                               <p> Giá: {}</p>
+//                             </td>
+//                             <td className="text-start"></td>
+//                             <td className="text-start"></td>
+//                             <td className="text-start">
+//                               <span
+//                                 // className={`badge badge-boxed ${getStatusBadgeClass(
+//                                 //   item.status
+//                                 // )}`}
+//                               >
+//                                 {/* {item.status} */}
+//                               </span>
+//                             </td>
+//                             <td colSpan="2" className="text-end">
+//                               <div className="additional-details">
+//                                 <p>Tổng tiền: {item.total}</p>
+//                               </div>
+//                               <div className="button-group">
+//                                 {item.status === "chưa giải quyết" && (
+//                                   <button
+//                                     className="btn btn-danger"
+//                                     style={{ marginRight: "10px" }}
+
+//                                   >
+//                                     Hủy mua
+//                                   </button>
+//                                 )}
+//                                 {/* {["đã giao", "đã hủy"].includes(item.status) && (
+//                                   <button
+//                                     className="btn btn-success"
+//                                     style={{ marginRight: "10px" }}
+            
+//                                   >
+//                                     Mua lại
+//                                   </button>
+//                                 )} */}
+//                                 <button className="btn btn-secondary">Xem chi tiết</button>
+//                               </div>
+//                             </td>
+//                           </tr>
+//                         </React.Fragment>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div >
+//       <div id="footer">
+//         <Footer />
+//       </div>
+//     </>
+//   );
+// }
+
+// export default OrderList;

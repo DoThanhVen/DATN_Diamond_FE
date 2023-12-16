@@ -5,6 +5,8 @@ import ModelEdit from "./ModelEdit";
 import axios from "axios";
 import { GetDataLogin } from "../../service/DataLogin";
 import { Navigate, useNavigate } from "react-router";
+import { callAPI } from "../../service/API";
+import moment from "moment";
 
 const numberProductPage = 10;
 
@@ -24,23 +26,14 @@ export default function AllBill() {
     { id: "9", value: "Giao Không Thành Công" }
   ];
 
-  const [accountLogin,setAccountLogin] = useState();
+
   const navigate = useNavigate();
-  const getAccountFromSession = () => {
-    const accountLogin = GetDataLogin();
-    if (accountLogin !== null) {
-      try {
-        if (accountLogin.shop !== null) {
-          setAccountLogin(accountLogin);
-          fetchApiShop(accountLogin.shop.id);
-        } else {
-          navigate("/login");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      navigate("/login");
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+  console.log(accessToken)
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
     }
   };
 
@@ -83,52 +76,33 @@ export default function AllBill() {
   const [shop, setShop] = useState([]);
   const [status, setStatus] = useState("");
   const [keyword, setKeyword] = useState("");
-
-  const fetchApiShop = (id) => {
-    axios
-      .get(`http://localhost:8080/api/auth/find/shop/${id}`)
-      .then((response) => {
-        setShop(response.data.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+  const [listStatus, setListStatus] = useState([]);
+  const isload = false;
+  const fetchApiShop = async () => {
+    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
+    setOrder(response.data)
+    console.log(response)
+    const responseStatus = await callAPI(`/api/get/status`, 'GET')
+    if (responseStatus.status == 'SUCCESS') {
+      setListStatus(responseStatus.data)
+    }
   };
-
-  const fetchApi = () => {
-    axios
-      .get("http://localhost:8080/api/auth/getAllList")
-      .then((reponse) => {
-        setOrder(reponse.data.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
+  function formatDate(date) {
+    return moment(date).format("DD-MM-YYYY HH:mm:ss");
+  }
   useEffect(() => {
-    fetchApi();
-    getAccountFromSession();
-  }, []);
-
-  const onChangeStatus = (status, id) => {
+    fetchApiShop();
+    // getAccountFromSession();
+  }, [isload]);
+ 
+  const onChangeStatus = async (status) => {
     if (status == "") {
-      axios
-        .get(`http://localhost:8080/api/auth/find/shop/${id}`)
-        .then((reponse) => {
-          setOrder(reponse.data.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
+      setOrder(response.data)
     } else {
-      axios
-        .get(`http://localhost:8080/api/auth/order/shop/${id}/status/${status}`)
-        .then((reponse) => {
-          setOrder(reponse.data.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+
+      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}?status=${status}`, 'GET', {}, config);
+      setOrder(response.data)
     }
   };
   const handleSearch = () => {
@@ -156,6 +130,7 @@ export default function AllBill() {
         });
     }
   };
+
   // console.log(orders?.content?.status[orders?.content?.status.length -1].status.id)
   return (
     <React.Fragment>
@@ -199,74 +174,76 @@ export default function AllBill() {
           }}
           className={`${style.optionSelect}`}
         >
-          {statusBill.map((value, index) => (
+          {listStatus?.map((value, index) => (
             <option key={index} value={value.id}>
-              {value.value}
+              {value.name}
             </option>
           ))}
         </select>
       </div>
-      <div className={`${style.cardContainerTable}`}>
-        <table className={`table`}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Mã Hóa Đơn</th>
-              <th>Trạng Thái</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {shop &&
-              shop?.content?.map((value, index) => (
-                <tr key={index}>
-                  <th>{index + 1}</th>
-                  <td>{value.id}</td>
-                  <td style={{ position: "relative" }}>
-                    <span
-                      style={{
-                        backgroundColor:
-                          value.status[value.status.length - 1].status.id ===
-                          "1"
-                            ? "#34219E"
-                            : value.status[value.status.length - 1].status
+      
+        <div className={`${style.cardContainerTable}`}>
+          <table className={`table`}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Mã Hóa Đơn</th>
+                <th>Trạng Thái</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                orders?.map((value, index) => (
+                  <tr key={index}>
+                    <th>{index + 1}</th>
+                    <td>{value.id}</td>
+                    <td style={{ position: "relative" }}>
+                      <span
+                        style={{
+                          backgroundColor:
+                            value.status[value.status.length - 1].status.id ===
+                              "1"
+                              ? "#34219E"
+                              : value.status[value.status.length - 1].status
                                 .id === "2"
-                            ? "#FA9A18"
-                            : value.status[value.status.length - 1].status
-                                .id === "3"
-                            ? "#FA9A18"
-                            : value.status[value.status.length - 1].status
-                                .id === "4"
-                            ? "#FA9A18"
-                            : value.status[value.status.length - 1].status
-                                .id === "5"
-                            ? "#2ECC71"
-                            : value.status[value.status.length - 1].status
-                                .id === "6"
-                            ? "#2ECC71"
-                            : value.status[value.status.length - 1].status
-                                .id === "7"
-                            ? "orange"
-                            : value.status[value.status.length - 1].status
-                                .id === "8"
-                            ? "red"
-                            : "#E74C3C",
-                        width: "150px",
-                        height: "80%",
-                        left: "50%",
-                        top: "50%",
-                        transform: "translate(-50%,-50%)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderRadius: "20px",
-                        color: "white",
-                        position: "absolute",
-                        fontSize: "14px"
-                      }}
-                      value={`${value.status}`}
-                    >
-                      {value.status[value.status.length - 1].status.id === "1"
+                                ? "#FA9A18"
+                                : value.status[value.status.length - 1].status
+                                  .id === "3"
+                                  ? "#FA9A18"
+                                  : value.status[value.status.length - 1].status
+                                    .id === "4"
+                                    ? "#FA9A18"
+                                    : value.status[value.status.length - 1].status
+                                      .id === "5"
+                                      ? "#2ECC71"
+                                      : value.status[value.status.length - 1].status
+                                        .id === "6"
+                                        ? "#2ECC71"
+                                        : value.status[value.status.length - 1].status
+                                          .id === "7"
+                                          ? "orange"
+                                          : value.status[value.status.length - 1].status
+                                            .id === "8"
+                                            ? "red"
+                                            : "#E74C3C",
+                          width: "150px",
+                          height: "80%",
+                          left: "50%",
+                          top: "50%",
+                          transform: "translate(-50%,-50%)",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderRadius: "20px",
+                          color: "white",
+                          position: "absolute",
+                          fontSize: "14px"
+                        }}
+                        value={`${value.status}`}
+                      >
+                        {value?.status[value.status.length - 1]?.status.name}
+                        {/* {value.status[value.status.length - 1].status.id === "1"
                         ? "Chờ Xác Nhận"
                         : value.status[value.status.length - 1].status.id ===
                           "2"
@@ -289,22 +266,22 @@ export default function AllBill() {
                         : value.status[value.status.length - 1].status.id ===
                           "8"
                         ? "Đã Hủy"
-                        : "Giao Thất Bại"}
-                    </span>
-                  </td>
-                  <td
-                    onClick={() => {
-                      handleClickChiTiet(value);
-                    }}
-                  >
-                    Xem Chi Tiết
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} />}
+                        : "Giao Thất Bại"} */}
+                      </span>
+                    </td>
+                    <td
+                      onClick={() => {
+                        handleClickChiTiet(value);
+                      }}
+                    >
+                      Xem Chi Tiết
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} listStatus={listStatus} isLoad={isload} />}
     </React.Fragment>
   );
 }

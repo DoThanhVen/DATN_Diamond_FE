@@ -278,7 +278,7 @@ const MainNavbar = () => {
                             </a>
                             <a className="cart-img" href="#">
                               <img
-                                src="https://via.placeholder.com/70x70"
+                                src={item.product.image_product[0].url}
                                 alt="#"
                               />
                             </a>

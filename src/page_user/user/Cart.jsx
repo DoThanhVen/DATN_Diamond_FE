@@ -63,7 +63,7 @@ function Cart() {
                   <div key={item.product.id} className="card-body">
                     <div className="col-lg-8 mb-4 d-flex">
                       <img
-                        src="images/banner_style.jpg"
+                        src={item?.product?.shop?.image}
                         className="rounded-circle shop-image"
                         alt="Diamond_Fashion"
                         style={{
@@ -87,7 +87,7 @@ function Cart() {
                     <div className="d-flex align-items-start border-bottom pb-3">
                       <div className="me-4">
                         <img
-                          src={`http://localhost:8080/api/uploadImageProduct/${item.product.image_product[0].url}`}
+                          src={item.product.image_product[0].url}
                           style={{ width: "80px", height: "80px" }}
                           alt=""
                           className="avatar-lg rounded"

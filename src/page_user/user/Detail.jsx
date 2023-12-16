@@ -310,7 +310,33 @@ function ProductPage() {
     );
     ThongBao("Thêm thành công", "success")
   };
+  const handleBuy = async () => {
+    let newProduct = null
+    let shop;
+    const response = await callAPI(`/api/shop/findByProduct/${product.id}`, 'GET')
+    if (response.status == 'SUCCESS') {
+      shop = response.data;
+    }
+    else {
+      return;
+    }
 
+    newProduct = {
+      ...product,
+      shop: shop
+    }
+    if (newProduct == null) {
+      alert('Đang có lỗi vui lòng thử lại sau')
+      return;
+    }
+    dispatchs(
+      cartSilce.actions.addToCart({
+        product: newProduct,
+        quantity: quantity
+      })
+    );
+    navigate('/checkOut')
+  }
   return (
     <>
       <nav>
@@ -425,10 +451,12 @@ function ProductPage() {
                     </div>
                   </div>
                   <div className={style.groupButton}>
-                    <a href="#" className={style.buttonBuy}>
+                    <button onClick={()=> {
+                      handleBuy()
+                    }} className={style.buttonBuy}>
                       <i className="bi bi-bag-plus mx-2"></i>
                       <strong>Mua ngay</strong>
-                    </a>
+                    </button>
                     <button onClick={handleAddCart} className={style.buttonAdd}>
                       <i className="bi bi-basket3-fill"></i>
                       <strong> Thêm vào giỏ hàng</strong>

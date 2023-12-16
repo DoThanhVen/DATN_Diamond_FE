@@ -39,7 +39,7 @@ function App() {
         <Route path='/category/:id' element={<Product />} exact />
         <Route path='/product/:productId' element={<Detail />} exact />
         <Route path='/newProducts' element={<NewProducts />} />
-        <Route path='/orderDetail' element={<OrderDetail />} />
+        <Route path='/orderDetail/:id' element={<OrderDetail />} />
         <Route path='/checkout' element={<Checkout />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/order' element={<Order />} />

@@ -5,19 +5,23 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { useEffect } from 'react';
+import { GetDataLogin } from '../../service/DataLogin';
+import { callAPI } from '../../service/API';
 function OrderReceipt() {
   const { id } = useParams();
   const [order, setOrder] = useState();
-  const fectAPI = () => {
-    axios
-      .get(`http://localhost:8080/api/order/find/${id}`)
-      .then((response) => {
-        console.log(response.data.data)
-        setOrder(response.data.data)
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  };
+  const fectAPI = async () => {
+    const response = await callAPI(`/api/auth/order/find/${id}`, 'GET', {}, config);
+    setOrder(response.data)
   }
   useEffect(() => {
     fectAPI();
@@ -63,12 +67,12 @@ function OrderReceipt() {
                   </div>
                   <table className="table table-borderless">
                     <tbody>
-                      {order?.orderDetails.map((item, index) => (
+                      {order?.orderDetails?.map((item, index) => (
                         <tr key={index}>
                           <td>
                             <div className="d-flex mb-2">
                               <div className="flex-shrink-0">
-                                <img src={`http://localhost:8080/api/uploadImageProduct/${item?.productOrder?.image_product[0].url}`} style={{ width: '80px', height: '80px' }} alt="" width="35" className="img-fluid" />
+                                <img src={item?.productOrder?.image_product[0].url} style={{ width: '80px', height: '80px' }} alt="" width="35" className="img-fluid" />
                               </div>
                               <div className="flex-lg-grow-1 ms-3">
                                 <h6 className="small mb-0 text-start">{item.productOrder.product_name}</h6>
@@ -111,10 +115,12 @@ function OrderReceipt() {
                     <div className="col-lg-6">
                       <h3 className="h6">Địa chỉ thanh toán</h3>
                       <address>
-                        <strong>{order?.address.name}</strong><br />
+                        {
+                        order?.address_order
+                        /* <strong>{order?.address.name}</strong><br />
                         {order?.address.address}, {order?.address.ward}, {order?.address.district},<br />
-                        {order?.address.city}<br />
-                        <abbr title="Phone">P:</abbr> {order?.address.phone}
+                        {order?.address.city}<br /> */}
+                        {/* <abbr title="Phone">P:</abbr> {order?.address.phone} */}
                       </address>
                     </div>
                   </div>
@@ -138,10 +144,12 @@ function OrderReceipt() {
                   <hr />
                   <h3 className="h6">Địa chỉ</h3>
                   <address>
-                    <strong>{order?.address.name}</strong><br />
+                    {/* <strong>{order?.address.name}</strong><br />
                     {order?.address.address}, {order?.address.ward}, {order?.address.district},<br />
                     {order?.address.city}<br />
-                    <abbr title="Phone">P:</abbr> {order?.address.phone}
+                    <abbr title="Phone">P:</abbr> {order?.address.phone} */
+                    order?.address_order
+                    }
 
                   </address>
                 </div>

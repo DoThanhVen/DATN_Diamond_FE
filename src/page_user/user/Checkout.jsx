@@ -11,10 +11,10 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
 import { callAPI } from "../../service/API";
-
+import {ThongBao} from '../../service/ThongBao'
 const CheckoutForm = () => {
   // const [user, setUser] = useState();
-  const [addressDefault, setAddressDefault] = useState();
+  const [addressDefault, setAddressDefault] = useState(null);
   const cart = useSelector(cartSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const CheckoutForm = () => {
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
-    const accessToken=sessionStorage.getItem('accessToken')
+    const accessToken = sessionStorage.getItem('accessToken')
     settoken(accessToken)
     if (accountLogin !== undefined) {
       try {
@@ -44,16 +44,11 @@ const CheckoutForm = () => {
   }, []);
 
   const findAccount = async (id) => {
-    axios
-      .get(`http://localhost:8080/api/account/${id}/address`)
-      .then((response) => {
-        setAddressDefault(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error loading shop data:", error);
-      });
+    const response = await callAPI(`/api/account/${id}/address`,'GET')
+    setAddressDefault(response.data)
+    
   }
-
+  console.log(addressDefault)
   let orderDetails = [];
   let amount = 0;
   cart.map((item) => {
@@ -63,8 +58,13 @@ const CheckoutForm = () => {
       quantity: item.quantity,
     });
   });
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    // if(addressDefault.phone == null) {
+    //   ThongBao('Bạn cần thêm số điện thoại nhận hàng!')
+    //   navigate('/profile')
+    //   return;
+    // }
     let order = {
       // accountOrder: user,
       orderDetails: orderDetails,
@@ -76,13 +76,12 @@ const CheckoutForm = () => {
         "Authorization": `Bearer ${token}`
       }
     };
-     const response= await callAPI(`/api/auth/order/create/account/${accountLogin.id}`,'POST', order,config);
-     console.log(response)
-        if (response.status === "SUCCESS") {
-          dispatch(cartSilce.actions.removeAll());
-          alert("Đặt hàng thành công");
-          navigation("/order");
-        }
+    const response = await callAPI(`/api/auth/order/create/account/${accountLogin.id}`, 'POST', order, config);
+    if (response.status === "SUCCESS") {
+      dispatch(cartSilce.actions.removeAll());
+      ThongBao("Đặt hàng thành công",'success')
+      navigation("/order");
+    }
 
   };
   return (
@@ -97,128 +96,7 @@ const CheckoutForm = () => {
               <div className="card">
                 <div className="card-body">
                   <ol className="activity-checkout mb-0 px-4 mt-3">
-                    {/* <li className="checkout-item">
-                      <div className="avatar checkout-icon p-1">
-                        <div className="avatar-title rounded-circle bg-primary">
-                          <i className="bx bxs-receipt text-white font-size-20"></i>
-                        </div>
-                      </div>
-                      <div className="feed-item-list">
-                        <div>
-                          <h5 className="font-size-16 mb-1">
-                            Thông tin thanh toán
-                          </h5>
-                          <p className="text-muted text-truncate mb-4">
-                            Vui lòng điền đầy đủ tất cả thông tin bên dưới
-                          </p>
-                          <div className="mb-3">
-                            <div>
-                              <div className="row">
-                                <div className="col-lg-4">
-                                  <div className="mb-3">
-                                    <label
-                                      className="form-label"
-                                      htmlFor="billing-name"
-                                    >
-                                      Tên
-                                    </label>
-                                    <input
-                                      type="text"
-
-                                      className="form-control"
-                                      id="billing-name"
-                                      placeholder="Vui lòng nhập tên"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="mb-3">
-                                    <label
-                                      className="form-label"
-                                      htmlFor="billing-email-address"
-                                    >
-                                      Địa chỉ email
-                                    </label>
-                                    <input
-
-                                      type="email"
-                                      className="form-control"
-                                      id="billing-email-address"
-                                      placeholder="Vui lòng nhập email"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-lg-4">
-                                  <div className="mb-3">
-                                    <label
-                                      className="form-label"
-                                      htmlFor="billing-phone"
-                                    >
-                                      Số điện thoại
-                                    </label>
-                                    <input
-
-                                      type="text"
-                                      className="form-control"
-                                      id="billing-phone"
-                                      placeholder="Vui lòng nhập số điện thoại"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="mb-3">
-                                <label
-                                  className="form-label"
-                                  htmlFor="billing-address"
-                                >
-                                  Địa chỉ
-                                </label>
-                                <textarea
-                                  className="form-control"
-                                  id="billing-address"
-                                  rows="3"
-                                  placeholder="Vui lòng nhập đầy đủ địa chỉ"
-                                ></textarea>
-                              </div>
-
-                               <div className="row">
-                                  <div className="col-lg-4">
-                                    <div className="mb-4 mb-lg-0">
-                                      <label className="form-label">Country</label>
-                                      <select className="form-control form-select" title="Country">
-                                        <option value="0">Select Country</option>
-                                        <option value="AF">Afghanistan</option>
-                                        <option value="AL">Albania</option>
-                                        <option value="DZ">Algeria</option>
-                                        <option value="AS">American Samoa</option>
-                                        <option value="AD">Andorra</option>
-                                        <option value="AO">Angola</option>
-                                        <option value="AI">Anguilla</option>
-                                      </select>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-lg-4">
-                                    <div className="mb-4 mb-lg-0">
-                                      <label className="form-label" htmlFor="billing-city">City</label>
-                                      <input type="text" className="form-control" id="billing-city" placeholder="Enter City" />
-                                    </div>
-                                  </div>
-
-                                  <div className="col-lg-4">
-                                    <div className="mb-0">
-                                      <label className="form-label" htmlFor="zip-code">Zip / Postal code</label>
-                                      <input type="text" className="form-control" id="zip-code" placeholder="Enter Postal code" />
-                                    </div>
-                                  </div>
-                                </div> 
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-                    </li>*/}
+                  
                     <li className="checkout-item">
                       <div className="avatar checkout-icon p-1">
                         <div className="avatar-title rounded-circle bg-primary">
@@ -237,6 +115,8 @@ const CheckoutForm = () => {
                             <div className="row">
                               <div className="col-lg-4 col-sm-6">
                                 <div>
+
+
                                   <label className="card-radio-label mb-0">
                                     <input
                                       type="radio"
@@ -244,24 +124,33 @@ const CheckoutForm = () => {
                                       id="info-address2"
                                       className="card-radio-input"
                                     />
-                                    <div className="card-radio text-truncate p-3">
-                                      <span className="fs-14 mb-4 d-block">
-                                        Địa chỉ
-                                      </span>
-                                      <span className="fs-14 mb-2 d-block">
-                                        {addressDefault?.name}
-                                      </span>
-                                      <span className="text-muted fw-normal text-wrap mb-1 d-block">
-                                        {addressDefault?.address} ,{" "}
-                                        {addressDefault?.ward} ,{" "}
-                                        {addressDefault?.district} ,
-                                        {addressDefault?.city}
-                                      </span>
-                                      <span className="text-muted fw-normal d-block">
-                                        {addressDefault?.phone}
-                                      </span>
-                                    </div>
+                                    {addressDefault == null ?
+                                      <div className=" p-3">
+                                        <span>
+                                          Bạn chưa có địa chỉ giao hàng, vui lòng thêm địa chỉ giao hàng!
+                                        </span>
+                                      </div>
+                                      :
+                                      <div className="card-radio text-truncate p-3">
+                                        <span className="fs-14 mb-4 d-block">
+                                          Địa chỉ
+                                        </span>
+                                        <span className="fs-14 mb-2 d-block">
+                                          {addressDefault?.name}
+                                        </span>
+                                        <span className="text-muted fw-normal text-wrap mb-1 d-block">
+                                          {addressDefault?.address} ,{" "}
+                                          {addressDefault?.ward} ,{" "}
+                                          {addressDefault?.district} ,
+                                          {addressDefault?.city}
+                                        </span>
+                                        <span className="text-muted fw-normal d-block">
+                                          {addressDefault?.phone}
+                                        </span>
+                                      </div>
+                                    }
                                   </label>
+
                                   <div className="edit-btn bg-light  rounded">
                                     <a
                                       href="#"
@@ -274,6 +163,8 @@ const CheckoutForm = () => {
                                     </a>
                                   </div>
                                 </div>
+
+
                               </div>
                             </div>
                           </div>
@@ -308,7 +199,19 @@ const CheckoutForm = () => {
                                   />
                                   <span className="card-radio py-3 text-center text-truncate">
                                     <i className="bx bx-money d-block h2 mb-3"></i>
-                                    Cash on Delivery
+                                    Thanh toán khi nhận hàng
+                                  </span>
+                                </label>
+                                <label className="card-radio-label">
+                                  <input
+                                    type="radio"
+                                    name="pay-method"
+                                    id="pay-methodoption2"
+                                    className="card-radio-input"
+                                  />
+                                  <span className="card-radio py-3 text-center text-truncate">
+                                    <i className="bx bx-money d-block h2 mb-3"></i>
+                                    Thanh toán qua VN Pay
                                   </span>
                                 </label>
                               </div>
@@ -376,7 +279,7 @@ const CheckoutForm = () => {
                         <tr>
                           <th scope="row">
                             <img
-                              src={`http://localhost:8080/api/uploadImageProduct/${item.product.image_product[0].url}`}
+                              src={item.product.image_product[0].url}
                               style={{ width: "80px", height: "80px" }}
                               alt="product-img"
                               title="product-img"
@@ -403,33 +306,6 @@ const CheckoutForm = () => {
                           <td>$ {item.product.price * item.quantity}</td>
                         </tr>
                       ))}
-
-                      {/* <tr>
-                        <th scope="row">
-                          <img
-                            src="images/best-saler-1.jpg"
-                            style={{ width: "80px", height: "80px" }}
-                            alt="product-img"
-                            title="product-img"
-                            className="avatar-lg rounded"
-                          />
-                        </th>
-                        <td>
-                          <h5 className="font-size-16 text-truncate">
-                            <a href="#" className="text-dark">
-                              Smartphone Dual Camera
-                            </a>
-                          </h5>
-                          <p className="text-muted mb-0">
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                          </p>
-                          <p className="text-muted mb-0 mt-1">$ 260 x 1</p>
-                        </td>
-                        <td>$ 260</td>
-                      </tr> */}
 
                       <tr>
                         <td colSpan="2">

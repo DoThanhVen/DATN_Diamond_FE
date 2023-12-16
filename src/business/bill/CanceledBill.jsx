@@ -3,13 +3,22 @@ import style from "../../css/business/bill.module.css";
 import Nav from "react-bootstrap/Nav";
 import ModelEdit from "./ModelEdit";
 import axios from "axios";
+import { GetDataLogin } from "../../service/DataLogin";
+import { callAPI } from "../../service/API";
 
 const numberProductPage = 10;
 
 export default function CanceledBill() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState({});
-
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+  console.log(accessToken)
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  };
   function handleClickChiTiet(order) {
     // const tdElement = event.currentTarget.parentElement;
 
@@ -44,18 +53,17 @@ export default function CanceledBill() {
 
   const [orders, setOrders] = useState([]);
   const [KeyWord, setKeyWord] = useState('');
+  const [listStatus, setListStatus] = useState([]);
+  const isload = false;
+  const fetchApi = async () => {
+    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}?status=6`, 'GET', {}, config);
+    setOrders(response.data)
+    const responseStatus = await callAPI(`/api/get/status`, 'GET')
+    if (responseStatus.status == 'SUCCESS') {
+      setListStatus(responseStatus.data)
+    }
 
-  const fetchApi = () => {
-    axios.get(`http://localhost:8080/api/order/findByStatus/8`)
-      .then((reponse) => {
-        if (reponse.data.status == 'SUCCESS') {
-          setOrders(reponse.data.data)
-        }
-      })
-      .catch((e) => {
-        console.log(e)
-      })
-  }
+  };
   useEffect(() => {
     fetchApi()
   }, [])
@@ -122,7 +130,8 @@ export default function CanceledBill() {
           </tbody>
         </table>
       </div>
-      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} />}
+      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} listStatus={listStatus} isLoad={isload} />}
+
     </React.Fragment>
   );
 }

@@ -3,11 +3,21 @@ import style from "../../css/business/bill.module.css";
 import Nav from "react-bootstrap/Nav";
 import ModelEdit from "./ModelEdit";
 import axios from "axios";
+import { callAPI } from "../../service/API";
+import { GetDataLogin } from "../../service/DataLogin";
 
 const numberProductPage = 10;
 export default function UnpaidBill() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState({});
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+  console.log(accessToken)
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  };
 
   function handleClickChiTiet(order) {
     // const tdElement = event.currentTarget.parentElement;
@@ -43,17 +53,15 @@ export default function UnpaidBill() {
 
   const [orders, setOrders] = useState([]);
   const [load, isLoad] = useState(false);
-  const fetchApi = () => {
-    axios
-      .get(`http://localhost:8080/api/order/findByStatus/1`)
-      .then(reponse => {
-        if (reponse.data.status == "SUCCESS") {
-          setOrders(reponse.data.data);
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
+  const [listStatus, setListStatus] = useState([]);
+  const isload = false;
+  const fetchApi = async () => {
+    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}?status=1`, 'GET', {}, config);
+    setOrders(response.data)
+    const responseStatus = await callAPI(`/api/get/status`, 'GET')
+    if (responseStatus.status == 'SUCCESS') {
+      setListStatus(responseStatus.data)
+    }
   };
   useEffect(
     () => {
@@ -62,18 +70,12 @@ export default function UnpaidBill() {
     [load]
   );
   console.log(orders);
-  const handleOrder = id => {
-    axios
-      .put(`http://localhost:8080/api/order/update/${id}/account/${5}?status=2`)
-      .then(reponse => {
-        if (reponse.data.status == "SUCCESS") {
-          alert("xác nhận đơn thành công");
-          isLoad(!load);
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
+  const handleOrder = async (id) => {
+    const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${2}`, 'PUT', {}, config);
+    if (response.status == 'SUCCESS') {
+      isLoad = true;
+      alert("success")
+    }
   };
   return (
     <React.Fragment>
@@ -149,7 +151,8 @@ export default function UnpaidBill() {
           </tbody>
         </table>
       </div>
-      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} />}
+      {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} listStatus={listStatus} isLoad={isload} />}
+
     </React.Fragment>
   );
 }
