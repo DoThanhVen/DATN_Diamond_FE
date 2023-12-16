@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/user/responsive.css";
@@ -12,6 +12,8 @@ import NewProducts from "./NewProducts";
 import SidebarM from "./SuggestedProducts";
 import RecommendedProducts from "./RecommendedProducts";
 import style from "../css/user/home.module.css";
+import ChatApp from "../../chatApp/chatApp";
+import { GetDataLogin } from "../../service/DataLogin";
 
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
@@ -36,6 +38,9 @@ function SamplePrevArrow(props) {
 }
 
 function Home() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [isShowChat, setIsShowChat] = useState(false)
+  const [showIconMess, setShowIconMess] = useState(true)
   const settings = {
     dots: true,
     infinite: true,
@@ -45,6 +50,15 @@ function Home() {
     prevArrow: <SamplePrevArrow />
   };
 
+  useEffect(() => {
+    getDataLogin()
+  }, [])
+  const getDataLogin = () => {
+    const accountLogin = GetDataLogin();
+    if (accountLogin) {
+      setIsLogin(true)
+    }
+  }
   return (
     <>
       <nav>
@@ -53,7 +67,7 @@ function Home() {
       <div style={{ backgroundColor: "#f5f5fa" }}>
         <div className="p-4">
           <div className={style.container}>
-              <SidebarM />
+            <SidebarM />
             <div className={style.content}>
               <div
                 className="container bg-white"
@@ -192,6 +206,15 @@ function Home() {
       <div id="footer">
         <Footer />
       </div>
+      {isLogin && showIconMess ? (
+        <i className={`bi bi-chat-dots-fill ${isShowChat}`} onClick={() => { setIsShowChat(!isShowChat); setShowIconMess(false) }}></i>
+      ) : null}
+      {isLogin && isShowChat ? (
+        <div id="chat">
+          <i class="bi bi-x-lg" onClick={() => { setIsShowChat(false); setShowIconMess(true) }} style={{ fontSize: '30px', color: 'blue' }}></i>
+          <ChatApp shop={null} />
+        </div>
+      ) : null}
     </>
   );
 }

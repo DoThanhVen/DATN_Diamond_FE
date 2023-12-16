@@ -12,7 +12,7 @@ import './App.css'
 import { ThongBao } from '../service/ThongBao';
 var stompClient = null;
 
-const ChatApp = () => {
+const ChatApp = (shopName) => {
   const [privateChats, setPrivateChats] = useState(new Map());
   const [tab, setTab] = useState('CHATROOM');
   const [historySender, setHistorySender] = useState([]);
@@ -50,9 +50,8 @@ const ChatApp = () => {
   const getData = async () => {
     try {
       const accountData = getAccountFromCookie();
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('ShopName')) {
-        const res = await callAPI(`/api/account/findaccountbyshopname/${params.get('ShopName')}`, 'GET');
+      if (shopName.shop!==null) {
+        const res = await callAPI(`/api/account/findaccountbyshopname/${shopName.shop}`, 'GET');
         if (accountData) {
           setUserData({
             ...userData,
@@ -210,7 +209,7 @@ const ChatApp = () => {
   };
 
   const sendPrivateValue = () => {
-    if (stompClient) {
+    if (stompClient && userData.message !== null || file !== null) {
       var chatMessage = {
         sender: userData.username,
         receiver: selectedRecipient,
@@ -294,17 +293,11 @@ const ChatApp = () => {
   }
 
   return (
-    <div className="container">
-      <nav>
-        <MainNavbar />
-      </nav>
+    <React.Fragment>
       {userData.connected ? (
         <div className="chat-box">
           <div className="member-list">
             <ul>
-              <li onClick={() => setTab('CHATROOM')} className={`member ${tab === 'CHATROOM' && 'active'}`} style={{ fontSize: '27px' }}>
-                {userData.username}
-              </li>
               {historySender && historySender.map((name, index) => (
                 name.receiver && name.receiver.username !== receiverData[0] && name.receiver.username !== userData.username && (
                   <li
@@ -343,28 +336,25 @@ const ChatApp = () => {
           {selectedRecipient ? (
             <div className="chat-content">
               <ScrollableFeed>
-                <ul className="chat-messages" style={{ overflowY: 'scroll', maxHeight: '400px' }}>
+                <label className={`user-chat`}>
+                  {selectedRecipient}
+                </label>
+                <ul className="chat-messages">
                   {listMess.map((chat, index) => (
                     <li
                       className={`message`}
                       key={index}
-                      style={{
-                        backgroundColor:
-                          chat.sender.username === userData.username ? '#c3e6cb' : '#bee5eb'
-                      }}
                       onClick={() => setShowTime(!showTime)}
                     >
                       {chat.sender.username === userData.username ? (
-                        <div className="message-data" >
-                          <span className="username">Bạn: </span>
-                          {chat.message}
-                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
+                        <div className="message-data user-sender" >
+                          <label className={`time`}>{formatDate(chat.time)}</label>
+                          <label className={`message`}> {chat.message}</label>
                         </div>
                       ) : chat.sender.username === selectedRecipient ? (
-                        <div className="message-data" >
-                          <span className="username">{chat.sender.username}: </span>
-                          {chat.message}
-                          {showTime && <span className="message-time">{formatDate(chat.time)}</span>}
+                        <div className="message-data user-receiver" >
+                          <label className={`time`}>{formatDate(chat.time)}</label>
+                          <label className={`message`}> {chat.message}</label>
                         </div>
                       ) : chat.receiver.username === userData.username ? (
                         <div className="message-data" >
@@ -381,12 +371,8 @@ const ChatApp = () => {
                       ) : null}
 
                       {chat.image && (
-                        <div>
-                          <img src={chat.image} alt="Sent File" style={{
-                            width: '150px',
-                            height: '150px',
-                            objectFit: 'contain'
-                          }} />
+                        <div className={`image`}>
+                          <img src={chat.image} alt="Sent File" />
                         </div>
                       )}
                     </li>
@@ -403,18 +389,8 @@ const ChatApp = () => {
 
 
               <div className="send-message">
-                <input
-                  type="text"
-                  className="input-message"
-                  placeholder="enter the message"
-                  value={userData.message}
-                  onChange={handleMessage}
-                />
-                <button type="button" className="send-button" onClick={sendPrivateValue}>
-                  send
-                </button>
                 <label className="file-input-label" htmlFor="file-input">
-                  <i className="fa-solid fa-image" style={{ padding: '10px', fontSize: '30px' }}></i>
+                  <i className="fa-solid fa-image"></i>
                   <input
                     type="file"
                     id="file-input"
@@ -423,6 +399,14 @@ const ChatApp = () => {
                     style={{ display: 'none' }}
                   />
                 </label>
+                <input
+                  type="text"
+                  className="input-message"
+                  placeholder="Aa"
+                  value={userData.message}
+                  onChange={handleMessage}
+                />
+                <i className="bi bi-send-fill" onClick={sendPrivateValue}></i>
               </div>
 
             </div>
@@ -445,10 +429,7 @@ const ChatApp = () => {
           </button>
         </div>
       )}
-      <div id="footer">
-        <Footer />
-      </div>
-    </div>
+    </React.Fragment>
   );
 };
 

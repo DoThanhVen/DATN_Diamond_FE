@@ -18,8 +18,7 @@ function Navbar() {
     const accountLogin = GetDataLogin();
 
     if (accountLogin !== null) {
-      console.log(accountLogin)
-      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Bussiness');
+      const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Bussiness'||role.authority === 'ROLE_Admin');
       const isStatus = accountLogin.shop.status===1;
       if (isAdmin) {
         if (isStatus) {
@@ -51,9 +50,6 @@ function Navbar() {
   const isActiveProduct = location.pathname === "/business/product";
   const isActiveStorge = location.pathname === "/business/storge";
   const isActiveEditShop = location.pathname === "/business/shop";
-  //SHOW THÔNG BÁO
-  const [activeNotifycation, setNotifycation] = useState(false);
-  //SHOW MENU
   const [activeMenu, setActiveMenu] = useState(false);
 
   //DANH SÁCH MENU

@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import LazyLoad from "react-lazy-load";
 import { GetDataLogin } from "../../service/DataLogin";
+import ChatApp from "../../chatApp/chatApp";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -74,11 +75,13 @@ function Shop() {
   const navigate = useNavigate();
   const [accountLogin, setAccountLogin] = useState(null);
   const [token, settoken] = useState(null);
-
+  const [isLogin, setIsLogin] = useState(false);
+  const [isShowChat, setIsShowChat] = useState(false)
+  const [shopName, setShopName] = useState('')
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
     const tokenac = sessionStorage.getItem('accessToken');
-    console.log(accountLogin)
+    setIsLogin(true);
     settoken(tokenac)
     if (accountLogin !== null) {
       try {
@@ -243,7 +246,8 @@ function Shop() {
                             cursor: "pointer"
                           }}
                           onClick={() => {
-                            navigate(`/chatPage?ShopName=${shopData[1]}`);
+                            setShopName(shopData[1])
+                            setIsShowChat(true);
                           }}
                         ></i>
                       </li>
@@ -410,6 +414,12 @@ function Shop() {
           </div>
         </div>
       </div>
+      {isLogin && isShowChat ? (
+        <div id="chat">
+          <i class="bi bi-x-lg" onClick={()=>setIsShowChat(false)} style={{fontSize:'30px',color:'red'}}></i>
+          <ChatApp shop={shopName}/>
+        </div>
+      ) : null}
       <div id="footer">
         <Footer />
       </div>

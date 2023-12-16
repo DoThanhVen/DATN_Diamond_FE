@@ -223,14 +223,6 @@ const MainNavbar = () => {
                         >
                           Danh sách yêu thích
                         </Nav.Link>
-                        {accountLogin ? (
-                          <Nav.Link
-                            href="/chatPage"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Tin nhắn
-                          </Nav.Link>
-                        ) : (null)}
                         <Nav.Link href="/policy" style={{ fontSize: "14px" }}>
                           Chính sách
                         </Nav.Link>

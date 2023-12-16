@@ -73,6 +73,7 @@ function HistoryAdd() {
           <label className={style.column}>Tên SP</label>
           <label className={style.column}>Loại SP</label>
           <label className={style.column}>Số lượng</label>
+          <label className={style.column}>Loại thực hiện</label>
           <label className={style.column}>Ngày thực hiện</label>
         </div>
         {listProducts.map((product, index) => (
@@ -103,6 +104,9 @@ function HistoryAdd() {
             </>
             <label className={style.column}>
               {product.storageItem.quantity || ""}
+            </label>
+            <label className={style.column}>
+              {product.storageItem.type==='cong' ? 'Nhập' : 'Xuất'}
             </label>
             <label className={style.column}>
               {formatDate(product.storageItem.create_date) || ""}

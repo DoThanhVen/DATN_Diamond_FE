@@ -5,6 +5,26 @@
   font-family: "Roboto", serif;
 }
 
+.bi-chat-dots-fill {
+  position: fixed;
+  border: 1px solid blue;
+  color: blue;
+  cursor: pointer;
+  right: 20px;
+  bottom: 20px;
+  width: 60px;
+  height: 60px;
+  font-size: 40px;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: all .5s ease-in-out;
+}
+
+.bi-chat-dots-fill.true {
+  bottom: 470px;
+}
 
 section {
   width: 85%;
@@ -1262,4 +1282,11 @@ section .content {
   .tall {
     grid-row: span 2;
   }
+}
+
+#chat {
+  z-index: 9;
+  position: fixed;
+  bottom: 0;
+  right: 0;
 }
