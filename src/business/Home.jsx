@@ -6,6 +6,9 @@ import Loading from "../admin/Loading";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../service/DataLogin";
+import { CChart } from "@coreui/react-chartjs";
+import { Bar } from "react-chartjs-2";
+import "../css/business/home.css";
 
 const numberPage = 10;
 //CHUYỂN ĐỔI TIỀN TỆ
@@ -20,6 +23,19 @@ function formatCurrency(price, promotion) {
 
 function Home() {
   const navigate = useNavigate();
+  const [bandProduct, setBandProduct] = useState(0);
+  const [stockingProduct, setStockingProduct] = useState(0);
+  const [listTotal, setListTotal] = useState([]);
+  const [listStatistical, setListStatistical] = useState([]);
+  const [year, setYear] = useState('');
+  const [month, setMonth] = useState('');
+  const [day, setDay] = useState('');
+
+  const moment = require('moment-timezone');
+
+  const currentDate = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD');
+  const [selectedDate, setSelectedDate] = useState(currentDate);
+
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
@@ -33,9 +49,10 @@ function Home() {
       navigate("/login");
     }
   };
+
   useEffect(() => {
     getAccountFromSession();
-  }, []);
+  }, [day, month, year]);
   //LOADING
   const [loading, setLoading] = useState(true);
   //STATUS BILL
@@ -53,34 +70,35 @@ function Home() {
     { id: "9", value: "Giao Không Thành Công" }
   ];
 
-  const handleChangeStatusBill = status => {
+  const handleChangeStatusBill = (status) => {
     setValueBillOption(status);
   };
 
-  const [bandProduct, setBandProduct] = useState(0);
-  const [stockingProduct, setStockingProduct] = useState(0);
-  const [listTotal, setListTotal] = useState([]);
-
-  const getAllBill = async idShop => {
-    await callAPI(`/api/business/thongke/${idShop}`, "GET")
-      .then(response => {
+  const getAllBill = async (idShop) => {
+    await callAPI(
+      `/api/business/thongke/${idShop}?year=${year}&month=${month}&day=${day}`,
+      "GET"
+    )
+      .then((response) => {
         if (response) {
           setListTotal(response.data[0]);
           setBandProduct(response.data[1]);
           setStockingProduct(response.data[2]);
+          setListStatistical(response.data[3]);
         }
         setLoading(false);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
+
   //CHECK TRÙNG DATA
   const uniqueData = Array.from(
-    new Set(listTotal.map(item => item[0].id))
-  ).map(id => listTotal.find(item => item[0].id === id));
+    new Set(listTotal.map((item) => item[0].id))
+  ).map((id) => listTotal.find((item) => item[0].id === id));
   //PAGE
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(uniqueData.length / numberPage);
-  const handlePageChange = page => {
+  const handlePageChange = (page) => {
     if (uniqueData.length <= numberPage || page <= 0) {
       setCurrentPage(1);
     } else {
@@ -96,6 +114,21 @@ function Home() {
     (currentPage - 1) * numberPage,
     currentPage * numberPage
   );
+
+  const handleDateChange = (event) => {
+    const formattedDate = event.target.value;
+    setSelectedDate(formattedDate);
+
+    const dateObject = new Date(formattedDate);
+    const day = dateObject.getDate();
+    const month = dateObject.getMonth() + 1;
+    const year = dateObject.getFullYear();
+
+    setDay(day);
+    setMonth(month);
+    setYear(year);
+  };
+
   return (
     <React.Fragment>
       <div className={style.card}>
@@ -106,7 +139,7 @@ function Home() {
         <div className={`${style.cardActivity}`}>
           <Nav.Link className={style.cardContentActivity} href="#/choXacNhan">
             <div className={style.cardAmount}>
-              {uniqueData.reduce(function(count, data) {
+              {uniqueData.reduce(function (count, data) {
                 if (data[0].status[data[0].status.length - 1].status.id === 1)
                   count++;
                 return count;
@@ -116,7 +149,7 @@ function Home() {
           </Nav.Link>
           <Nav.Link className={style.cardContentActivity} href="#/choLayHang">
             <div className={style.cardAmount}>
-              {uniqueData.reduce(function(count, data) {
+              {uniqueData.reduce(function (count, data) {
                 if (data[0].status[data[0].status.length - 1].status.id === 5)
                   count++;
                 return count;
@@ -126,7 +159,7 @@ function Home() {
           </Nav.Link>
           <Nav.Link className={style.cardContentActivity} href="#/daXuLy">
             <div className={style.cardAmount}>
-              {uniqueData.reduce(function(count, data) {
+              {uniqueData.reduce(function (count, data) {
                 if (data[0].status[data[0].status.length - 1].status.id === 6)
                   count++;
                 return count;
@@ -137,7 +170,7 @@ function Home() {
 
           <Nav.Link className={style.cardContentActivity} href="#/donHuy">
             <div className={style.cardAmount}>
-              {uniqueData.reduce(function(count, data) {
+              {uniqueData.reduce(function (count, data) {
                 if (data[0].status[data[0].status.length - 1].status.id === 8)
                   count++;
                 return count;
@@ -147,7 +180,7 @@ function Home() {
           </Nav.Link>
           <Nav.Link className={style.cardContentActivity} href="#/traHang">
             <div className={style.cardAmount}>
-              {uniqueData.reduce(function(count, data) {
+              {uniqueData.reduce(function (count, data) {
                 if (data[0].status[data[0].status.length - 1].status.id === 7)
                   count++;
                 return count;
@@ -158,20 +191,70 @@ function Home() {
             </div>
           </Nav.Link>
           <Nav.Link className={style.cardContentActivity} href="#/tamKhoa">
-            <div className={style.cardAmount}>
-              {bandProduct}
-            </div>
+            <div className={style.cardAmount}>{bandProduct}</div>
             <div className={style.cardTitleActivity}>Sản Phẩm Bị Tạm Khóa</div>
           </Nav.Link>
           <Nav.Link className={style.cardContentActivity} href="#/hetHang">
-            <div className={style.cardAmount}>
-              {stockingProduct}
-            </div>
+            <div className={style.cardAmount}>{stockingProduct}</div>
             <div className={style.cardTitleActivity}>Sản Phẩm Hết Hàng</div>
           </Nav.Link>
         </div>
       </div>
       <div className={`${style.card} mt-3`}>
+        <input
+          type="date"
+          id="datePicker"
+          value={selectedDate}
+          onChange={handleDateChange}
+        />
+        {listStatistical ? (
+          <CChart
+            type="bar"
+            data={{
+              labels: listStatistical?.map((data) => data[0]),
+              datasets: [
+                {
+                  label: "Sản Phẩm",
+                  backgroundColor: "#f87979",
+                  data: listStatistical?.map((data) => data[2])
+                },
+                {
+                  label: "Đơn Hàng",
+                  backgroundColor: "red",
+                  data: listStatistical?.map((data) => data[1])
+                }
+              ]
+            }}
+            labels="months"
+            options={{
+              plugins: {
+                legend: {
+                  labels: {
+                    color: "red"
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  grid: {
+                    color: "green"
+                  },
+                  ticks: {
+                    color: "blue"
+                  }
+                },
+                y: {
+                  grid: {
+                    color: "green"
+                  },
+                  ticks: {
+                    color: "blue"
+                  }
+                }
+              }
+            }}
+          />
+        ) : null}
         <div>
           <div className={style.heading}>Phân Tích Bán Hàng</div>
           <div className={style.title}>
@@ -181,14 +264,14 @@ function Home() {
         <div className={`${style.filterStatus}`}>
           <select
             value={valueBillOption}
-            onChange={event => handleChangeStatusBill(event.target.value)}
+            onChange={(event) => handleChangeStatusBill(event.target.value)}
             className={`${style.optionSelect}`}
           >
-            {statusBill.map((value, index) =>
+            {statusBill.map((value, index) => (
               <option key={index} value={value.id}>
                 {value.value}
               </option>
-            )}
+            ))}
           </select>
         </div>
         <div className={`${style.listProduct}`}>
@@ -201,14 +284,10 @@ function Home() {
               <label className={style.column}>Ngày Cập Nhật</label>
               <label className={style.column}>Thành Tiền</label>
             </div>
-            {listPage.map((value, index) =>
+            {listPage.map((value, index) => (
               <div key={index} className={style.tableBody}>
-                <label className={style.column}>
-                  {index + 1}
-                </label>
-                <label className={style.column}>
-                  {value[0].id}
-                </label>
+                <label className={style.column}>{index + 1}</label>
+                <label className={style.column}>{value[0].id}</label>
                 <label
                   className={style.column}
                   style={{ color: value[0].pay === true ? "green" : "red" }}
@@ -225,92 +304,91 @@ function Home() {
                           ? "#34219E"
                           : value[0].status[value[0].status.length - 1].status
                               .id === 2
-                            ? "#34219E"
-                            : value[0].status[value[0].status.length - 1].status
-                                .id === 3
-                              ? "#34219E"
-                              : value[0].status[value[0].status.length - 1]
-                                  .status.id === 4
-                                ? "#2ECC71"
-                                : value[0].status[value[0].status.length - 1]
-                                    .status.id === 5
-                                  ? "#2ECC71"
-                                  : value[0].status[value[0].status.length - 1]
-                                      .status.id === 6
-                                    ? "#2ECC71"
-                                    : value[0].status[
-                                        value[0].status.length - 1
-                                      ].status.id === 7
-                                      ? "orange"
-                                      : value[0].status[
-                                          value[0].status.length - 1
-                                        ].status.id === 8
-                                        ? "red"
-                                        : "#E74C3C"
+                          ? "#34219E"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 3
+                          ? "#34219E"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 4
+                          ? "#2ECC71"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 5
+                          ? "#2ECC71"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 6
+                          ? "#2ECC71"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 7
+                          ? "orange"
+                          : value[0].status[value[0].status.length - 1].status
+                              .id === 8
+                          ? "red"
+                          : "#E74C3C"
                     }}
-                    value={`${value[0].status[value[0].status.length - 1].status
-                      .id}`}
+                    value={`${
+                      value[0].status[value[0].status.length - 1].status.id
+                    }`}
                   >
                     {value[0].status[value[0].status.length - 1].status.id === 1
                       ? "Chờ Xác Nhận"
                       : value[0].status[value[0].status.length - 1].status
                           .id === 2
-                        ? "Đã Xác Nhận"
-                        : value[0].status[value[0].status.length - 1].status
-                            .id === 3
-                          ? "Chuẩn Bị Hàng"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 4
-                            ? "Đang Giao"
-                            : value[0].status[value[0].status.length - 1].status
-                                .id === 5
-                              ? "Chờ Lấy Hàng"
-                              : value[0].status[value[0].status.length - 1]
-                                  .status.id === 6
-                                ? "Đã Nhận"
-                                : value[0].status[value[0].status.length - 1]
-                                    .status.id === 7
-                                  ? "Trả Hàng/Hoàn Tiền"
-                                  : value[0].status[value[0].status.length - 1]
-                                      .status.id === 8
-                                    ? "Đã Hủy"
-                                    : "Giao Thất Bại"}
+                      ? "Đã Xác Nhận"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 3
+                      ? "Chuẩn Bị Hàng"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 4
+                      ? "Đang Giao"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 5
+                      ? "Chờ Lấy Hàng"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 6
+                      ? "Đã Nhận"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 7
+                      ? "Trả Hàng/Hoàn Tiền"
+                      : value[0].status[value[0].status.length - 1].status
+                          .id === 8
+                      ? "Đã Hủy"
+                      : "Giao Thất Bại"}
                   </label>
                 </label>
-                <label className={style.column}>
-                  {value[1].create_date}
-                </label>
+                <label className={style.column}>{value[1].create_date}</label>
                 <label className={style.column}>
                   {formatCurrency(value[1].quantity * value[2].price, 0)}
                 </label>
               </div>
-            )}
+            ))}
           </div>
           <div className={`${style.buttonPage}`}>
-            <Nav.Link className={style.button} onClick={() => handlePageChange(1)}>
+            <Nav.Link
+              className={style.button}
+              onClick={() => handlePageChange(1)}
+            >
               <i className="bi bi-chevron-bar-left" />
             </Nav.Link>
-            {currentPage - 1 > 0
-              ? <Nav.Link
-                  className={style.button}
-                  onClick={() => handlePageChange(currentPage - 1) 
-                  }
-                >
-                  {currentPage - 1}
-                </Nav.Link>
-              : null}
+            {currentPage - 1 > 0 ? (
+              <Nav.Link
+                className={style.button}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                {currentPage - 1}
+              </Nav.Link>
+            ) : null}
 
             <Nav.Link className={`${style.button} ${style.btnActivePage}`}>
               {currentPage}
             </Nav.Link>
-            {currentPage + 1 <= totalPages
-              ? <Nav.Link
-                  className={style.button}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  {currentPage + 1}
-                </Nav.Link>
-              : null}
+            {currentPage + 1 <= totalPages ? (
+              <Nav.Link
+                className={style.button}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                {currentPage + 1}
+              </Nav.Link>
+            ) : null}
             <Nav.Link
               className={style.button}
               onClick={() => handlePageChange(totalPages)}
