@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../service/DataLogin";
 import { CChart } from "@coreui/react-chartjs";
-import { Bar } from "react-chartjs-2";
+
 import "../css/business/home.css";
 
 const numberPage = 10;

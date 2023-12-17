@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import emailjs from "@emailjs/browser";
 import "../css/user/contact.css";
+import swal from 'sweetalert';
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -9,20 +10,34 @@ function ContactInfo() {
 
   const sendEmail = (e) => {
     e.preventDefault();
+    const userName = form.current.user_name.value.trim();
+    const userEmail = form.current.user_email.value.trim();
+    const message = form.current.message.value.trim();
+
+    if (!userName || !userEmail || !message) {
+      return swal("Vui lòng điền đầy đủ thông tin", "", "warning");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      return swal("Địa chỉ email không hợp lệ", "", "warning");
+    }
 
     emailjs
       .sendForm(
-        "service_nc9zmfr",
-        "template_rbvp4kb",
+        "service_23ykcao",
+        "template_1j50s6c",
         form.current,
-        "P6iZRWlAwj-Yj6GoE"
+        "arK0NMKeDmldEcr3x"
       )
       .then(
         (result) => {
           console.log(result.text);
+          swal("Tin nhắn của bạn đã được gửi, cảm ơn bạn!", "", "success");
         },
         (error) => {
           console.log(error.text);
+          swal("Đã xảy ra lỗi, vui lòng thử lại sau", "", "error");
         }
       );
   };
@@ -30,16 +45,6 @@ function ContactInfo() {
   return (
     <div>
       <MainNavbar />
-
-      <form ref={form} onSubmit={sendEmail}>
-        <label>Name</label>
-        <input type="text" name="user_name" />
-        <label>Email</label>
-        <input type="email" name="user_email" />
-        <label>Message</label>
-        <textarea name="message" />
-        <input type="submit" value="Send" />
-      </form>
 
       <section className="ftco-section">
         <div className="container">
@@ -52,14 +57,14 @@ function ContactInfo() {
                     <div className="contact-wrap w-100 p-md-5 p-4">
                       <h3 className="mb-4">Liên hệ với chúng tôi</h3>
                       <div id="form-message-warning" className="mb-4"></div>
-                      <div id="form-message-success" className="mb-4">
-                        Tin nhắn của bạn đã được gửi, cảm ơn bạn!
-                      </div>
+
                       <form
                         method="POST"
                         id="contactForm"
                         name="contactForm"
                         className="contactForm"
+                        ref={form}
+                        onSubmit={sendEmail}
                       >
                         <div className="row">
                           <div className="col-md-6">
@@ -70,7 +75,7 @@ function ContactInfo() {
                               <input
                                 type="text"
                                 className="form-control"
-                                name="name"
+                                name="user_name"
                                 id="name"
                                 placeholder="Nguyễn Văn A"
                               />
@@ -84,26 +89,13 @@ function ContactInfo() {
                               <input
                                 type="email"
                                 className="form-control"
-                                name="email"
+                                name="user_email"
                                 id="email"
                                 placeholder="info@gmail.com"
                               />
                             </div>
                           </div>
-                          <div className="col-md-12 mt-2">
-                            <div className="form-group">
-                              <label className="label" for="subject">
-                                Tiêu đề
-                              </label>
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="subject"
-                                id="subject"
-                                placeholder="Cửa hàng A, sản phẩm 1..."
-                              />
-                            </div>
-                          </div>
+
                           <div className="col-md-12 mt-2">
                             <div className="form-group">
                               <label className="label" for="#">
@@ -121,7 +113,11 @@ function ContactInfo() {
                           </div>
                           <div className="col-md-12 mt-2">
                             <div className="form-group">
-                              <button className="btn btn-primary">
+                              <button
+                                className="btn btn-primary"
+                                type="submit"
+                                value="Send"
+                              >
                                 {" "}
                                 Gửi phản hồi{" "}
                               </button>
@@ -134,7 +130,7 @@ function ContactInfo() {
                   <div className="col-md-5 d-flex mt-4 align-items-stretch">
                     <div id="map">
                       <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.443980540085!2d106.62348867451811!3d10.853796757762948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752a20d8555e69%3A0x743b1e9558fb89e0!2sQTSC%209%20Building!5e0!3m2!1svi!2s!4v1698402331114!5m2!1svi!2s"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.443980540085!2d106.62348867451811!3d10.853796757762948!2m3!1f0!2f0!3f0!3m2!1i...!1svi!2s"
                         width="600"
                         height="450"
                         style={{ border: "0" }}

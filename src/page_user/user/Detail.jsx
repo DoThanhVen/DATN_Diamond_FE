@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useHistory } from "react";
 import "../css/user/detail.css";
 import MainNavbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -10,8 +10,6 @@ import { Carousel } from "react-responsive-carousel";
 import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
 import swal from "sweetalert";
-import Cookies from "js-cookie";
-import listDataAddress from "../../service/AddressVietNam.json";
 import style from "../css/user/detail.module.css";
 import { GetDataLogin } from "../../service/DataLogin.js";
 import { useDispatch } from "react-redux";
@@ -24,7 +22,7 @@ function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
-    minimumFractionDigits: 0
+    minimumFractionDigits: 0,
   });
   return formatter.format(price - price * (promotion / 100));
 }
@@ -53,14 +51,27 @@ function localStateReducer(state, action) {
 }
 
 function ProductPage() {
-  const navigate = useNavigate();
   const [accountLogin, setAccountLogin] = useState(null);
-
+  const [reload, setreload] = useState(0);
+  const [totalBuy, setTotalBuy] = useState(0);
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
     if (accountLogin !== undefined) {
       try {
         setAccountLogin(accountLogin);
+
+        axios
+          .get(`${API_BASE_URL}/api/ratings/avg/${productId}`)
+          .then((response) => {
+            setAvg(response.data);
+          });
+
+
+        axios
+          .get(`${API_BASE_URL}/api/ratings/getTotalBuy/${productId}`)
+          .then((response) => {
+            setTotalBuy(response.data)
+          });
       } catch (error) {
         console.log(error);
       }
@@ -71,7 +82,7 @@ function ProductPage() {
 
   useEffect(() => {
     getAccountFromSession();
-  }, []);
+  }, [reload]);
 
   const { productId } = useParams();
   const [localState, dispatch] = useReducer(localStateReducer, {
@@ -81,7 +92,7 @@ function ProductPage() {
     shopAddress: null,
     city: "",
     count: parseInt(localStorage.getItem("count")) || 14,
-    showAllComments: false
+    showAllComments: false,
   });
 
   const { product, shopName, shopData, shopAddress, count, showAllComments } =
@@ -131,7 +142,7 @@ function ProductPage() {
       .catch((error) => {
         console.error("Error loading shop data:", error);
       });
-  }, [productId]);
+  }, [productId, accountLogin, reload]);
 
   useEffect(() => {
     const fetchSimilarProducts = async () => {
@@ -146,7 +157,7 @@ function ProductPage() {
           const similarProducts = data.data[1];
           dispatch({
             type: "SET_SIMILAR_PRODUCTS",
-            payload: similarProducts
+            payload: similarProducts,
           });
         } else {
           // Xử lý khi API trả về lỗi
@@ -159,7 +170,7 @@ function ProductPage() {
     };
 
     fetchSimilarProducts();
-  }, [productId]);
+  }, [productId, accountLogin, reload]);
 
   const handleLikeProduct = (productId) => {
     axios
@@ -172,6 +183,7 @@ function ProductPage() {
         } else {
           swal("Thông báo", "Sản phẩm đã được like trước đó.", "info");
         }
+        setreload(reload + 1)
       })
       .catch((error) => {
         console.error(error);
@@ -186,54 +198,48 @@ function ProductPage() {
   const [reviews, setReviews] = useState([]);
   const [avg, setAvg] = useState(0);
   const [userReviews, setUserReviews] = useState([]);
-
+  const [isEditing, setIsEditing] = useState(false);
   const handleRatingChange = (event, newValue) => {
     setValue(newValue);
   };
+  const [ratingId, setRatingId] = useState(null);
+  const [newRating, setNewRating] = useState({
+    star: 0,
+    description: "",
+  });
+  const navigate = useNavigate();
+
   const isValidRating = () => {
     return value !== null && description.trim() !== "";
   };
 
   const handlePostRating = () => {
-    if (isValidRating()) {
-      const ratingData = {
-        productId: parseInt(productId),
-        accountId: parseInt(accountLogin.id),
-        start: parseInt(value),
-        description: description
-      };
+    if (accountLogin && accountLogin.id) {
+      if (isValidRating()) {
+        const ratingData = {
+          productId: parseInt(productId),
+          start: parseInt(value),
+          description: description,
+        };
 
-      console.log("Rating Payload:", ratingData);
-
-      axios
-        .post(`${API_BASE_URL}/api/ratings/add`, ratingData)
-        .then((response) => {
-          if (response.status === 200) {
-            if (response.data === "Bạn đã đánh giá sản phẩm này.") {
-              swal(
-                "Thành công",
-                "Bạn đã đánh giá sản phẩm này.",
-                "success"
-              ).then(() => {
-                // Tải lại trang sau khi đánh giá thành công
-                window.location.reload();
-              });
-            } else {
-              swal("Lỗi", "Phản hồi từ server không đúng.", "error");
-            }
-          } else {
-            // swal("Lỗi", `Lỗi không xác định: ${response.status}`, "error");
-          }
-        })
-        .catch((error) => {
-          swal("Lỗi", "Có lỗi xảy ra khi đánh giá sản phẩm.", "error");
-        });
+        axios
+          .post(`${API_BASE_URL}/api/ratings/add/${parseInt(accountLogin.id)}`, ratingData)
+          .then((response) => {
+            setreload(reload + 1)
+          })
+          .catch((error) => {
+            swal("Lỗi", "Có lỗi xảy ra khi đánh giá sản phẩm.", "error");
+          });
+      } else {
+        swal(
+          "Lỗi",
+          "Vui lòng chọn số sao và viết đánh giá trước khi đăng",
+          "error"
+        );
+      }
     } else {
-      swal(
-        "Lỗi",
-        "Vui lòng chọn số sao và viết đánh giá trước khi đăng",
-        "error"
-      );
+      // Handle the case when accountLogin is null or its id is undefined
+      console.error("Error: Account information is not available.");
     }
   };
 
@@ -248,94 +254,144 @@ function ProductPage() {
               (review) => review.account_rate.id === accountLogin.id
             )
           );
+
+          // Nếu có đánh giá, thiết lập ratingId cho đánh giá đầu tiên (hoặc một cách nào đó bạn chọn)
+          if (response.data.length > 0) {
+            setRatingId(response.data[0].id);
+          }
         })
         .catch((error) => {
-          console.error("Error fetching reviews:", error);
+          console.error("Lỗi khi lấy đánh giá:", error);
         });
     }
-  }, [productId]);
+  }, [productId, accountLogin, reload]);
 
-  useEffect(() => {
-    if (accountLogin) {
-      axios
-        .get(`${API_BASE_URL}/api/ratings/${productId}`)
-        .then((response) => {
-          setReviews(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching reviews:", error);
-        });
-    }
-  }, [productId]);
+  const handleUpdateRating = () => {
+    axios
+      .put(`${API_BASE_URL}/api/ratings/update/${ratingId}`, newRating)
+      .then((response) => {
+        setreload(reload + 1)
+        setIsEditing(false);
 
-  useEffect(() => {
-    if (accountLogin) {
-      axios
-        .get(`${API_BASE_URL}/api/ratings/avg/${productId}`)
-        .then((response) => {
-          setAvg(response.data);
-          console.log("AVG: ", response.data);
-        });
-    }
-  }, []);
+
+        const updatedReviews = reviews.map((review) =>
+          review.id === ratingId
+            ? {
+              ...review,
+              star: newRating.star,
+              description: newRating.description,
+            }
+            : review
+        );
+
+        setReviews(updatedReviews);
+
+        // Cập nhật userReviews nếu người dùng hiện tại đã đánh giá sản phẩm
+        const updatedUserReviews = userReviews.map((userReview) =>
+          userReview.id === ratingId
+            ? {
+              ...userReview,
+              star: newRating.star,
+              description: newRating.description,
+            }
+            : userReview
+        );
+
+        setUserReviews(updatedUserReviews);
+
+        // Chuyển về nút "Chỉnh sửa"
+        navigate(`/product/${productId}#edit`);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi cập nhật đánh giá:", error);
+        swal("Lỗi", "Không thể cập nhật đánh giá", "error");
+      });
+    console.log("Cập nhật đánh giá. ID đánh giá:", ratingId);
+  };
+
 
   const dispatchs = useDispatch();
   const [quantity, setQuantity] = useState(1);
 
-
   const handleAddCart = async () => {
-    let newProduct = null
+    let newProduct = null;
     let shop;
-    const response = await callAPI(`/api/shop/findByProduct/${product.id}`, 'GET')
-    if (response.status == 'SUCCESS') {
+    const response = await callAPI(
+      `/api/shop/findByProduct/${product.id}`,
+      "GET"
+    );
+    if (response.status == "SUCCESS") {
       shop = response.data;
-    }
-    else {
+    } else {
       return;
     }
 
     newProduct = {
       ...product,
-      shop: shop
-    }
+      shop: shop,
+    };
     if (newProduct == null) {
-      alert('Đang có lỗi vui lòng thử lại sau')
+      alert("Đang có lỗi vui lòng thử lại sau");
       return;
     }
     dispatchs(
       cartSilce.actions.addToCart({
         product: newProduct,
-        quantity: quantity
+        quantity: quantity,
       })
     );
-    ThongBao("Thêm thành công", "success")
+    ThongBao("Thêm thành công", "success");
   };
   const handleBuy = async () => {
-    let newProduct = null
+    let newProduct = null;
     let shop;
-    const response = await callAPI(`/api/shop/findByProduct/${product.id}`, 'GET')
-    if (response.status == 'SUCCESS') {
+    const response = await callAPI(
+      `/api/shop/findByProduct/${product.id}`,
+      "GET"
+    );
+    if (response.status == "SUCCESS") {
       shop = response.data;
-    }
-    else {
+    } else {
       return;
     }
 
     newProduct = {
       ...product,
-      shop: shop
-    }
+      shop: shop,
+    };
     if (newProduct == null) {
-      alert('Đang có lỗi vui lòng thử lại sau')
+      alert("Đang có lỗi vui lòng thử lại sau");
       return;
     }
     dispatchs(
       cartSilce.actions.addToCart({
         product: newProduct,
-        quantity: quantity
+        quantity: quantity,
       })
     );
-    navigate('/checkOut')
+    navigate("/checkOut");
+  };
+  const renderStars = (avg) => {
+    const fullStars = Math.floor(avg); // Number of full stars
+    const hasHalfStar = avg % 1 !== 0; // Check for half star
+    const starIcons = [];
+    // Full star icons
+    for (let i = 0; i < fullStars; i++) {
+      starIcons.push(<i key={i} className="bi bi-star-fill"></i>);
+    }
+
+    // Half star icon
+    if (hasHalfStar) {
+      starIcons.push(<i key={starIcons.length} className="bi bi-star-half"></i>);
+    }
+
+    // Outlined star icons for the remaining stars
+    const remainingStars = 5 - Math.ceil(avg); // Calculate the remaining stars to be outlined
+
+    for (let j = 0; j < remainingStars; j++) {
+      starIcons.push(<i key={starIcons.length + j} className="bi bi-star"></i>);
+    }
+    return starIcons;
   }
   return (
     <>
@@ -363,13 +419,11 @@ function ProductPage() {
                           height: "700px",
                           display: "flex",
                           justifyContent: "center",
-                          alignItems: "center"
+                          alignItems: "center",
                         }}
                       >
                         <img
-                          src={
-                            image.url ? image.url : "/images/nullImage.png"
-                          }
+                          src={image.url ? image.url : "/images/nullImage.png"}
                           alt={`Image ${index}`}
                         />
                       </div>
@@ -390,15 +444,13 @@ function ProductPage() {
 
                   <div className="d-flex flex-row my-3">
                     <div className="text-warning mb-1 me-2">
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-half"></i>
-                      <span className="ms-1">4.5</span>
+                      {renderStars(avg).map((icon, index) => (
+                        <span key={index}>{icon}</span>
+                      ))}
+                      <span className="ms-1">{avg}</span>
                     </div>
                     <span className="text-muted">
-                      <i className="fas fa-shopping-basket fa-sm mx-1"></i>154
+                      <i className="fas fa-shopping-basket fa-sm mx-1"></i>{totalBuy}
                       lượt mua
                     </span>
                   </div>
@@ -451,9 +503,12 @@ function ProductPage() {
                     </div>
                   </div>
                   <div className={style.groupButton}>
-                    <button onClick={()=> {
-                      handleBuy()
-                    }} className={style.buttonBuy}>
+                    <button
+                      onClick={() => {
+                        handleBuy();
+                      }}
+                      className={style.buttonBuy}
+                    >
                       <i className="bi bi-bag-plus mx-2"></i>
                       <strong>Mua ngay</strong>
                     </button>
@@ -468,7 +523,7 @@ function ProductPage() {
           </div>
         </section>
 
-        <div className="container mt-4">
+        {/* <div className="container mt-4">
           <div className="row gx-4 ">
             <div className="col-lg-8 mb-4 d-flex">
               {product && shopName !== null && shopData ? (
@@ -484,7 +539,7 @@ function ProductPage() {
                     style={{
                       width: "50px",
                       height: "50px",
-                      borderRadius: "50%"
+                      borderRadius: "50%",
                     }}
                   />
                   <Link to={`/shops/${productId}/shop`}>
@@ -503,7 +558,7 @@ function ProductPage() {
               ) : null}
             </div>
           </div>
-        </div>
+        </div> */}
 
         <section className=" border-top border-bottom pt-4">
           <div className="container">
@@ -525,7 +580,7 @@ function ProductPage() {
                     >
                       <p
                         dangerouslySetInnerHTML={{
-                          __html: product ? product.description : ""
+                          __html: product ? product.description : "",
                         }}
                       />
                     </div>
@@ -584,34 +639,40 @@ function ProductPage() {
                     <div className="card-body">
                       <h4 className="card-title">Sản phẩm tương tự</h4>
                       {localState.similarProducts &&
-                        localState.similarProducts.map((product, index) => (
+                        localState.similarProducts.map((product, index) =>
                           product.status === 1 ? (
-                          <div className="d-flex mb-3 mt-4" key={index}>
-                            <Link className={`me-2`} to={`/product/${product.id}`}>
-                              {product.image_product &&
-                                product.image_product.length > 0 && (
-                                  <img
-                                    src={`${product.image_product[0].url}`}
-                                    style={{ minWidth: "96px", height: "96px" }}
-                                    className="img-md"
-                                    alt={`Similar Product ${index + 1}`}
-                                  />
-                                )}
-                            </Link>
-                            <div className="info">
+                            <div className="d-flex mb-3 mt-4" key={index}>
                               <Link
+                                className={`me-2`}
                                 to={`/product/${product.id}`}
-                                className="nav-link mb-1"
                               >
-                                {product.product_name}
+                                {product.image_product &&
+                                  product.image_product.length > 0 && (
+                                    <img
+                                      src={`${product.image_product[0].url}`}
+                                      style={{
+                                        minWidth: "96px",
+                                        height: "96px",
+                                      }}
+                                      className="img-md"
+                                      alt={`Similar Product ${index + 1}`}
+                                    />
+                                  )}
                               </Link>
-                              <strong className="text-dark">
-                                {product.price} ₫
-                              </strong>
+                              <div className="info">
+                                <Link
+                                  to={`/product/${product.id}`}
+                                  className="nav-link mb-1"
+                                >
+                                  {product.product_name}
+                                </Link>
+                                <strong className="text-dark">
+                                  {product.price} ₫
+                                </strong>
+                              </div>
                             </div>
-                          </div>
                           ) : null
-                        ))}
+                        )}
                     </div>
                   </div>
                 </div>
@@ -633,7 +694,9 @@ function ProductPage() {
                         </span>
                       </b>
                       <div className={style.content}>
-                        {userReviews.length === 0 ? (
+                        {accountLogin &&
+                          userReviews.length === 0 &&
+                          avg === 0 ? (
                           <>
                             <Rating
                               name="product-rating"
@@ -641,14 +704,18 @@ function ProductPage() {
                               onChange={handleRatingChange}
                             />
                             <div className={style.text}>
-                              <label htmlFor="description" className={style.label}>Mô tả:</label>
+                              <label
+                                htmlFor="description"
+                                className={style.label}
+                              >
+                                Mô tả:
+                              </label>
                               <textarea
                                 id="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 className={style.input}
                               />
-
                               <button
                                 onClick={handlePostRating}
                                 disabled={!isValidRating()}
@@ -659,24 +726,30 @@ function ProductPage() {
                             </div>
                           </>
                         ) : (
-                          <p>Sản phẩm này bạn đã đánh giá</p>
+                          <>
+                            <p>Sản phẩm này bạn đã đánh giá</p>
+                          </>
                         )}
                       </div>
                     </div>
 
                     <div className="average-rating-section">
                       {avg !== 0 && (
-                        <div>
-                          <p>Trung bình: {avg}</p>
+                        <div className="text-warning mb-1 me-2">
+                          <span style={{fontSize:'30px'}} className="ms-1">{avg} trên 5</span>
+                          {renderStars(avg).map((icon, index) => (
+                            <span style={{fontSize:'30px'}} key={index}>{icon}</span>
+                          ))}
+                          
                         </div>
                       )}
-
+                      <br />
                       <Typography variant="h6">
                         Đánh giá của người dùng
                       </Typography>
 
-                      {userReviews.length > 0 ? (
-                        userReviews.map((review) => (
+                      {reviews.length > 0 ? (
+                        reviews.map((review) => (
                           <div key={review.id} className="user-review">
                             <Typography>
                               Người đánh giá: {review.account_rate.username}
@@ -687,11 +760,52 @@ function ProductPage() {
                               readOnly
                             />
                             <Typography>Mô tả: {review.description}</Typography>
-                            {review.account_rate.infoAccount && (
-                              <Typography>
-                                {/* Email: {review.account_rate.infoAccount.email} */}
-                              </Typography>
-                            )}
+                            {userReviews.length > 0 &&
+                              review.account_rate.id === accountLogin.id && (
+                                <>
+                                  {isEditing ? (
+                                    <>
+                                      <Rating
+                                        name="edited-rating"
+                                        value={newRating.star}
+                                        onChange={(event, newValue) =>
+                                          setNewRating({
+                                            ...newRating,
+                                            star: newValue,
+                                          })
+                                        }
+                                      />
+                                      <textarea
+                                        value={newRating.description}
+                                        onChange={(e) =>
+                                          setNewRating({
+                                            ...newRating,
+                                            description: e.target.value,
+                                          })
+                                        }
+                                      />
+                                      <button onClick={handleUpdateRating}>
+                                        Lưu
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <div id="edit">
+                                      <button
+                                        onClick={() => {
+                                          setIsEditing(!isEditing);
+                                          setRatingId(review.id);
+                                          setNewRating({
+                                            star: review.star,
+                                            description: review.description,
+                                          });
+                                        }}
+                                      >
+                                        Chỉnh sửa
+                                      </button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
                           </div>
                         ))
                       ) : (

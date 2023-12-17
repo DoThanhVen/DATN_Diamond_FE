@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useReducer } from "react";
-import { useLocation, useParams, Link } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import {  Link, useParams } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
@@ -18,8 +17,7 @@ import "../css/user/slider.css";
 import style from "../css/user/product.module.css";
 import LazyLoad from "react-lazy-load";
 import { Pagination } from "@mui/material";
-
-const API_BASE_URL = "http://localhost:8080";
+import { callAPI } from "../../service/API";
 
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -29,191 +27,69 @@ function formatCurrency(price, promotion) {
   });
   return formatter.format(price - price * (promotion / 100));
 }
-// Hàm này được sử dụng để hiển thị giá trị của Slider
-function valuetext(value) {
-  return `${value}°C`;
-}
 
-// Reducer cho quản lý trạng thái của component Product
-function productReducer(state, action) {
-  switch (action.type) {
-    case "SET_VALUE":
-      return {
-        ...state,
-        value1: action.value1,
-        valueMin: action.valueMin,
-        valueMax: action.valueMax
-      };
-    case "SET_CATEGORY_ITEM":
-      return { ...state, categoryItem: action.categoryItem };
-    case "SET_PRODUCTS":
-      return { ...state, products: action.products };
-    case "SET_SELECTED_CATEGORY":
-      return { ...state, selectedCategory: action.selectedCategory };
-    case "SET_DATE_SORTING":
-      return { ...state, dateSorting: action.dateSorting };
-    case "SET_PRICE_SORTING":
-      return { ...state, priceSorting: action.priceSorting };
-    case "SET_RATING_FILTER":
-      return { ...state, ratingFilter: action.ratingFilter };
-    default:
-      return state;
-  }
-}
 
 function Product() {
-  // Sử dụng useReducer để quản lý trạng thái của component
-  const [localState, dispatch] = useReducer(productReducer, {
-    value1: [0, 1000000],
-    valueMin: 0,
-    valueMax: 1000000,
-    categoryItem: [],
-    products: [],
-    selectedCategory: null,
-    dateSorting: "ascending",
-    priceSorting: "ascending",
-    ratingFilter: "5"
-  });
-  const {
-    value1,
-    valueMin,
-    valueMax,
-    categoryItem,
-    products,
-    selectedCategory,
-    dateSorting,
-    priceSorting,
-    ratingFilter
-  } = localState;
-  const [sortedProducts, setSortedProducts] = useState([]);
+  const { CategoryId } = useParams();
+  const [listCategoryItem, setListCategoryItem] = useState([])
+  const [CategoryFind, setCategoryFind] = useState(0);
+  const [RateFind, setRateFind] = useState(0);
+  const [sort, setsort] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(false)
+  const [priceRange, setPriceRange] = useState([0, 100000000]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const numberPage = 12;
-  // Bắt sự kiện khi giá trị của Slider thay đổi
-  const handleChange1 = (event, newValue) => {
-    dispatch({
-      type: "SET_VALUE",
-      value1: newValue,
-      valueMin: newValue[0],
-      valueMax: newValue[1]
-    });
-  };
-
-  // Bắt sự kiện khi thay đổi sắp xếp theo ngày
-  const handleDateSortingChange = (e) => {
-    dispatch({ type: "SET_DATE_SORTING", dateSorting: e.target.value });
-  };
-
-  // Bắt sự kiện khi thay đổi sắp xếp theo giá
-  const handlePriceSortingChange = (e) => {
-    dispatch({ type: "SET_PRICE_SORTING", priceSorting: e.target.value });
-  };
-
-  // Bắt sự kiện khi thay đổi bộ lọc theo độ đánh giá
-  const handleRatingFilterChange = (e) => {
-    dispatch({ type: "SET_RATING_FILTER", ratingFilter: e.target.value });
-  };
-
-  // Lấy dữ liệu danh mục từ server khi component được render
-  const { id } = useParams();
+  const [listProduct, setListproduct] = useState([]);
+  const numberPage = 10;
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/category/${id}`)
-      .then((response) => {
-        // Loại bỏ các danh mục trùng lặp
-        const uniqueCategoryList = response.data.listCategory.filter(
-          (category, index, self) =>
-            index ===
-            self.findIndex(
-              (c) => c.type_category_item === category.type_category_item
-            )
-        );
-        response.data.listCategory = uniqueCategoryList;
+    getCategory();
+  }, [RateFind, currentPage, priceRange, CategoryFind, sort])
 
-        // Cập nhật danh sách danh mục
-        dispatch({
-          type: "SET_CATEGORY_ITEM",
-          categoryItem: response.data.listCategory
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [id]);
+  const getCategory = async () => {
+    const res = await callAPI(`/api/category/${CategoryId}`, 'GET');
+    getProduct(currentPage)
+    setListCategoryItem(res.listCategory)
+  }
 
-  // Lấy danh sách sản phẩm từ server khi component được render
-  useEffect(() => {
-    getListProduct(currentPage);
-  }, [currentPage]);
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
+  };
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
-  // Hàm để lấy danh sách sản phẩm từ server
-  const getListProduct = (page) => {
-    axios
-      .get(
-        `${API_BASE_URL}/api/product/getAll?key=&keyword=&offset=${
-          page - 1
-        }&sizePage=${numberPage}&sort=&sortType=&status=1`
-      )
-      .then((response) => {
-        console.log(response.data.data.content);
-        // Cập nhật danh sách sản phẩm
-        dispatch({ type: "SET_PRODUCTS", products: response.data.data.content });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const getProduct = async (page) => {
+    const res = await callAPI(`/api/product/user/findAll?offset=${page - 1}&sizePage=${numberPage}&sort=${sort}&price=${priceRange}&category=${CategoryFind}&cate=${CategoryId}&rate=${RateFind}`, 'GET');
 
-  // Lọc sản phẩm
-  const listFilter = [];
-  categoryItem.forEach((value) => {
-    products.forEach((product) => {
-      if (value.id === product.categoryItem_product.id) {
-        listFilter.push(product);
-      }
-    });
-  });
-
-  // Lọc và sắp xếp sản phẩm theo giá
-  useEffect(() => {
-    const filteredProducts = listFilter.filter((product) => {
-      return (
-        (!selectedCategory ||
-          product.categoryItem_product.id === selectedCategory.id) &&
-        product.price >= valueMin &&
-        product.price <= valueMax
-      );
-    });
-
-    const productsCopy = [...filteredProducts];
-
-    if (priceSorting === "ascending") {
-      productsCopy.sort((a, b) => a.price - b.price);
-    } else if (priceSorting === "descending") {
-      productsCopy.sort((a, b) => b.price - a.price);
+    if (res.data !== null) {
+      setListproduct(res.data.content)
+      setTotalPages(res.data.totalPages || 1)
     }
-
-    // Chỉ cập nhật sortedProducts nếu nó thay đổi
-    if (!isEqual(sortedProducts, productsCopy)) {
-      setSortedProducts(productsCopy);
-    }
-  }, [
-    selectedCategory,
-    valueMin,
-    valueMax,
-    priceSorting,
-    listFilter,
-    sortedProducts
-  ]);
-
-  // Hàm so sánh đối tượng
-  function isEqual(a, b) {
-    return JSON.stringify(a) === JSON.stringify(b);
   }
+
+  const [totalBuys, setTotalBuys] = useState({});
+
+  const getToltalBuy = async (idproduct) => {
+    try {
+      const resToltal = await callAPI(`/api/ratings/getTotalBuy/${idproduct}`, 'GET');
+      return resToltal;
+    } catch (error) {
+      console.error("Error fetching totalBuy:", error);
+      return 0; // Trả về mặc định hoặc giá trị bạn muốn khi xảy ra lỗi
+    }
+  };
+  useEffect(() => {
+    async function fetchData() {
+      const totalBuys = {};
+      for (const product of listProduct) {
+        const totalBuy = await getToltalBuy(product.id);
+        totalBuys[product.id] = totalBuy;
+      }
+      setTotalBuys(totalBuys);
+    }
+    fetchData();
+  }, [listProduct]);
 
   return (
     <>
@@ -258,32 +134,22 @@ function Product() {
                 </div>
                 <ListGroup variant="flush">
                   <ListGroup.Item
-                    onClick={() => {
-                      // Xử lý khi người dùng chọn "Tất cả sản phẩm"
-                      dispatch({
-                        type: "SET_SELECTED_CATEGORY",
-                        selectedCategory: null // Đặt selectedCategory thành null để hiển thị tất cả sản phẩm
-                      });
-                    }}
+                    onClick={() => { setCategoryFind(0); setRateFind(0); setPriceRange([0, 100000000]) }}
                   >
                     Tất cả sản phẩm
                   </ListGroup.Item>
-                  {Array.isArray(categoryItem) &&
-                    categoryItem.map((item) => (
-                      <ListGroup.Item
-                        key={item.id}
-                        onClick={() => {
-                          // Xử lý khi người dùng chọn một danh mục khác
-                          dispatch({
-                            type: "SET_SELECTED_CATEGORY",
-                            selectedCategory: item
-                          });
-                        }}
-                        className={item === selectedCategory ? "active" : ""}
-                      >
-                        {item.type_category_item}
-                      </ListGroup.Item>
-                    ))}
+                  {listCategoryItem.map((item) => (
+                    <ListGroup.Item
+                      key={item.id}
+                      onClick={() => {
+                        setCategoryFind(item.id);
+                        setSelectedCategory(true)
+                      }}
+                      className={item === selectedCategory ? "active" : ""}
+                    >
+                      {item.type_category_item}
+                    </ListGroup.Item>
+                  ))}
                 </ListGroup>
               </div>
               <div className="sidebar__item mt-4">
@@ -291,16 +157,16 @@ function Product() {
                   <Box sx={{ width: 250 }}>
                     <Slider
                       getAriaLabel={() => "Temperature range"}
-                      value={value1}
-                      onChange={handleChange1}
+                      value={priceRange} // Sử dụng giá trị từ state để hiển thị khoảng giá
+                      onChange={handlePriceChange} // Xử lý khi Slider thay đổi giá trị
                       valueLabelDisplay="auto"
-                      getAriaValueText={valuetext}
                       min={0}
-                      max={1000000}
+                      max={100000000}
                     />
                     <Typography variant="body2">
-                      <span style={{ color: "#FF0000" }}>Giá:</span> {value1[0]}{" "}
-                      - {value1[1]}
+                      <span style={{ color: "#FF0000" }}>Giá:</span>{" "}
+                      {priceRange[0].toLocaleString("vi-VN")} -{" "}
+                      {priceRange[1].toLocaleString("vi-VN")} vnđ
                     </Typography>
                   </Box>
                 </div>
@@ -309,16 +175,16 @@ function Product() {
                   <RadioGroup
                     aria-label="priceSorting"
                     name="priceSorting"
-                    value={priceSorting}
-                    onChange={handlePriceSortingChange}
+                    value={sort}
+                    onChange={(e) => { setsort(e.target.value) }}
                   >
                     <FormControlLabel
-                      value="ascending"
+                      value="asc"
                       control={<Radio />}
                       label="Sắp xếp theo tăng dần"
                     />
                     <FormControlLabel
-                      value="descending"
+                      value="desc"
                       control={<Radio />}
                       label="Sắp xếp theo giảm dần"
                     />
@@ -330,8 +196,8 @@ function Product() {
                   <RadioGroup
                     aria-label="ratingFilter"
                     name="ratingFilter"
-                    value={ratingFilter}
-                    onChange={handleRatingFilterChange}
+                    value={RateFind}
+                    onChange={(e) => { setRateFind(e.target.value) }}
                   >
                     <FormControlLabel
                       value="5"
@@ -366,11 +232,11 @@ function Product() {
           <div className={style.content}>
             <div className={style.listProduct}>
               <label className={style.heading}>DANH SÁCH SẢN PHẨM</label>
-              <div className={style.list_product}>
-                {sortedProducts.map((value, index) =>
-                  value.price >= valueMin &&
-                  value.price <= valueMax &&
-                  value.status === 1 ? (
+              <div className={style.list_product} >
+                {listProduct.length < 1 ? (
+                  <p>Không có sản phẩm</p>
+                ) : (
+                  listProduct.map((value, index) =>
                     <LazyLoad
                       once={true}
                       key={index}
@@ -378,15 +244,8 @@ function Product() {
                     >
                       <Link to={`/product/${value.id}`}>
                         <img
-                          key={value.id}
-                          src={`${API_BASE_URL}/api/uploadImageProduct/${
-                            value.image_product[value.image_product.length - 1]
-                              .url
-                          }`}
-                          alt={`Image ${
-                            value.image_product[value.image_product.length - 1]
-                              .url
-                          }`}
+                          src={value.image_product[0].url}
+                          alt=""
                           className={style.image}
                         />
                         <div className={style.name}>{value.product_name}</div>
@@ -395,14 +254,15 @@ function Product() {
                             {formatCurrency(value.price, 0)}
                           </label>
                           <label className={style.amount_sell}>
-                            Đã bán 999
+                            Đã bán {totalBuys[value.id]}
                           </label>
                         </div>
                         <div className={style.show_detail}>Xem chi tiết</div>
                       </Link>
                     </LazyLoad>
-                  ) : null
+                  )
                 )}
+
               </div>
             </div>
             <div
