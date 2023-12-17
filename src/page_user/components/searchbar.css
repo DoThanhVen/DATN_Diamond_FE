@@ -1,0 +1,38 @@
+/* searchbar.css */
+
+.search {
+    position: absolute;
+    top: calc(100% + 10px); /* Điều chỉnh khoảng cách với input tìm kiếm */
+    left: 0;
+    z-index: 999;
+    width: 100%; /* Độ rộng bằng với input */
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 200px; /* Điều chỉnh chiều cao tối đa cho kết quả */
+    overflow-y: auto; /* Cho phép cuộn khi kết quả quá nhiều */
+  }
+  
+  .dataResult {
+    padding: 8px 10px;
+  }
+  
+  .dataItem {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  #search-item-img {
+    margin-right: 10px;
+    border-radius: 4px;
+  }
+  
+  #search-item-name {
+    margin: 0;
+  }
+  
+  

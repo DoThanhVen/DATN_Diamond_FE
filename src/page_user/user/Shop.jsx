@@ -90,7 +90,7 @@ function Shop() {
         console.log(error);
       }
     } else {
-      navigate("/login");
+      return;
     }
   };
   useEffect(() => {
@@ -235,25 +235,25 @@ function Shop() {
                       </span>
                     </div>
                   </li>
-                  {
+                  {accountLogin &&
                     accountLogin?.shop?.shop_name !== shopData[1] ? (
-                      <li>
-                        <i
-                          className="bi bi-chat-dots"
-                          style={{
-                            fontSize: "25px",
-                            color: "red",
-                            cursor: "pointer"
-                          }}
-                          onClick={() => {
-                            setShopName(shopData[1])
-                            setIsShowChat(true);
-                          }}
-                        ></i>
-                      </li>
-                    ) : (
-                      null
-                    )
+                    <li>
+                      <i
+                        className="bi bi-chat-dots"
+                        style={{
+                          fontSize: "25px",
+                          color: "red",
+                          cursor: "pointer"
+                        }}
+                        onClick={() => {
+                          setShopName(shopData[1])
+                          setIsShowChat(true);
+                        }}
+                      ></i>
+                    </li>
+                  ) : (
+                    null
+                  )
                   }
 
                 </ul>
@@ -416,8 +416,8 @@ function Shop() {
       </div>
       {isLogin && isShowChat ? (
         <div id="chat">
-          <i class="bi bi-x-lg" onClick={()=>setIsShowChat(false)} style={{fontSize:'30px',color:'red'}}></i>
-          <ChatApp shop={shopName}/>
+          <i class="bi bi-x-lg" onClick={() => setIsShowChat(false)} style={{ fontSize: '30px', color: 'red' }}></i>
+          <ChatApp shop={shopName} />
         </div>
       ) : null}
       <div id="footer">

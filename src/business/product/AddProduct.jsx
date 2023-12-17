@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { reloadPage } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
-import Cookies from "js-cookie";
 import { GetDataLogin } from "../../service/DataLogin";
 import ModalAction from "../../service/ModalAction";
 import LoadingOverlay from "../../service/loadingOverlay";

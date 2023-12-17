@@ -7,7 +7,6 @@ import {
 } from "firebase/auth";
 import {
     getFirestore,
-
 } from "firebase/firestore";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 
@@ -21,16 +20,21 @@ const firebaseConfig = {
     measurementId: "G-NKS64L39KM"
 };
 
-// Initialize Firebase
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app)
+
 const googleProvider = new GoogleAuthProvider();
 const signInWithGoogle = async () => {
-    const res = await signInWithPopup(auth, googleProvider);
-    return res;
+    try {
+        const res = await signInWithPopup(auth, googleProvider);
+        return res;
+    } catch (error) {
+        console.log(error)
+        return null;
+    }
 };
 
 const uploadImageToFirebaseStorage = async (file) => {
@@ -44,6 +48,7 @@ const uploadImageToFirebaseStorage = async (file) => {
         throw error;
     }
 };
+
 const deleteImageFromFirebaseStorage = async (imagePath) => {
     try {
         const pathSegments = imagePath.split('/o/');
@@ -67,5 +72,5 @@ export {
     db,
     storage,
     signInWithGoogle,
-    logout, uploadImageToFirebaseStorage,deleteImageFromFirebaseStorage
+    logout, uploadImageToFirebaseStorage, deleteImageFromFirebaseStorage
 };

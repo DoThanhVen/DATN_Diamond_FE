@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { GetDataLogin } from "../../service/DataLogin";
 import { cartSelector } from '../../actions/actions';
 import { useSelector } from 'react-redux';
+import SearchBar from "./searchBar";
 
 
 const MainNavbar = () => {
@@ -27,6 +28,7 @@ const MainNavbar = () => {
   searchParams.append('keyword', "s")
   const [isAdmin, setIsAdmin] = useState(false)
   const [accountLogin, setAccountLogin] = useState(null);
+  const [keyword, setkeyword] = useState('');
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
@@ -184,14 +186,13 @@ const MainNavbar = () => {
                   <div className="input-group">
                     <FormControl
                       type="search"
-                      placeholder="Tìm kiếm sản phẩm của bạn"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Tìm kiếm sản phẩm và cửa hàng"
+                      value={keyword}
+                      onChange={(e) => setkeyword(e.target.value)}
                     />
-
-                    <Button variant="light" type="submit">
-                      <i className="fa fa-search"></i>
-                    </Button>
+                    {keyword !== '' ? (
+                      <SearchBar keyword={keyword} />
+                    ) : null}
                   </div>
                 </Form>
                 <Navbar expand="lg">
@@ -302,6 +303,7 @@ const MainNavbar = () => {
             </div>
           </div>
         </div>
+
       </header>
     </>
   );

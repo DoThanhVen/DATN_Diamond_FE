@@ -17,7 +17,6 @@ function encodeObjectToBase64(obj) {
   return base64String;
 }
 
-
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +39,7 @@ function Login() {
 
   const Login = async () => {
     const res = await signInWithGoogle();
-    if (res) {
+    if (res!==null) {
       const formData = new FormData();
       formData.append('email', res.user.email)
       formData.append('displayName', res.user.displayName)
@@ -53,6 +52,8 @@ function Login() {
       } else {
         ThongBao(response.message, response.status)
       }
+    }else{
+      return;
     }
   }
 
