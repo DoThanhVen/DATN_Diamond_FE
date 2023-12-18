@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import style from "../css/user/home.module.css";
 import LazyLoad from "react-lazy-load";
+import { callAPI } from "../../service/API";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -41,26 +42,45 @@ function SamplePrevArrow(props) {
 
 function NewProducts() {
   const [top10Products, setTop10Products] = useState([]);
-
+  const [totalBuys, setTotalBuys] = useState({});
   useEffect(() => {
     axios
       .get(`${API_BASE_URL}/api/product/top10`)
       .then((response) => {
         setTop10Products(response.data);
+        response.data.forEach((product) => {
+          fetchTotalBuy(product[0]);
+        });
       })
       .catch((error) => {
         console.error("Error fetching top 10 products:", error);
       });
   }, []);
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    slidesToShow: 4,
-    slidesToScroll: 1,
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />
+  const fetchTotalBuy = async (idProduct) => {
+    try {
+      if (idProduct) {
+        const data = await callAPI(`/api/ratings/getTotalBuy/${idProduct}`, "GET");
+        setTotalBuys((prevTotalBuys) => ({
+          ...prevTotalBuys,
+          [idProduct]: data
+        }));
+      } else {
+        setTotalBuys((prevTotalBuys) => ({
+          ...prevTotalBuys,
+          [idProduct]: 0
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching total buys:", error);
+      setTotalBuys((prevTotalBuys) => ({
+        ...prevTotalBuys,
+        [idProduct]: 0
+      }));
+    }
   };
+
+
 
   return (
     <div className={style.list_item_new}>
@@ -70,26 +90,26 @@ function NewProducts() {
             <Link to={`/product/${product[0]}`}>
               {typeof product[5] === "string"
                 ? (() => {
-                    try {
-                      const images = JSON.parse(product[5]);
-                      const lastImage = images[0];
+                  try {
+                    const images = JSON.parse(product[5]);
+                    const lastImage = images[0];
 
-                      return (
-                        <img
-                          key={lastImage.id}
-                          src={`${lastImage.url}`}
-                          alt={`Image`}
-                          className={style.image}
-                        />
-                      );
-                    } catch (error) {
-                      return <img
+                    return (
+                      <img
+                        key={lastImage.id}
+                        src={`${lastImage.url}`}
+                        alt={`Image`}
+                        className={style.image}
+                      />
+                    );
+                  } catch (error) {
+                    return <img
                       src={`/images/nullimage.png`}
                       alt={`Image`}
                       className={style.image}
                     />;
-                    }
-                  })()
+                  }
+                })()
                 : null}
 
               <div className={style.status}>new</div>
@@ -98,7 +118,7 @@ function NewProducts() {
                 <label className={style.price}>
                   {formatCurrency(product[3], 0)}
                 </label>
-                <label className={style.amount_sell}>Đã bán 999</label>
+                <label className={style.amount_sell}>Đã bán {totalBuys[product[0]] || 0}</label>
               </div>
               <div className={style.show_detail}>Xem chi tiết</div>
             </Link>

@@ -13,7 +13,8 @@ import { callAPI } from "../service/API.js";
 import axios from "axios";
 import { GetDataLogin } from "../service/DataLogin.js";
 import { Nav } from "react-bootstrap";
-import e from "cors";
+import BillDetail from "./bill/BillDetail.jsx";
+
 
 function AdminDashboard() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -24,13 +25,13 @@ function AdminDashboard() {
 
     if (accountLogin !== null) {
       const isAdmin = accountLogin.authorities.some(role => role.authority === 'ROLE_Admin');
-      if(isAdmin){
+      if (isAdmin) {
         try {
           setAccountLogin(accountLogin);
         } catch (error) {
           console.log(error);
         }
-      }else{
+      } else {
         navigate("/not-found");
       }
 
@@ -42,7 +43,7 @@ function AdminDashboard() {
   useEffect(() => {
     getAccountFromSession();
   }, []);
-  
+
   //ROUTER
   const location = useLocation();
   const isActiveHome = location.pathname === "/admin";
@@ -53,7 +54,7 @@ function AdminDashboard() {
   const isActiveListProduct = location.pathname === "/admin/products";
   const isActiveStatistical = location.pathname === "/admin/statistical";
   const isActiveListOrder = location.pathname === "/admin/bills";
-  const isActiveOrderDetail = location.pathname === "/admin/bills/billdetail";
+  const isActiveOrderDetail = location.pathname === "/admin/bills/detail";
   //ListMenu
   const listMenu = [
     {
@@ -112,7 +113,7 @@ function AdminDashboard() {
     borderRadius: "10px"
   };
 
-  
+
   const handleLogout = () => {
     sessionStorage.removeItem("accountLogin");
     sessionStorage.removeItem("accessToken")
@@ -125,7 +126,7 @@ function AdminDashboard() {
   return (
     <React.Fragment>
       <div id={style.adminDashBoard}>
-      <div className={`${style.header}`}>
+        <div className={`${style.header}`}>
           <div className={`${style.logo}`}>
             <img src="/images/LogoFEADS.png" alt="Hình Ảnh" />
             <Nav.Link href="/admin">Kênh Quản Trị</Nav.Link>
@@ -136,17 +137,27 @@ function AdminDashboard() {
                 className={style.image}
                 src={
                   accountLogin &&
-                  accountLogin.infoAccount &&
-                  accountLogin.infoAccount.image
+                    accountLogin.infoAccount &&
+                    accountLogin.infoAccount.image
                     ? accountLogin
-                        .infoAccount.image
+                      .infoAccount.image
                     : "https://bootdey.com/img/Content/avatar/avatar7.png"
                 }
                 alt="Hình Ảnh"
               />
-              <label className={`${style.label} ms-2`}>
-                {accountLogin && accountLogin.fullname}
-              </label>
+              {
+                accountLogin && accountLogin.infoAccount.fullname !== '' ? (
+                  <label className={`${style.label} ms-2`}>
+                    {accountLogin && accountLogin.infoAccount.fullname}
+                  </label>
+                ) : (
+                  <label className={`${style.label} ms-2`}>
+                    {accountLogin && accountLogin.username}
+                  </label>
+
+                )
+              }
+
             </div>
             <div
               className={`${style.logout} ms-2 me-2`}
@@ -189,7 +200,8 @@ function AdminDashboard() {
           {isActiveTypeProduct ? <Category /> : null}
           {isActiveListProduct ? <ProductAdmin /> : null}
           {isActiveStatistical ? <Statistical /> : null}
-          {isActiveListOrder || isActiveOrderDetail ? <Bill /> : null}
+          {isActiveListOrder ? <Bill /> : null}
+          {isActiveOrderDetail ?<BillDetail /> : null}
         </div>
       </div>
     </React.Fragment>

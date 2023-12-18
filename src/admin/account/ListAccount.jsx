@@ -40,6 +40,7 @@ function ListAccount() {
       setIsLoading(true);
       const response = await callAPI(`/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)}&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=account`, "GET", {}, config);
       const responseData = response.data;
+      console.log(response)
       if (response) {
         setIsLoading(false)
       }
@@ -144,41 +145,41 @@ function ListAccount() {
           </div>
           {accounts.map((value, index) => (
             <div key={index} className={style.tableBody}>
-              <label className={style.column}>{value.id}</label>
+              <label className={style.column}>{value[0]}</label>
               <label className={style.column}>
                 <img
                   className={style.image}
                   src={
-                    value.infoAccount?.image
-                      ? value.infoAccount?.image
+                    value[5]
+                      ? value[5]
                       : "https://bootdey.com/img/Content/avatar/avatar7.png"
                   }
                   alt="Hình Ảnh"
                 ></img>
               </label>
-              <label className={style.column}>{value.username}</label>
+              <label className={style.column}>{value[2]}</label>
               <label className={style.column}>
-                {value.infoAccount?.fullname}
+                {value[4]}
               </label>
               <label className={style.column}>
-                {value.infoAccount?.gender === true ? "Nam" : "Nữ"}
+                {value[6] === true ? "Nam" : "Nữ"}
               </label>
               <label className={style.column}>
-                {formatDate(value.create_date)}
+                {formatDate(value[1])}
               </label>
               <label className={style.column}>
                 <span
                   className={style.statusAccount}
-                  style={{ backgroundColor: value.status ? "green" : "red" }}
+                  style={{ backgroundColor: value[3] ? "green" : "red" }}
                 >
-                  {value.status ? "Đang hoạt động" : "Cấm hoạt động"}
+                  {value[3] ? "Đang hoạt động" : "Cấm hoạt động"}
                 </span>
               </label>
               <label className={style.column}>
                 <i
                   className={`bi bi-pencil-square`}
                   onClick={() => {
-                    dispatch(getIdAccountAdmin(value.id));
+                    dispatch(getIdAccountAdmin(value[0]));
                     openModal();
                   }}
                 ></i>

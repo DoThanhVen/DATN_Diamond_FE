@@ -2,10 +2,6 @@
     font-family: 'Roboto';
 }
 
-#adminDashBoard {
-    background-color: #ECECEC;
-}
-
 
 .header {
     height: 70px;
@@ -86,7 +82,7 @@
     float: left;
     background-color: white;
     position: fixed;
-    top:70px;
+    top: 70px;
 }
 
 #content {
@@ -95,6 +91,7 @@
     float: right;
     padding: 20px;
     margin-top: 70px;
+    background-color: rgba(211, 211, 211, .4);
 }
 
 .logo {

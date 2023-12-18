@@ -29,7 +29,7 @@ function Profile_User() {
   const [imageNew, setimageNew] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [token, settoken] = useState(null);
-  const [reload,setreload]=useState(0)
+  const [reload, setreload] = useState(0)
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
     const tokenac = sessionStorage.getItem('accessToken');
@@ -128,75 +128,79 @@ function Profile_User() {
     fileInputRef.current.click();
   };
   const handleUpdateProfile = async () => {
-    if (
-      fullname === "" ||
-      phone === "" ||
-      id_card === ""
-    ) {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else {
-      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-      if (isConfirmed) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        };
-        if (selectedImage === null) {
-          setIsLoading(true);
-          const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
-            fullname,
-            id_card,
-            phone,
-            gender,
-            email,
-            image
-          }, config)
-          setIsLoading(false)
-          if (response.status === "success") {
-            ThongBao(response.message, "success");
-            accountLogin.infoAccount.id_card = id_card;
-            accountLogin.infoAccount.phone = phone;
-            accountLogin.infoAccount.gender = gender;
-            accountLogin.infoAccount.email = email;
-            accountLogin.infoAccount.fullname = fullname;
-            const base64String = utf8_to_b64(accountLogin);
-            sessionStorage.setItem("accountLogin", base64String);
+    try {
+      if (
+        fullname === "" ||
+        phone === "" ||
+        id_card === ""
+      ) {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          if (selectedImage === null) {
+            setIsLoading(true);
+            const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
+              fullname,
+              id_card,
+              phone,
+              gender,
+              email,
+              image
+            }, config)
+            setIsLoading(false)
+            if (response.status === "success") {
+              ThongBao(response.message, "success");
+              accountLogin.infoAccount.id_card = id_card;
+              accountLogin.infoAccount.phone = phone;
+              accountLogin.infoAccount.gender = gender;
+              accountLogin.infoAccount.email = email;
+              accountLogin.infoAccount.fullname = fullname;
+              const base64String = utf8_to_b64(accountLogin);
+              sessionStorage.setItem("accountLogin", base64String);
+            } else {
+              ThongBao(response.message, "error");
+            }
           } else {
-            ThongBao(response.message, "error");
-          }
-        } else {
-          if (imageNew === null) {
-            ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-          }
-          setIsLoading(true);
-          const downloadURL = await uploadImageToFirebaseStorage(imageNew);
-          const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
-            fullname,
-            id_card,
-            phone,
-            gender,
-            email,
-            image: downloadURL
-          }, config)
-          setIsLoading(false)
-          if (response.status === "success") {
-            ThongBao(response.message, "success");
-            accountLogin.infoAccount.id_card = id_card;
-            accountLogin.infoAccount.phone = phone;
-            accountLogin.infoAccount.gender = gender;
-            accountLogin.infoAccount.email = email;
-            accountLogin.infoAccount.fullname = fullname;
-            accountLogin.infoAccount.image = downloadURL;
-            const base64String = utf8_to_b64(accountLogin);
-            sessionStorage.setItem("accountLogin", base64String);
-          } else {
-            ThongBao(response.message, "error");
+            if (imageNew === null) {
+              ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+            }
+            setIsLoading(true);
+            const downloadURL = await uploadImageToFirebaseStorage(imageNew);
+            const response = await callAPI(`/api/auth/account/updateprofile/${username}`, 'POST', {
+              fullname,
+              id_card,
+              phone,
+              gender,
+              email,
+              image: downloadURL
+            }, config)
+            setIsLoading(false)
+            if (response.status === "success") {
+              ThongBao(response.message, "success");
+              accountLogin.infoAccount.id_card = id_card;
+              accountLogin.infoAccount.phone = phone;
+              accountLogin.infoAccount.gender = gender;
+              accountLogin.infoAccount.email = email;
+              accountLogin.infoAccount.fullname = fullname;
+              accountLogin.infoAccount.image = downloadURL;
+              const base64String = utf8_to_b64(accountLogin);
+              sessionStorage.setItem("accountLogin", base64String);
+            } else {
+              ThongBao(response.message, "error");
+            }
           }
         }
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra.", "error")
     }
-  };
+  }
   const handleImageChange = e => {
     const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
@@ -222,141 +226,167 @@ function Profile_User() {
   };
 
   const handleChangePass = async () => {
-    if (oldPassword === "" || newPassword === "" || reNewPassword === "") {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else {
-      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-      if (isConfirmed) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        };
-        const formData = new FormData();
-        formData.append("oldPassword", oldPassword);
-        formData.append("newPassword", newPassword);
-        formData.append("reNewPassword", reNewPassword);
-        const response = await callAPI(`/api/auth/account/changepass/${username}`, 'POST', formData, config);
-        ThongBao(response.message, response.status)
+    try {
+      if (oldPassword === "" || newPassword === "" || reNewPassword === "") {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const formData = new FormData();
+          formData.append("oldPassword", oldPassword);
+          formData.append("newPassword", newPassword);
+          formData.append("reNewPassword", reNewPassword);
+          const response = await callAPI(`/api/auth/account/changepass/${username}`, 'POST', formData, config);
+          ThongBao(response.message, response.status)
+        }
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra", "error")
     }
+
   };
 
   const handleCreateAddress = async () => {
-    if (city === "" || address === "" || district === "" || ward === "") {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else {
-      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-      if (isConfirmed) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
+    try {
+      if (city === "" || address === "" || district === "" || ward === "") {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const response = await callAPI(
+            `/api/auth/account/createAddress/${username}`,
+            "POST",
+            { city, district, ward, address }, config
+          );
+          if (response.status === "success") {
+            ThongBao(response.message, "success");
+            accountLogin.address_account = response.data;
+            const base64String = utf8_to_b64(accountLogin);
+            sessionStorage.setItem("accountLogin", base64String);
+            setreload(reload + 1)
           }
-        };
-        const response = await callAPI(
-          `/api/auth/account/createAddress/${username}`,
-          "POST",
-          { city, district, ward, address }, config
-        );
-        if (response.status === "success") {
-          ThongBao(response.message, "success");
-          accountLogin.address_account = response.data;
-          const base64String = utf8_to_b64(accountLogin);
-          sessionStorage.setItem("accountLogin", base64String);
-          setreload(reload+1)
         }
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra.", "error")
     }
+
   };
 
   const handleUpdateAddress = async () => {
-    if (idAddressUse === 0) {
-      ThongBao("Vui lòng chọn địa chỉ cần cập nhật!", "info");
-    } else if (
-      city === "" ||
-      address === "" ||
-      district === "" ||
-      ward === ""
-    ) {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else {
-      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-      if (isConfirmed) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
+    try {
+      if (idAddressUse === 0) {
+        ThongBao("Vui lòng chọn địa chỉ cần cập nhật!", "info");
+      } else if (
+        city === "" ||
+        address === "" ||
+        district === "" ||
+        ward === ""
+      ) {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else {
+        const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+        if (isConfirmed) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const response = await callAPI(
+            `/api/auth/account/updateAddress/${username}/${idAddressUse}`,
+            "POST",
+            { city, district, ward, address }, config
+          );
+          if (response.status === "success") {
+            ThongBao(response.message, "success");
+            accountLogin.address_account = response.data;
+            const base64String = utf8_to_b64(accountLogin);
+            sessionStorage.setItem("accountLogin", base64String);
+            setreload(reload + 1)
+          } else {
+            ThongBao("Lỗi!", "error");
           }
-        };
-        const response = await callAPI(
-          `/api/auth/account/updateAddress/${username}/${idAddressUse}`,
-          "POST",
-          { city, district, ward, address }, config
-        );
-        if (response.status === "success") {
-          ThongBao(response.message, "success");
-          accountLogin.address_account = response.data;
-          const base64String = utf8_to_b64(accountLogin);
-          sessionStorage.setItem("accountLogin", base64String);
-          setreload(reload+1)
-        } else {
-          ThongBao("Lỗi!", "error");
         }
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra.", "error")
     }
+
   };
 
   const handleSelectUseAddress = async (id, status) => {
-    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-    if (isConfirmed) {
-      if (!status) {
-        const config = {
-          headers: {
-            "Authorization": `Bearer ${token}`
+    try {
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        if (!status) {
+          const config = {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          };
+          const response = await callAPI(
+            `/api/auth/account/useAddress/${username}/${id}`,
+            "POST", {}, config
+          );
+          if (response.status === "success") {
+            setIdAddressUse(id);
+            ThongBao(response.message, "success");
+            accountLogin.address_account = response.data;
+            const base64String = utf8_to_b64(accountLogin);
+            sessionStorage.setItem("accountLogin", base64String);
+            setreload(reload + 1)
+          } else {
+            ThongBao("Lỗi!", "error");
           }
-        };
-        const response = await callAPI(
-          `/api/auth/account/useAddress/${username}/${id}`,
-          "POST", {}, config
-        );
-        if (response.status === "success") {
-          setIdAddressUse(id);
-          ThongBao(response.message, "success");
-          accountLogin.address_account = response.data;
-          const base64String = utf8_to_b64(accountLogin);
-          sessionStorage.setItem("accountLogin", base64String);
-          setreload(reload+1)
         } else {
-          ThongBao("Lỗi!", "error");
+          ThongBao("Địa Chỉ Đã Được Sử Dụng!", "info");
         }
-      } else {
-        ThongBao("Địa Chỉ Đã Được Sử Dụng!", "info");
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra.", "error")
     }
+
   };
 
 
   const handleDeleteAddress = async (id) => {
-    const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
-    if (isConfirmed) {
-      const config = {
-        headers: {
-          "Authorization": `Bearer ${token}`
+    try {
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        const response = await callAPI(
+          `/api/auth/account/deleteAddress/${username}/${id}`,
+          "POST", {}, config
+        );
+        if (response.status === "success") {
+          ThongBao(response.message, "success");
+          accountLogin.address_account = response.data;
+          const base64String = utf8_to_b64(accountLogin);
+          sessionStorage.setItem("accountLogin", base64String);
+          setreload(reload + 1)
+        } else {
+          ThongBao("Lỗi!", "error");
         }
       };
-    const response = await callAPI(
-      `/api/auth/account/deleteAddress/${username}/${id}`,
-      "POST",{},config
-    );
-    if (response.status === "success") {
-      ThongBao(response.message, "success");
-      accountLogin.address_account = response.data;
-      const base64String = utf8_to_b64(accountLogin);
-      sessionStorage.setItem("accountLogin", base64String);
-      setreload(reload+1)
-    } else {
-      ThongBao("Lỗi!", "error");
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra.", "error")
     }
-  };}
+
+  }
   return (
     <>
       <nav>
@@ -370,7 +400,7 @@ function Profile_User() {
                 <div className="account-settings">
                   <div className="user-profile">
                     <div className="user-avatar" style={{ cursor: "pointer" }}>
-                      {accountLogin &&  accountLogin.infoAccount&& accountLogin.infoAccount.image !== '' && accountLogin.infoAccount.image !== null && selectedImage === null ? (
+                      {accountLogin && accountLogin.infoAccount && accountLogin.infoAccount.image !== '' && accountLogin.infoAccount.image !== null && selectedImage === null ? (
                         <img
                           src={
                             accountLogin.infoAccount.image
@@ -629,6 +659,30 @@ function Profile_User() {
               <div className="row gutters">
                 <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                   <h6 className="mt-3 text-primary">Địa chỉ</h6>
+                </div>
+                <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label htmlFor="phone">Số điện thoại:</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label htmlFor="phone">Tên người nhận:</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
                 </div>
                 <div className="col-xl-6 col-lg-6 mt-2 col-md-6 col-sm-6 col-12">
                   <div className="form-group">

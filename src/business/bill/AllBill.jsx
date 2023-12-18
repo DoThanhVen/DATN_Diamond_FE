@@ -7,6 +7,7 @@ import { GetDataLogin } from "../../service/DataLogin";
 import { Navigate, useNavigate } from "react-router";
 import { callAPI } from "../../service/API";
 import moment from "moment";
+import { TypeSpecimenSharp } from "@mui/icons-material";
 
 const numberProductPage = 10;
 
@@ -53,10 +54,12 @@ export default function AllBill() {
   const closeModal = () => {
     setIsModalOpen(false);
     setModalData({});
+    setIsLoad(isload + 1)
+
   };
   //FORM SEARCH
-  const [selectedOption, setSelectedOption] = React.useState("");
-  const [valueOption, setValueOption] = React.useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [valueOption, setValueOption] = useState(1);
   const handleChangeOption = (event) => {
     const selectedOptionValue = event.target.value;
     let text = "";
@@ -74,10 +77,10 @@ export default function AllBill() {
 
   const [orders, setOrder] = useState([]);
   const [shop, setShop] = useState([]);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(0);
   const [keyword, setKeyword] = useState("");
   const [listStatus, setListStatus] = useState([]);
-  const isload = false;
+  const [isload,setIsLoad] = useState(0);
   const fetchApiShop = async () => {
     const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
     setOrder(response.data)
@@ -94,7 +97,7 @@ export default function AllBill() {
     fetchApiShop();
     // getAccountFromSession();
   }, [isload]);
- 
+
   const onChangeStatus = async (status) => {
     if (status == "") {
       const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
@@ -105,44 +108,37 @@ export default function AllBill() {
       setOrder(response.data)
     }
   };
-  const handleSearch = () => {
-    if (status == "") {
-      axios
-        .get(
-          `http://localhost:8080/api/auth/order/find/shop/${accountLogin.shop.id}?keyword=${keyword}`
-        )
-        .then((reponse) => {
-          setOrder(reponse.data.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+  const handleSearch = async () => {
+    console.log(keyword)
+    if (valueOption == 1) {
+      if (Number(keyword)) {
+        const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&&type=${valueOption}`, 'GET', {}, config);
+        console.log(response)
+        setOrder(response.data)
+      }
+      else {
+        alert('Looix')
+      }
     } else {
-      axios
-        .get(
-          `http://localhost:8080/api/auth/shop/${accountLogin.shop.id}/status/${status}?keyword=${keyword}`
-        )
-        .then((reponse) => {
-          setOrder(reponse.data.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&&type=${valueOption}`, 'GET', {}, config);
+      console.log(response)
+      setOrder(response.data)
     }
-  };
 
+  }
   // console.log(orders?.content?.status[orders?.content?.status.length -1].status.id)
   return (
     <React.Fragment>
       <div className={`${style.formSearch}`}>
         <select
           value={valueOption}
-          onChange={handleChangeOption}
+          onChange={(e) => {
+            setValueOption(e.target.value)
+          }}
           className={`${style.optionSelect}`}
         >
-          <option value="idBill">Mã đơn hàng</option>
-          <option value="customerName">Tên người mua</option>
-          <option value="productName">Sản phẩm</option>
+          <option value={1} >Mã đơn hàng</option>
+          <option value={2}>Sản phẩm</option>
         </select>
         <input
           onChange={(e) => {
@@ -181,69 +177,76 @@ export default function AllBill() {
           ))}
         </select>
       </div>
-      
-        <div className={`${style.cardContainerTable}`}>
-          <table className={`table`}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Mã Hóa Đơn</th>
-                <th>Trạng Thái</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                orders?.map((value, index) => (
-                  <tr key={index}>
-                    <th>{index + 1}</th>
-                    <td>{value.id}</td>
-                    <td style={{ position: "relative" }}>
-                      <span
-                        style={{
-                          backgroundColor:
-                            value.status[value.status.length - 1].status.id ===
-                              "1"
-                              ? "#34219E"
+
+      <div className={`${style.cardContainerTable}`}>
+        <table className={`table`}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Mã Hóa Đơn</th>
+              <th 
+              
+              >Thông tin người nhận</th>
+              <th>Trạng Thái</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              orders?.map((value, index) => (
+                <tr key={index}>
+                  <th>{index + 1}</th>
+                  <td>{value.id}</td>
+                  <td
+                        width={200}
+                  
+                  >{JSON.parse(value.address_order.replace(/\\/g, '')).city}</td>
+                  <td style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        backgroundColor:
+                          value.status[value.status.length - 1].status.id ===
+                            "1"
+                            ? "#34219E"
+                            : value.status[value.status.length - 1].status
+                              .id === "2"
+                              ? "#FA9A18"
                               : value.status[value.status.length - 1].status
-                                .id === "2"
+                                .id === "3"
                                 ? "#FA9A18"
                                 : value.status[value.status.length - 1].status
-                                  .id === "3"
+                                  .id === "4"
                                   ? "#FA9A18"
                                   : value.status[value.status.length - 1].status
-                                    .id === "4"
-                                    ? "#FA9A18"
+                                    .id === "5"
+                                    ? "#2ECC71"
                                     : value.status[value.status.length - 1].status
-                                      .id === "5"
+                                      .id === "6"
                                       ? "#2ECC71"
                                       : value.status[value.status.length - 1].status
-                                        .id === "6"
-                                        ? "#2ECC71"
+                                        .id === "7"
+                                        ? "orange"
                                         : value.status[value.status.length - 1].status
-                                          .id === "7"
-                                          ? "orange"
-                                          : value.status[value.status.length - 1].status
-                                            .id === "8"
-                                            ? "red"
-                                            : "#E74C3C",
-                          width: "150px",
-                          height: "80%",
-                          left: "50%",
-                          top: "50%",
-                          transform: "translate(-50%,-50%)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          borderRadius: "20px",
-                          color: "white",
-                          position: "absolute",
-                          fontSize: "14px"
-                        }}
-                        value={`${value.status}`}
-                      >
-                        {value?.status[value.status.length - 1]?.status.name}
-                        {/* {value.status[value.status.length - 1].status.id === "1"
+                                          .id === "8"
+                                          ? "red"
+                                          : "#E74C3C",
+                        width: "150px",
+                        height: "80%",
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%,-50%)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: "20px",
+                        color: "white",
+                        position: "absolute",
+                        fontSize: "14px"
+                      }}
+                      value={`${value.status}`}
+                    >
+                      {value?.status[value.status.length - 1]?.status.name}
+                      {/* {value.status[value.status.length - 1].status.id === "1"
                         ? "Chờ Xác Nhận"
                         : value.status[value.status.length - 1].status.id ===
                           "2"
@@ -267,20 +270,21 @@ export default function AllBill() {
                           "8"
                         ? "Đã Hủy"
                         : "Giao Thất Bại"} */}
-                      </span>
-                    </td>
-                    <td
-                      onClick={() => {
-                        handleClickChiTiet(value);
-                      }}
-                    >
-                      Xem Chi Tiết
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
+                    </span>
+                  </td>
+                  
+                  <td
+                    onClick={() => {
+                      handleClickChiTiet(value);
+                    }}
+                  >
+                    Xem Chi Tiết
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
       {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} listStatus={listStatus} isLoad={isload} />}
     </React.Fragment>
   );

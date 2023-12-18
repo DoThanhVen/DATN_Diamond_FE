@@ -5,6 +5,7 @@ import ModelEdit from "./ModelEdit";
 import axios from "axios";
 import { callAPI } from "../../service/API";
 import { GetDataLogin } from "../../service/DataLogin";
+import { ThongBao } from "../../service/ThongBao";
 
 const numberProductPage = 10;
 export default function UnpaidBill() {
@@ -52,7 +53,7 @@ export default function UnpaidBill() {
   };
 
   const [orders, setOrders] = useState([]);
-  const [load, isLoad] = useState(false);
+  const [load, isLoad] = useState(0);
   const [listStatus, setListStatus] = useState([]);
   const isload = false;
   const fetchApi = async () => {
@@ -73,8 +74,8 @@ export default function UnpaidBill() {
   const handleOrder = async (id) => {
     const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${2}`, 'PUT', {}, config);
     if (response.status == 'SUCCESS') {
-      isLoad = true;
-      alert("success")
+      isLoad(load + 1);
+      ThongBao("Duyệt đơn thành công!", "success")
     }
   };
   return (

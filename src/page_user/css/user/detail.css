@@ -10,3 +10,39 @@
   padding: 10px;
   margin-bottom: 10px;
 }
+
+.inner {
+  padding: 1em;
+  background-color: white;
+  overflow: hidden;
+  position: relative;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.rating {
+  margin-right: 5%;
+  text-align: center;
+}
+
+.rating-num {
+  color: #141414;
+  font-size: 60px;
+  font-weight: 100;
+  line-height: 1em;
+}
+
+.rating-stars {
+  font-size: 20px;
+  color: #ffc107;
+  margin-bottom: .5em;
+}
+
+.rating-stars .active {
+  color: #737373;
+}
+
+.rating-users {
+  font-size: 14px;
+}

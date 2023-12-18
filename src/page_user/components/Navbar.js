@@ -13,7 +13,6 @@ import { cartSelector } from '../../actions/actions';
 import { useSelector } from 'react-redux';
 import SearchBar from "./searchBar";
 
-
 const MainNavbar = () => {
   const cart = useSelector(cartSelector);
   let total = 0;
@@ -113,7 +112,7 @@ const MainNavbar = () => {
                     </li>
                     <li>
                       {accountLogin !== null ? (
-                        accountLogin.username
+                        accountLogin.infoAccount.fullname ? accountLogin.infoAccount.fullname : accountLogin.username
                       ) : (
                         <div>
                           <i className="ti-power-off"></i>

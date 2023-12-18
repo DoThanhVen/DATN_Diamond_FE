@@ -93,7 +93,7 @@ export default function SalesRegistration() {
   };
 
   const handleSaleRegis = async () => {
-    if (accountLogin.infoAccount.id_card === null || accountLogin.infoAccount.image === null || accountLogin.infoAccount.phone === null) {
+    if (accountLogin.infoAccount.id_card === null || accountLogin.infoAccount.phone === null) {
       ThongBao("Vui lòng nhập đầy đủ thông tin tài khoản trước khi đăng kí Cửa hàng!", "error");
     }
     else {

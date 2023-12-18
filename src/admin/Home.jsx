@@ -18,157 +18,188 @@ function formatCurrency(price, promotion) {
 }
 
 function Home() {
-  const [products, setProducts] = useState([]);
-  const [shops, setShops] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [orders, setOrders] = useState([]);
+  const [product, setProduct] = useState();
+  const [account, setAccount] = useState();
+  const [order, setOrder] = useState();
+  const [shop, setShop] = useState();
+  const [top10, setTop10] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
   useEffect(() => {
     getDataProducts();
     getDataShop();
     getDataAccounts();
     getDataOrders();
+    getTop10();
   }, []);
-
-  const countProduct = (status) => {
-    const amount = products.filter(product => product.status === status); // Giả sử có trường 'isActive' để xác định sản phẩm có đang hoạt động hay không
-    return amount.length;
-  }
-  const countShop = (status) => {
-    const amount = shops.filter(shops => shops.status === status); // Giả sử có trường 'isActive' để xác định sản phẩm có đang hoạt động hay không
-    return amount.length;
-  }
-  const countAccount = (status) => {
-    const amount = accounts.filter(accounts => accounts.status === status); // Giả sử có trường 'isActive' để xác định sản phẩm có đang hoạt động hay không
-    return amount.length;
-  }
 
   const getDataProducts = async () => {
     try {
       setIsLoading(true)
-      const response = await callAPI(
-        `/api/product/getAll?key=&keyword=&offset=0&sizePage=1000000&sort=&sortType=&status=`,
-        "GET"
-      );
-      if(response){
-        setProducts(response.data.content || []);
-        setIsLoading(false)
+      const response = await callAPI(`/api/admin/thongke/product`, "GET");
+      setIsLoading(false)
+      if (response) {
+        setProduct(response.data);
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  const getDataAccounts = async (page) => {
+  const getDataAccounts = async page => {
     try {
-      const response = await callAPI(
-        `/api/account/findAll`,
-        "GET"
-      );
-      setAccounts(response.data)
+      setIsLoading(true)
+      const response = await callAPI(`/api/admin/thongke/account`, "GET");
+      setIsLoading(false)
+      if (response) {
+        setAccount(response.data);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
   const getDataOrders = async () => {
-    const token = sessionStorage.getItem('accessToken');
     try {
-      const config = {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      };
-      const response = await callAPI(`/api/auth/order/getAllList`, "GET", {}, config);
-      setOrders(response.data)
+      setIsLoading(true)
+      const response = await callAPI(`/api/admin/thongke/order`, "GET");
+      setIsLoading(false)
+      if (response) {
+        setOrder(response.data);
+      }
     } catch (error) {
-
+      console.error("Error fetching data:", error);
     }
-  }
+  };
   const getDataShop = async () => {
-    const response = await callAPI("/api/shop/findAll", "GET")
-    if (response) {
-      setShops(response.data)
+    try {
+      setIsLoading(true)
+      const response = await callAPI(`/api/admin/thongke/shop`, "GET");
+      setIsLoading(false)
+      if (response) {
+        setShop(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }
+  };
+  const getTop10 = async () => {
+    try {
+      setIsLoading(true)
+      const response = await callAPI(`/api/admin/thongke/top10`, "GET");
+      setIsLoading(false)
+      if (response) {
+        setTop10(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   return (
     <React.Fragment>
       <div className={style.card_info}>
         <div className={style.card}>
           <label className={style.icon}>
-            <i className={`bi bi-bag ${style.icon_edit}`}></i>
+            <i className={`bi bi-bag ${style.icon_edit}`} />
           </label>
           <div className={style.total}>
             <label className={style.label}>Tổng số sản phẩm</label>
-            <label className={style.amount}>{products ? products.length : 0}</label>
+            <label className={style.amount}>
+              {product ? product[0] + product[1] + product[2] + product[3] : 0}
+            </label>
           </div>
           <div className={style.list_status}>
             <div className={style.status}>
               <label className={style.label}>Chờ phê duyệt</label>
-              <label className={style.amount}>{countProduct(0)}</label>
+              <label className={style.amount}>
+                {product ? product[0] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Đang hoạt động</label>
-              <label className={style.amount}>{countProduct(1)}</label>
+              <label className={style.amount}>
+                {product ? product[1] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Dừng hoạt động</label>
-              <label className={style.amount}>{countProduct(2)}</label>
+              <label className={style.amount}>
+                {product ? product[2] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Cấm hoạt động</label>
-              <label className={style.amount}>{countProduct(3)}</label>
+              <label className={style.amount}>
+                {product ? product[3] : 0}
+              </label>
             </div>
           </div>
         </div>
         <div className={style.card}>
           <label className={style.icon}>
-            <i className={`bi bi-shop  ${style.icon_edit}`}></i>
+            <i className={`bi bi-shop  ${style.icon_edit}`} />
           </label>
           <div className={style.total}>
             <label className={style.label}>Số lượng gian hàng</label>
-            <label className={style.amount}>{shops ? shops.length : 0}</label></div>
+            <label className={style.amount}>
+              {shop ? shop[0] + shop[1] + shop[2] : 0}
+            </label>
+          </div>
           <div className={style.list_status}>
             <div className={style.status}>
               <label className={style.label}>Chờ phê duyệt</label>
-              <label className={style.amount}>{countShop(0)}</label>
+              <label className={style.amount}>
+                {shop ? shop[0] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Đang hoạt động</label>
-              <label className={style.amount}>{countShop(1)}</label>
+              <label className={style.amount}>
+                {shop ? shop[1] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Cấm hoạt động</label>
-              <label className={style.amount}>{countShop(2)}</label>
+              <label className={style.amount}>
+                {shop ? shop[2] : 0}
+              </label>
             </div>
           </div>
         </div>
         <div className={style.card}>
           <label className={style.icon}>
-            <i className={`bi bi-person-circle ${style.icon_edit}`}></i>
+            <i className={`bi bi-person-circle ${style.icon_edit}`} />
           </label>
           <div className={style.total}>
             <label className={style.label}>Số lượng tài khoản</label>
-            <label className={style.amount}>{accounts ? accounts.length : 0}</label></div>
-            <div className={style.list_status}>
+            <label className={style.amount}>
+              {account ? account[0] + account[1] : 0}
+            </label>
+          </div>
+          <div className={style.list_status}>
             <div className={style.status}>
               <label className={style.label}>Đang hoạt động</label>
-              <label className={style.amount}>{countAccount(true)}</label>
+              <label className={style.amount}>
+                {account ? account[0] : 0}
+              </label>
             </div>
             <div className={style.status}>
               <label className={style.label}>Cấm hoạt động</label>
-              <label className={style.amount}>{countAccount(false)}</label>
+              <label className={style.amount}>
+                {account ? account[1] : 0}
+              </label>
             </div>
           </div>
         </div>
         <div className={style.card}>
           <label className={style.icon}>
-            <i className={`bi bi-receipt-cutoff ${style.icon_edit}`}></i>
+            <i className={`bi bi-receipt-cutoff ${style.icon_edit}`} />
           </label>
           <div className={style.total}>
-
             <label className={style.label}>Số lượng đơn hàng</label>
-            <label className={style.amount}>{orders ? orders.length : 0}</label></div>
+            <label className={style.amount}>
+              {order ? order : 0}
+            </label>
+          </div>
         </div>
       </div>
       <div className={style.listProduct}>
@@ -185,16 +216,17 @@ function Home() {
             <label className={style.column}>Loại SP</label>
             <label className={style.column}>Giá SP</label>
             <label className={style.column}>Ngày tạo</label>
+            <label className={style.column}>Đã Bán</label>
           </div>
-          {products.map((value, index) => (
+          {top10.map((value, index) => (
             <div key={index} className={style.tableBody}>
-              <label className={style.column}>{value.id}</label>
+              <label className={style.column}>{value[0].id}</label>
               <label className={style.column}>
-                {value.image_product != null ? (
+                {value[0].image_product != null ? (
                   <img
-                    key={value.image_product[0].id}
+                    key={value[0].image_product[0].id}
                     className={style.image}
-                    src={`${value.image_product[0].url}`}
+                    src={`${value[0].image_product[0].url}`}
                     alt="Hình Ảnh"
                   />
                 ) : (
@@ -205,15 +237,18 @@ function Home() {
                   />
                 )}
               </label>
-              <label className={style.column}>{value.product_name}</label>
+              <label className={style.column}>{value[0].product_name}</label>
               <label className={style.column}>
-                {value.categoryItem_product?.type_category_item}
+                {value[0].categoryItem_product?.type_category_item}
               </label>
               <label className={style.column}>
-                {formatCurrency(value.price, 0)}
+                {formatCurrency(value[0].price, 0)}
               </label>
               <label className={style.column}>
-                {formatDate(value.create_date)}
+                {formatDate(value[0].create_date)}
+              </label>
+              <label className={style.column}>
+                {value[1]}
               </label>
             </div>
           ))}

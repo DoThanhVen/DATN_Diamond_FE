@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { ThongBao } from "../service/ThongBao";
 import { signInWithGoogle } from "../service/firebase";
+import LoadingOverlay from "../service/loadingOverlay";
 
 function encodeObjectToBase64(obj) {
   const jsonString = JSON.stringify(obj);
@@ -20,13 +21,17 @@ function encodeObjectToBase64(obj) {
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {e.preventDefault()
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setIsLoading(true);
     const response = await callAPI(`/api/login`, 'POST', {
       username: username,
       password: password
     })
+    setIsLoading(false);
     if (response.status === 'success') {
       sessionStorage.setItem('accessToken', response.data.token)
       const base64String = encodeObjectToBase64(response.data.data);
@@ -39,7 +44,7 @@ function Login() {
 
   const Login = async () => {
     const res = await signInWithGoogle();
-    if (res!==null) {
+    if (res !== null) {
       const formData = new FormData();
       formData.append('email', res.user.email)
       formData.append('displayName', res.user.displayName)
@@ -52,7 +57,7 @@ function Login() {
       } else {
         ThongBao(response.message, response.status)
       }
-    }else{
+    } else {
       return;
     }
   }
@@ -148,6 +153,7 @@ function Login() {
       <div id="footer">
         <Footer />
       </div>
+      <LoadingOverlay isLoading={isLoading} />
     </>
   );
 }

@@ -5,8 +5,6 @@ import getAccountFromCookie from '../service/getAccountLogin';
 import { useNavigate } from 'react-router';
 import { callAPI } from '../service/API';
 import ScrollableFeed from 'react-scrollable-feed';
-import Footer from '../page_user/components/Footer';
-import MainNavbar from '../page_user/components/Navbar';
 import moment from 'moment';
 import './App.css'
 import { ThongBao } from '../service/ThongBao';
@@ -50,7 +48,7 @@ const ChatApp = (shopName) => {
   const getData = async () => {
     try {
       const accountData = getAccountFromCookie();
-      if (shopName.shop!==null) {
+      if (shopName.shop !== null) {
         const res = await callAPI(`/api/account/findaccountbyshopname/${shopName.shop}`, 'GET');
         if (accountData) {
           setUserData({
@@ -291,46 +289,54 @@ const ChatApp = (shopName) => {
   function formatDate(date) {
     return moment(date).format("DD-MM-YYYY HH:mm:ss");
   }
-
+  const noConversations =
+    historySender.length === 0 &&
+    historyReceiver.length === 0 &&
+    receiverData.length === 0;
   return (
     <React.Fragment>
       {userData.connected ? (
         <div className="chat-box">
           <div className="member-list">
-            <ul>
-              {historySender && historySender.map((name, index) => (
-                name.receiver && name.receiver.username !== receiverData[0] && name.receiver.username !== userData.username && (
-                  <li
-                    onClick={() => { registerUser(); getHistoryData2(name.receiver.username); setSelectedRecipient(name.receiver.username); }}
-                    className={`member ${tab === name.receiver.username && 'active'}`}
-                    key={index}
-                  >
-                    {name.receiver.username}
-                  </li>
-                )
-              ))}
-              {historyReceiver && historyReceiver.map((name, index) => (
-                name.sender && name.receiver.username !== receiverData[0] && name.sender.username !== userData.username && (
-                  <li
-                    onClick={() => { registerUser(); getHistoryData2(name.sender.username); setSelectedRecipient(name.sender.username); }}
-                    className={`member ${tab === name.sender.username && 'active'}`}
-                    key={index}
-                  >
-                    {name.sender.username}
-                  </li>)
-              ))}
-              {receiverData && receiverData.map((name, index) => (
-                name !== userData.username && (
-                  <li
-                    onClick={() => { registerUser(); getHistoryData2(name); setSelectedRecipient(name); }}
-                    className={`member ${tab === name && 'active'}`}
-                    key={index}
-                  >
-                    {name}
-                  </li>
-                )
-              ))}
-            </ul>
+            {noConversations ? (
+              <p>Không có cuộc trò chuyện</p>
+            ) : (
+              <ul>
+                {historySender && historySender.map((name, index) => (
+                  name.receiver && name.receiver.username !== receiverData[0] && name.receiver.username !== userData.username && (
+                    <li
+                      onClick={() => { registerUser(); getHistoryData2(name.receiver.username); setSelectedRecipient(name.receiver.username); }}
+                      className={`member ${tab === name.receiver.username && 'active'}`}
+                      key={index}
+                    >
+                      {name.receiver.username}
+                    </li>
+                  )
+                ))}
+                {historyReceiver && historyReceiver.map((name, index) => (
+                  name.sender && name.receiver.username !== receiverData[0] && name.sender.username !== userData.username && (
+                    <li
+                      onClick={() => { registerUser(); getHistoryData2(name.sender.username); setSelectedRecipient(name.sender.username); }}
+                      className={`member ${tab === name.sender.username && 'active'}`}
+                      key={index}
+                    >
+                      {name.sender.username}
+                    </li>)
+                ))}
+                {receiverData && receiverData.map((name, index) => (
+                  name !== userData.username && (
+                    <li
+                      onClick={() => { registerUser(); getHistoryData2(name); setSelectedRecipient(name); }}
+                      className={`member ${tab === name && 'active'}`}
+                      key={index}
+                    >
+                      {name}
+                    </li>
+                  )
+                ))}
+              </ul>
+            )}
+
           </div>
 
           {selectedRecipient ? (

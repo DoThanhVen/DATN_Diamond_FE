@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { callAPI } from "../../service/API";
 import { GetDataLogin } from "../../service/DataLogin";
+import { ThongBao } from "../../service/ThongBao";
+import { DataArray } from "@mui/icons-material";
 
 //CHUYỂN ĐỔI TIỀN TỆ
 function formatCurrency(price, promotion) {
@@ -17,7 +19,7 @@ function formatCurrency(price, promotion) {
 }
 export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
 
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState(data.status[data.status.length - 1].status.id + 1);
   const accountLogin = GetDataLogin();
 
   const accessToken = sessionStorage.getItem('accessToken')
@@ -40,13 +42,14 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
   }
 
   const handleChangeStatus = async (id) => {
-    const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${listStatus[data.status.length + 1].id}`, 'PUT', {}, config);
+    const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${status}`, 'PUT', {}, config);
     if (response.status == 'SUCCESS') {
       isLoad = !isLoad;
-      alert("success")
+      ThongBao("Duyệt đơn thành công!", "success")
+      closeModal()
     }
-
   }
+
   return (
     <React.Fragment>
       <div className={`${style.formCardModel}`}>
@@ -79,13 +82,19 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
             </ul>
           </div>
           <span>Trạng thái tiếp theo: </span>
-          {data.status[data.status.length - 1].status.id != 4 && data.status[data.status.length - 1].status.id != 6 ? (
+          {data.status[data.status.length - 1].status.id != 6 && data.status[data.status.length - 1].status.id != 8 && data.status[data.status.length - 1].status.id != 9 ? (
             <select className={`${style.cardModelStatus}`} onChange={
               (e) => {
                 setStatus(e.target.value)
               }
             }>
-              <option>{listStatus[data.status.length + 1].name}</option>
+              <option value={data.status[data.status.length - 1].status.id + 1}>{listStatus[data.status.length + 1].name}</option>
+              {data.status[data.status.length - 1].status.id === 5 ? (
+                <>
+                  <option value="8">{listStatus[7].name}</option>
+                  <option value="9">{listStatus[8].name}</option>
+                </>
+              ) : null}
 
             </select>
           ) : ''}
@@ -103,7 +112,7 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
               <div key={index} className={`${style.cardModelProduct}`}>
                 <span>{index + 1}</span>
                 <div>
-                  <img src={value.productOrder.image_product[0].url}/>
+                  <img src={value.productOrder.image_product[0].url} />
                 </div>
                 <div>{value.productOrder.product_name}</div>
                 <div>{formatCurrency(Number(value.productOrder.price), 0)}</div>
@@ -116,7 +125,7 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
             Tổng tiền:{" "}
             <b style={{ color: "red" }}>{formatCurrency(getTotal(), 0)}</b>
           </div>
-          {data.status[data.status.length - 1].status.id != 6||data.status[data.status.length - 1].status.id != 7||data.status[data.status.length - 1].status.id != 9 || data.status[data.status.length - 1].status.id != 8 &&
+          {data.status[data.status.length - 1].status.id != 6 && data.status[data.status.length - 1].status.id != 7 && data.status[data.status.length - 1].status.id != 9 && data.status[data.status.length - 1].status.id != 8 &&
             <button onClick={() => {
               handleChangeStatus(data.id)
             }} className={`btn btn-primary mt-3`}>Lưu Thay Đổi</button>}

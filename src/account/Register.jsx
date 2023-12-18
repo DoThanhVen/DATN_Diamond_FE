@@ -58,6 +58,11 @@ export default function Register() {
 
 
   const handleValidate = async (e) => {
+    try {
+      
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra","error")
+    }
     if (
       username === "" ||
       password === "" ||
@@ -93,47 +98,52 @@ export default function Register() {
   };
 
   const handleRegis = async (e) => {
-    if (username === "" || password === "" || email === "" || code === "") {
-      ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
-    } else if (email !== checkEmail) {
-      ThongBao("Email không khớp với email đã xác nhận!", "error");
-    } else if (
-      validateCode !== "" &&
-      Cookies.get("codeRegister") === undefined
-    ) {
-      ThongBao("Mã OTP đã hết hạn!", "error");
-    } else {
-      if (checkbox === false) {
-        ThongBao(
-          "Vui lòng đồng ý với các điều khoản trước khi đăng ký!",
-          "error"
-        );
+    try {
+      if (username === "" || password === "" || email === "" || code === "") {
+        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      } else if (email !== checkEmail) {
+        ThongBao("Email không khớp với email đã xác nhận!", "error");
+      } else if (
+        validateCode !== "" &&
+        Cookies.get("codeRegister") === undefined
+      ) {
+        ThongBao("Mã OTP đã hết hạn!", "error");
       } else {
-        if (password === repassword) {
-          if (code === validateCode) {
-            const response = await callAPI(`/api/register`, 'POST', {
-              username: username,
-              password: password,
-              email: email
-            })
-            if (response.status === 'success') {
-              ThongBao(response.message, response.status);
-              clearInput();
-              const delay = setTimeout(() => {
-                navigate("/login");
-              }, 800);
-              return () => clearTimeout(delay);
+        if (checkbox === false) {
+          ThongBao(
+            "Vui lòng đồng ý với các điều khoản trước khi đăng ký!",
+            "error"
+          );
+        } else {
+          if (password === repassword) {
+            if (code === validateCode) {
+              const response = await callAPI(`/api/register`, 'POST', {
+                username: username,
+                password: password,
+                email: email
+              })
+              if (response.status === 'success') {
+                ThongBao(response.message, response.status);
+                clearInput();
+                const delay = setTimeout(() => {
+                  navigate("/login");
+                }, 800);
+                return () => clearTimeout(delay);
+              } else {
+                ThongBao(response.message, response.status);
+              }
             } else {
-              ThongBao(response.message, response.status);
+              ThongBao("Mã xác nhận không chính xác!", "error");
             }
           } else {
-            ThongBao("Mã xác nhận không chính xác!", "error");
+            ThongBao("Mật khẩu không trùng khớp!", "error");
           }
-        } else {
-          ThongBao("Mật khẩu không trùng khớp!", "error");
         }
       }
+    } catch (error) {
+      ThongBao("Có lỗi xảy ra")
     }
+
   };
   return (
     <div>

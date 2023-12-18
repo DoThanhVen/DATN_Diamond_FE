@@ -6,10 +6,50 @@ import { ThongBao } from "../../service/ThongBao";
 import { GetDataLogin } from "../../service/DataLogin";
 import { callAPI } from "../../service/API";
 import { useNavigate } from "react-router";
+import PropTypes from 'prop-types';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+
 function OrderList() {
   const [orders, setOrders] = useState([]);
   const [load, isLoad] = useState(false);
-
+  const [listStatus, setListStatus] = useState([]);
 
   const accountLogin = GetDataLogin();
   const accessToken = sessionStorage.getItem('accessToken')
@@ -21,10 +61,17 @@ function OrderList() {
   };
   const fectAPI = async () => {
     const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}`, 'GET', {}, config);
+    const responseStatus = await callAPI(`/api/get/status`, 'GET');
+    setListStatus(responseStatus.data)
     setOrders(response.data)
 
-  };
 
+  };
+  const handleFindOrders = async (status) => {
+    const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}?status=1`, 'GET', {}, config);
+    setOrders(response.data)
+  };
+  console.log(listStatus)
   useEffect(() => {
     fectAPI();
   }, [load]);
@@ -56,6 +103,14 @@ function OrderList() {
     let fm = new Date(date).toLocaleDateString("vi-VI", { timeZone: "UTC" });
     return fm;
   };
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = async (id) => {
+    const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}?status=${id}`, 'GET', {}, config);
+    setOrders(response.data)
+  };
+
   return (
     <>
       <nav>
@@ -67,6 +122,17 @@ function OrderList() {
             <div className="card">
               <div className="card-body">
                 <h5 className="header-title pb-3 mt-0">Đơn hàng của tôi</h5>
+                <div>
+                  <ul>
+                    {listStatus.map((item) => (
+                    <li onClick={() => {
+                      handleChange(item.id)
+                    }}>
+                      {item.name}
+                    </li>
+                     ))}
+                  </ul>
+                </div>
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
                     <thead>

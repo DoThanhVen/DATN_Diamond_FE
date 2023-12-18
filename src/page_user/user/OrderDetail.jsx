@@ -142,16 +142,12 @@ function OrderReceipt() {
                   <strong>FedEx</strong>
                   <span><a href="#" className="text-decoration-underline" target="_blank">FF1234567890</a> <i className="bi bi-box-arrow-up-right"></i> </span>
                   <hr />
-                  <h3 className="h6">Địa chỉ</h3>
+                  <h3 className="h6">Chi tiết</h3>
+                  {order?.status.map((item) => (
                   <address>
-                    {/* <strong>{order?.address.name}</strong><br />
-                    {order?.address.address}, {order?.address.ward}, {order?.address.district},<br />
-                    {order?.address.city}<br />
-                    <abbr title="Phone">P:</abbr> {order?.address.phone} */
-                    order?.address_order
-                    }
-
+                    {item.create_date} : {item.status.name}
                   </address>
+                  ))}
                 </div>
               </div>
             </div>

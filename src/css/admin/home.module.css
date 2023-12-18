@@ -180,7 +180,7 @@
                 }
 
                 &:nth-child(3) {
-                    width: calc(100% - 490px);
+                    width: calc(100% - 570px);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -205,6 +205,14 @@
 
                 &:nth-child(6) {
                     width: 150px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                }
+
+                &:nth-child(7) {
+                    width: 80px;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;

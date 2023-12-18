@@ -13,13 +13,14 @@ const VNPayBankSelection = () => {
         const params = new URLSearchParams(location.search);
         const statusParam = params.get('status');
         setStatus(statusParam || '');
+        if(statusParam!==null){
         if(statusParam==='success'){
             ThongBao('Thanh toán thành công','success')
             navigate('/pay');
         }else{
             ThongBao('Thanh toán thất bại','error')
             navigate('/pay');
-        }
+        }}
     }, [location.search]);
 
     useEffect(() => {
@@ -45,7 +46,7 @@ const VNPayBankSelection = () => {
 
     const Pay = async (bank) => {
         if (bank.code !== 'NCB') {
-            alert('Chỉ chọn ngân hàng NCB ->Làm theo hướng dẫn');
+            ThongBao("Đọc kĩ hướng dẫn.","error")
             return;
         }
         try {

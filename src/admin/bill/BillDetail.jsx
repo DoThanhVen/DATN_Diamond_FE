@@ -1,138 +1,15 @@
 import React, { useState, useEffect } from "react";
 import style from "../../css/admin/bill/billdetail.module.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { callAPI } from "../../service/API";
+import { GetDataLogin } from "../../service/DataLogin";
+import listDataAddress from "../../service/AddressVietNam.json";
+import moment from "moment";
 
-const billDetail = {
-  idBill: "hoadon001",
-  listShop: [
-    {
-      shop: {
-        id: "shop001",
-        shopName: "Cửa Hàng 1",
-        image: "banner-left.jpg",
-        listProduct: [
-          {
-            id: "product001",
-            productName: "Áo Sơ Mi Nam",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description:
-              "Áo Sơ Mi Nam Cực Quyến Rũ Không Có Món Hàng Nào Có Thể Thay Thế"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product001",
-            productName: "Áo Sơ Mi Nam",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Sơ Mi Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          }
-        ]
-      }
-    },
-    {
-      shop: {
-        id: "shop002",
-        shopName: "Cửa Hàng 2",
-        image: "banner-left.jpg",
-        listProduct: [
-          {
-            id: "product001",
-            productName: "Áo Sơ Mi Nam",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Sơ Mi Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          }
-        ]
-      }
-    },
-    {
-      shop: {
-        id: "shop002",
-        shopName: "Cửa Hàng 3",
-        image: "banner-left.jpg",
-        listProduct: [
-          {
-            id: "product001",
-            productName: "Áo Sơ Mi Nam",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Sơ Mi Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          },
-          {
-            id: "product002",
-            productName: "Áo Thun",
-            image: "banner-right-1.jpg",
-            price: 220000,
-            quantity: 20,
-            description: "Áo Thun Nam Cực Quyến Rũ"
-          }
-        ]
-      }
-    }
-  ],
-  addressOrder: {
-    city: "Hồ Chí Minh",
-    district: "12",
-    ward: "Tô Ký",
-    address: "123/23"
-  },
-  ship: 24000,
-  status: 1,
-  createDate: "21/10/2023",
-  pay: false
-};
+function formatDate(date) {
+  return moment(date).format("DD-MM-YYYY HH:mm:ss");
+}
+
 
 //CHUYỂN ĐỔI TIỀN TỆ
 function formatCurrency(price, promotion) {
@@ -145,19 +22,35 @@ function formatCurrency(price, promotion) {
 }
 
 function BillDetail() {
-  const [totalProductPrice, setTotalProductPrice] = useState(0);
-  useEffect(
-    () => {
-      let total = 0;
-      billDetail.listShop.forEach(shop => {
-        shop.shop.listProduct.forEach(product => {
-          total += product.price * product.quantity;
-        });
-      });
-      setTotalProductPrice(total);
-    },
-    [billDetail]
-  );
+  const [address, setAddress] = useState()
+  const [order, setOrder] = useState();
+  const [shop, setShop] = useState([]);
+  const accountLogin = GetDataLogin();
+  const accessToken = sessionStorage.getItem('accessToken')
+  const location = useLocation();
+  const config = {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  };
+  const fetchAPI = async () => {
+    const searchParams = new URLSearchParams(location.search);
+    const id = searchParams.get("id");
+    if (id !== '') {
+      const response = await callAPI(`/api/auth/order/find/${id}`, 'GET', {}, config)
+      const responseOrder = await callAPI(`/api/auth/order/id/${id}`, 'GET', {}, config)
+
+      setShop(response.data)
+      setOrder(responseOrder.data)
+      setAddress(JSON.parse(responseOrder.data.address_order.replace(/\\/g, '')))
+    }
+    else {
+      return;
+    }
+  }
+  useEffect(() => {
+    fetchAPI()
+  }, []);
 
   return (
     <React.Fragment>
@@ -179,43 +72,27 @@ function BillDetail() {
               className={style.status}
               style={{
                 backgroundColor:
-                  billDetail.status === 0
+                  order?.status[order?.status.length - 1].status.id === 0
                     ? "#34219E"
-                    : billDetail.status === 1
+                    : order?.status[order?.status.length - 1].status.id === 1
                       ? "#34219E"
-                      : billDetail.status === 2
+                      : order?.status[order?.status.length - 1].status.id === 2
                         ? "#34219E"
-                        : billDetail.status === 3
+                        : order?.status[order?.status.length - 1].status.id === 3
                           ? "#2ECC71"
-                          : billDetail.status === 4
+                          : order?.status[order?.status.length - 1].status.id === 4
                             ? "#2ECC71"
-                            : billDetail.status === 5
+                            : order?.status[order?.status.length - 1].status.id === 5
                               ? "#2ECC71"
-                              : billDetail.status === 6
+                              : order?.status[order?.status.length - 1].status.id === 6
                                 ? "orange"
-                                : billDetail.status === 7 ? "red" : "#E74C3C"
+                                : order?.status[order?.status.length - 1].status.id === 7 ? "red" : "#E74C3C"
               }}
             >
-              {billDetail.status === 0
-                ? "Chờ Xác Nhận"
-                : billDetail.status === 1
-                  ? "Đã Xác Nhận"
-                  : billDetail.status === 2
-                    ? "Chuẩn Bị Hàng"
-                    : billDetail.status === 3
-                      ? "Đang Giao"
-                      : billDetail.status === 4
-                        ? "Chờ Lấy Hàng"
-                        : billDetail.status === 5
-                          ? "Đã Nhận"
-                          : billDetail.status === 6
-                            ? "Trả Hàng"
-                            : billDetail.status === 7
-                              ? "Đã Hủy"
-                              : "Giao Thất Bại"}
+              {order?.status[order?.status.length - 1].status.name}
             </span>
             <label className={style.createDate}>
-              {billDetail.createDate}
+              {formatDate(order?.create_date)}
             </label>
           </div>
           <div className={style.column}>
@@ -224,94 +101,104 @@ function BillDetail() {
             </Link>
           </div>
         </div>
-        <div className={style.cardContent}>
-          {billDetail.listShop.map((value, index) =>
-            <React.Fragment>
-              <div key={index} className={style.shop}>
+        {shop?.map((item) => (
+          <div key={item.id}>
+            <div className={style.cardContent}>
+
+              <div className={style.shop}>
                 <img
                   className={style.image}
-                  src={`/images/${value.shop.image}`}
+                  src={item?.image}
                   alt="Hình Ảnh"
                 />
                 <label className={style.shopName}>
-                  {value.shop.shopName}
+                  {item?.shop_name}
                 </label>
               </div>
-              <div className={style.listProduct}>
-                {value.shop.listProduct.map((valueProduct, indexProduct) =>
-                  <div key={indexProduct} className={style.product}>
-                    <img
-                      className={style.image}
-                      src={`/images/${valueProduct.image}`}
-                      alt="Hình Ảnh"
-                    />
-                    <div className={style.detail}>
-                      <label className={style.heading}>Chi tiết sản phẩm</label>
-                      <label className={style.productName}>
-                        Tên sản phẩm: {valueProduct.productName}
-                      </label>
-                      <label className={style.price}>
-                        Giá: {valueProduct.price}
-                      </label>
-                      <label className={style.price}>
-                        Số lượng: {valueProduct.quantity}
-                      </label>
-                      <label className={style.description}>
-                        Mô tả: {valueProduct.description}
-                      </label>
+              {item?.listOrder?.map((valueProduct, indexProduct) =>
+                <div>
+                  <div className={style.listProduct}>
+                    <div key={indexProduct} className={style.product}>
+                      <img
+                        className={style.image}
+                        src={valueProduct.productOrder.image_product[0].url}
+                        alt="Hình Ảnh"
+                      />
+                      <div className={style.detail}>
+                        <label className={style.heading}>Chi tiết sản phẩm</label>
+                        <label className={style.productName}>
+                          Tên sản phẩm: {valueProduct.productOrder.product_name}
+                        </label>
+                        <label className={style.price}>
+                          Giá:  {formatCurrency(valueProduct.productOrder.price, 0)}
+                        </label>
+                        <label className={style.price}>
+                          Số lượng: {valueProduct?.quantity}
+                        </label>
+
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </React.Fragment>
-          )}
-          <div className={style.totalAllProduct}>
-            <label> Tổng giá trị sản phẩm</label>
-            <label>
-              {formatCurrency(totalProductPrice, 0)}
-            </label>
+
+                  <div className={style.totalAllProduct}>
+                    <label> Tổng giá trị sản phẩm</label>
+                    <label>
+                      {formatCurrency(valueProduct.productOrder.price * valueProduct.quantity, 0)}
+                    </label>
+                  </div>
+                  <div className={style.ship}>
+                    <label> Chi phí vận chuyển</label>
+                    <label>
+                      {formatCurrency(24000, 0)}
+                    </label>
+                  </div>
+                  <div className={style.total}>
+                    <label>Tổng cộng</label>
+                    <label>
+                      {formatCurrency(order?.total, 0)}
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <div className={style.ship}>
-            <label> Chi phí vận chuyển</label>
-            <label>
-              {formatCurrency(billDetail.ship, 0)}
-            </label>
-          </div>
-          <div className={style.total}>
-            <label> Tổng cộng</label>
-            <label>
-              {formatCurrency(billDetail.ship + totalProductPrice, 0)}
-            </label>
-          </div>
-        </div>
+        ))}
       </div>
       <div className={style.other}>
         <div className={style.cardShip}>
           <label className={style.heading}>Thông tin thanh toán</label>
           <label
             className={style.statusShip}
-            style={{ color: billDetail.pay ? "green" : "red" }}
+            style={{ color: order?.pay ? "green" : "red" }}
           >
-            {billDetail.pay ? "Đã Thanh Toán" : "Thanh Toán Khi Nhận Hàng"}
+            {order?.pay ? "Đã Thanh Toán" : "Thanh Toán Khi Nhận Hàng"}
           </label>
           <label className={style.total}>
-            Tổng cộng: {formatCurrency(billDetail.ship + totalProductPrice, 0)}
+            Tổng cộng: {formatCurrency(order?.total, 0)}
           </label>
         </div>
         <div className={style.cardAddress}>
-          <label className={style.heading}>Địa chỉ nhận hàng</label>
+          <label className={style.heading}>Thông tin nhận hàng</label>
           <label className={style.detailAddress}>
-            Thành phố: {billDetail.addressOrder.city}
+          {
+                    listDataAddress.map((valueCity, index) =>
+                      valueCity.codename === address?.city
+                        ? valueCity.districts.map((valueDistrict, index) =>
+                          valueDistrict.codename === address?.district
+                            ? valueDistrict.wards.map((valueWard, index) =>
+                              valueWard.codename === address?.ward ? (
+                              
+                                  <div className={style.value}>
+                                    {valueCity.name}, {valueDistrict.name},{" "}
+                                    {valueWard.name}, {address.address}
+                                  </div>
+                              ):null
+                              ) : null
+                            )
+                            : null
+                  )}
           </label>
-          <label className={style.detailAddress}>
-            Quận: {billDetail.addressOrder.district}
-          </label>
-          <label className={style.detailAddress}>
-            Đường: {billDetail.addressOrder.ward}
-          </label>
-          <label className={style.detailAddress}>
-            Địa chỉ: {billDetail.addressOrder.address}
-          </label>
+
         </div>
       </div>
     </React.Fragment>

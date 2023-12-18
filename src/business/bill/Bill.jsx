@@ -34,7 +34,7 @@ function Bill() {
                   label="Tất cả"
                   value="1"
                 />
-                <Tab
+                {/* <Tab
                   sx={{
                     textTransform: "none",
                     "&.Mui-selected": {
@@ -53,7 +53,7 @@ function Bill() {
                   }}
                   label="Đã hủy"
                   value="6"
-                />
+                /> */}
               </TabList>
             </Box>
             <TabPanel value="1">

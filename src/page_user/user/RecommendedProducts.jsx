@@ -22,6 +22,7 @@ const RecommendedProducts = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalBuys, setTotalBuys] = useState({});
 
   useEffect(() => {
     getdataProduct(currentPage);
@@ -42,10 +43,38 @@ const RecommendedProducts = () => {
       const filteredProducts = response.data.content.filter(
         (product) => product.status === 1
       );
+
       setProducts(filteredProducts);
+      filteredProducts.forEach((product) => {
+        fetchTotalBuy(product.id);
+      });
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching data:", error);
+    }
+  };
+
+
+  const fetchTotalBuy = async (idProduct) => {
+    try {
+      if (idProduct) {
+        const data = await callAPI(`/api/ratings/getTotalBuy/${idProduct}`, "GET");
+        setTotalBuys((prevTotalBuys) => ({
+          ...prevTotalBuys,
+          [idProduct]: data
+        }));
+      } else {
+        setTotalBuys((prevTotalBuys) => ({
+          ...prevTotalBuys,
+          [idProduct]: 0
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching total buys:", error);
+      setTotalBuys((prevTotalBuys) => ({
+        ...prevTotalBuys,
+        [idProduct]: 0
+      }));
     }
   };
 
@@ -75,7 +104,7 @@ const RecommendedProducts = () => {
                     <label className={style.price}>
                       {formatCurrency(value.price, 0)}
                     </label>
-                    <label className={style.amount_sell}>Đã bán 999</label>
+                    <label className={style.amount_sell}>Đã bán {totalBuys[value.id] || 0}</label>
                   </div>
                   <div className={style.show_detail}>Xem chi tiết</div>
                 </Link>

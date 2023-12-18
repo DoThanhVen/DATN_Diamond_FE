@@ -44,15 +44,25 @@ function ListShop() {
           "Authorization": `Bearer ${token}`
         }
       };
-      setIsLoading(true);
+      // setIsLoading(true);
       const response = await callAPI(
         `/api/auth/account/getAll?key=${keyfind}&keyword=${keyword}&offset=${(page - 1)
         }&sizePage=${numberPage}&sort=${sortBy}&sortType=${sortType}&shoporaccount=shop`,
         "GET", {}, config
       );
+      
       const responseData = response.data;
+      const data = responseData.content.map((value) => ({
+        id: value[7],
+        shop_name: value[8],
+        status: value[9],
+        image: value[10],
+        addressShop: value[11],
+        create_date: value[12]
+      }));
+    
       setIsLoading(false);
-      const listShop = responseData && responseData.content.map((value) => value.shop);
+      const listShop = data;
       const filteredListShop = listShop.filter(shop => shop !== null);
 
       const newData = filteredListShop.filter((shop) => shop.status === Number(1) || shop.status === Number(2));

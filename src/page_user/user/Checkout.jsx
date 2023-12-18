@@ -11,7 +11,7 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
 import { callAPI } from "../../service/API";
-import {ThongBao} from '../../service/ThongBao'
+import { ThongBao } from '../../service/ThongBao'
 const CheckoutForm = () => {
   // const [user, setUser] = useState();
   const [addressDefault, setAddressDefault] = useState(null);
@@ -44,9 +44,9 @@ const CheckoutForm = () => {
   }, []);
 
   const findAccount = async (id) => {
-    const response = await callAPI(`/api/account/${id}/address`,'GET')
+    const response = await callAPI(`/api/account/${id}/address`, 'GET')
     setAddressDefault(response.data)
-    
+
   }
   console.log(addressDefault)
   let orderDetails = [];
@@ -65,11 +65,18 @@ const CheckoutForm = () => {
     //   navigate('/profile')
     //   return;
     // }
+    if (addressDefault == null) {
+      ThongBao('Bạn cần thêm thông tin người nhận hàng', 'error')
+      navigate('/profile')
+      return;
+    }
     let order = {
+
       // accountOrder: user,
       orderDetails: orderDetails,
       total: amount,
-      address_order: JSON.stringify(addressDefault),
+      address_order: addressDefault.name + ', ' + addressDefault.phone + ', '  + addressDefault.address
+        + ', ' + addressDefault.ward + ', ' + addressDefault.district + ', ' + addressDefault.city,
     };
     const config = {
       headers: {
@@ -79,7 +86,7 @@ const CheckoutForm = () => {
     const response = await callAPI(`/api/auth/order/create/account/${accountLogin.id}`, 'POST', order, config);
     if (response.status === "SUCCESS") {
       dispatch(cartSilce.actions.removeAll());
-      ThongBao("Đặt hàng thành công",'success')
+      ThongBao("Đặt hàng thành công", 'success')
       navigation("/order");
     }
 
@@ -96,7 +103,7 @@ const CheckoutForm = () => {
               <div className="card">
                 <div className="card-body">
                   <ol className="activity-checkout mb-0 px-4 mt-3">
-                  
+
                     <li className="checkout-item">
                       <div className="avatar checkout-icon p-1">
                         <div className="avatar-title rounded-circle bg-primary">

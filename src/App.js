@@ -28,6 +28,7 @@ import Shop from './page_user/user/Shop'
 import NotFoundPage from './page_user/user/NotFoundPage'
 import VNPayBankSelection from './pay/pay'
 import ChatApp from './chatApp/chatApp'
+import BillDetail from './admin/bill/BillDetail'
 function App() {
 
   return (
@@ -60,12 +61,9 @@ function App() {
         <Route path="/not-found" element={<NotFoundPage />} />
 
         <Route path="/admin/*" element={<AdminDashBoard />} />
+        {/* <Route path="/admin/bills/:id" element={<BillDetail />} /> */}
         <Route path="/business/*" element={<BusinessDashBoard />} />
-
-        {/* Mdung test pay */}
         <Route path="/pay" element={<VNPayBankSelection />} />
-
-        <Route path="/chatPage" element={<ChatApp />} />
 
       </Routes>
   )

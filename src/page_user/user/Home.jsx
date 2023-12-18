@@ -57,6 +57,7 @@ function Home() {
     const accountLogin = GetDataLogin();
     if (accountLogin) {
       setIsLogin(true)
+      console.log(accountLogin)
     }
   }
   return (
