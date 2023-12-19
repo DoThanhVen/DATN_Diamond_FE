@@ -53,8 +53,8 @@ function OrderList() {
   const [orders, setOrders] = useState([]);
   const [load, isLoad] = useState(false);
   const [listStatus, setListStatus] = useState([]);
-
-  const accountLogin = GetDataLogin();
+  const navigate=useNavigate()
+  const [accountLogin,setaccountLogin]=useState(null);
   const accessToken = sessionStorage.getItem('accessToken')
 
   const config = {
@@ -62,8 +62,8 @@ function OrderList() {
       "Authorization": `Bearer ${accessToken}`
     }
   };
-  const fectAPI = async () => {
-    const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}`, 'GET', {}, config);
+  const fectAPI = async (acc) => {
+    const response = await callAPI(`/api/auth/order/find/account/${acc.id}`, 'GET', {}, config);
     const responseStatus = await callAPI(`/api/get/status`, 'GET');
     setListStatus(responseStatus.data)
     console.log(response.data)
@@ -75,7 +75,12 @@ function OrderList() {
   };
   console.log(listStatus)
   useEffect(() => {
-    fectAPI();
+    const accountLogin2 = GetDataLogin();
+    if(accountLogin2===null){
+      navigate('/')
+    }else{
+    setaccountLogin(accountLogin2)
+    fectAPI(accountLogin2);}
   }, [load]);
 
   const handelRemoveOrder = async (id) => {

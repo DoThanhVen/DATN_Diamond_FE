@@ -45,24 +45,12 @@ function ListShopWait() {
         "GET", {}, config
       );
       const responseData = response.data;
-
-
       setIsLoading(false);
       const listFilter = responseData.content.filter((a) => {
-        return a[7] !== null && a[9] === 0;
+        return a.shop !== null && a.shop.status === 0;
       });
-
-      const data = listFilter.map((value) => ({
-        id: value[7],
-        shop_name: value[8],
-        status: value[9],
-        image: value[10],
-        addressShop: value[11],
-        create_date: value[12],
-        username: value[2]
-      }));
-      
-      setListShopwait(data || []);
+      console.log(listFilter)
+      setListShopwait(listFilter || []);
       setTotalPages(responseData.totalPages || 1);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -121,33 +109,33 @@ function ListShopWait() {
           {ListShopWait.map((value, index) => (
             <div key={index} className={style.tableBody}>
               <label className={style.column}>{index}</label>
-              <label className={style.column}>{value.shop_name}</label>
+              <label className={style.column}>{value.shop.shop_name}</label>
               <label className={style.column}>{value.username}</label>
               <label className={style.column}>
-                {formatDate(value.create_date)}
+                {formatDate(value.shop.create_date)}
               </label>
               <label className={style.column}>
                 <span
                   className={style.status}
                   style={{
-                    backgroundColor: value.status === 0 ? "#34219E" : null,
+                    backgroundColor: value.shop.status === 0 ? "#34219E" : null,
                     padding: "5px 10px"
                   }}
-                  value={`${value.status}`}
+                  value={`${value.shop.status}`}
                 >
-                  {value.status === 0 ? "Chờ Xác Nhận" : null}
+                  {value.shop.status === 0 ? "Chờ Xác Nhận" : null}
                 </span>
               </label>
               <label className={style.column}>
                 <img style={{ width: '60%' }} src=
-                  {value.image
-                    ? value.image
+                  {value.shop.image
+                    ? value.shop.image
                     : "/images/image_shop.jpg"} alt="Hình ảnh" />
               </label>
               <label
                 className={style.column}
                 onClick={() => {
-                  dispatch(getIdShop(value.id));
+                  dispatch(getIdShop(value.shop.id));
                 }}
               >
                 <Link to="/admin/shop/shopdetail">Xem Chi Tiết</Link>

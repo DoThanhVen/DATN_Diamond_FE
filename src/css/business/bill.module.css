@@ -324,3 +324,73 @@ option {
     background-color: orangered;
     color: white;
 }
+
+.cardContainerTable {
+    .table {
+        width: 100%;
+
+        .tableHeading {
+            background-color: rgba(240, 240, 240, 0.8);
+
+            .column {
+                padding: 10px 0;
+            }
+        }
+
+        .tableBody,
+        .tableHeading {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+
+            .column {
+                text-align: center;
+
+                &:nth-child(1) {
+                    width: 40px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(2) {
+                    width: 100px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(3) {
+                    width: calc(100% - 400px);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:nth-child(4) {
+                    width: 130px;
+                    display: grid;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+
+                    .status {
+                        width: 100%;
+                        padding: 3px 0;
+                        border-radius: 20px;
+                        color: white;
+                        font-size: 14px;
+                    }
+                }
+
+                &:nth-child(5) {
+                    width: 130px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}

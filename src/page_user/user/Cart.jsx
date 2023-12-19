@@ -88,9 +88,9 @@ function Cart() {
                               }}
                             />
                             <div className="shop-name ms-4 ">
-                              <b>Tên shop : {item?.product?.shop?.shop_name}</b>
+                              <b>{item?.product?.shop?.shop_name}</b>
                               <br />
-                              <span>Địa chỉ shop:
+                              <span>
                                 {listDataAddress.map((valueCity, index) =>
                                   valueCity.codename === item?.product?.shop?.addressShop?.city
                                     ? valueCity.districts.map((valueDistrict, index) =>
@@ -244,12 +244,6 @@ function Cart() {
           </div>
 
           <div className="col-xl-4">
-            <h5 className="font-size-16">Ghi chú </h5>
-            <textarea
-              className="form-control mb-3"
-              id="order-comments"
-              rows="5"
-            ></textarea>
             <div className="mt-5 mt-lg-0">
               <div className="card border shadow-none">
                 <div className="card-header bg-transparent border-bottom py-3 px-4">

@@ -13,7 +13,11 @@ import { callAPI } from "../../service/API";
 import { ThongBao } from "../../service/ThongBao"
 import { Button } from "react-bootstrap";
 import { Pagination } from "@mui/material";
-
+import listDataAddress from "../../service/AddressVietNam.json"
+import moment from "moment";
+function formatDate(date) {
+  return moment(date).format("DD-MM-YYYY HH:mm:ss");
+}
 //CHUYỂN ĐỔI TIỀN TỆ
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
@@ -135,12 +139,29 @@ function ListBill() {
                 {index + 1}
               </label>
               <label className={style.column}>{value.id}</label>
-              <label className={style.column}>{JSON.parse(value.address_order.replace(/\\/g, '')).city}</label>
+              <label className={style.column}>
+              {listDataAddress.map((valueCity, index) =>
+                    valueCity.codename === JSON.parse(value.address_order.replace(/\\/g, '')).city
+                      ? valueCity.districts.map((valueDistrict, index) =>
+                        valueDistrict.codename === JSON.parse(value.address_order.replace(/\\/g, '')).district
+                          ? valueDistrict.wards.map((valueWard, index) =>
+                            valueWard.codename === JSON.parse(value.address_order.replace(/\\/g, '')).ward ? (
+                              <>
+                              {JSON.parse(value.address_order.replace(/\\/g, '')).phone} - {JSON.parse(value.address_order.replace(/\\/g, '')).name}, {valueCity?.name}, {valueDistrict?.name},{" "}
+                                {valueWard?.name}, {JSON.parse(value.address_order.replace(/\\/g, '')).address}
+                              </>
+                            ) : null
+                          )
+                          : null
+                      )
+                      : null
+                  )}
+                </label>
               <label className={style.column}>
                 {formatCurrency(value.total, 0)}
               </label>
 
-              <label className={style.column}>{value.create_date}</label>
+              <label className={style.column}>{formatDate(value.create_date)}</label>
               <label className={style.column}>
                 <span
                   className={style.status}
@@ -166,23 +187,6 @@ function ListBill() {
                   }}
                   value={`${value.status}`}
                 >
-                  {/* {value.status === 0
-                    ? "Chờ Xác Nhận"
-                    : value.status === 1
-                    ? "Đã Xác Nhận"
-                    : value.status === 2
-                    ? "Chuẩn Bị Hàng"
-                    : value.status === 3
-                    ? "Đang Giao"
-                    : value.status === 4
-                    ? "Chờ Lấy Hàng"
-                    : value.status === 5
-                    ? "Đã Nhận"
-                    : value.status === 6
-                    ? "Trả Hàng"
-                    : value.status === 7
-                    ? "Đã Hủy"
-                    : "Giao Thất Bại"} */}
                   {value.status[value.status.length - 1].status.name}
                 </span>
               </label>

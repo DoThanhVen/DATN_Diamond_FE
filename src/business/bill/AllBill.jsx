@@ -78,12 +78,12 @@ export default function AllBill() {
 
   const [orders, setOrder] = useState([]);
   const [shop, setShop] = useState([]);
-  const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [listStatus, setListStatus] = useState([]);
-  const [isload,setIsLoad] = useState(0);
+  const [isload, setIsLoad] = useState(0);
   const fetchApiShop = async () => {
-    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
+    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&type=${valueOption}`, 'GET', {}, config);
     setOrder(response.data)
     console.log(response)
     const responseStatus = await callAPI(`/api/get/status`, 'GET')
@@ -100,20 +100,15 @@ export default function AllBill() {
   }, [isload]);
 
   const onChangeStatus = async (status) => {
-    if (status == "") {
-      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}`, 'GET', {}, config);
-      setOrder(response.data)
-    } else {
+    const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&type=${valueOption}`, 'GET', {}, config);
+    setOrder(response.data)
 
-      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}?status=${status}`, 'GET', {}, config);
-      setOrder(response.data)
-    }
   };
   const handleSearch = async () => {
     console.log(keyword)
     if (valueOption == 1) {
       if (Number(keyword)) {
-        const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&&type=${valueOption}`, 'GET', {}, config);
+        const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&type=${valueOption}`, 'GET', {}, config);
         console.log(response)
         setOrder(response.data)
       }
@@ -121,7 +116,7 @@ export default function AllBill() {
         alert('Looix')
       }
     } else {
-      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&&type=${valueOption}`, 'GET', {}, config);
+      const response = await callAPI(`/api/auth/order/shop/${accountLogin.shop.id}/search?status=${status}&keyword=${keyword}&type=${valueOption}`, 'GET', {}, config);
       console.log(response)
       setOrder(response.data)
     }
@@ -157,11 +152,9 @@ export default function AllBill() {
         <div className={`${style.cardHeadingModel}`}>
           {orders.length} Đơn hàng
         </div>
-        <span className={`${style.buttonChangeStatus}`}>
-          <i className="bi bi-receipt-cutoff"></i> Giao Hàng Loạt
-        </span>
+     
       </div>
-      <div className={`${style.filterStatus}`}>
+      <div className={`${style.filterStatus} mb-3`}>
         <select
           value={valueBillOption}
           onChange={(event) => {
@@ -180,26 +173,23 @@ export default function AllBill() {
       </div>
 
       <div className={`${style.cardContainerTable}`}>
-        <table className={`table`}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Mã Hóa Đơn</th>
-              <th 
-              
-              >Thông tin người nhận</th>
-              <th>Trạng Thái</th>
-              <th></th>
-            </tr>
+        <table className={style.table}>
+        <thead  className={style.tableHeading}>
+              <label className={style.column}>STT</label>
+              <label className={style.column}>Mã Hóa Đơn</label>
+              <label 
+              className={style.column}
+              >Thông tin người nhận</label>
+              <label className={style.column}>Trạng Thái</label>
+              <label className={style.column}></label>
           </thead>
-          <tbody>
-            {
+          {
               orders?.map((value, index) => (
-                <tr key={index}>
-                  <th>{index + 1}</th>
-                  <td>{value.id}</td>
-                  <td
-                        width={200}
+          <div key={index} className={style.tableBody}>
+                  <label className={style.column}>{index + 1}</label>
+                  <label className={style.column}>{value.id}</label>
+                  <label
+                       className={style.column}
                   
                   > {listDataAddress.map((valueCity, index) =>
                     valueCity.codename === JSON.parse(value.address_order.replace(/\\/g, '')).city
@@ -216,8 +206,8 @@ export default function AllBill() {
                           : null
                       )
                       : null
-                  )}</td>
-                  <td style={{ position: "relative" }}>
+                  )}</label>
+                  <label className={style.column}>
                     <span
                       style={{
                         backgroundColor:
@@ -245,60 +235,26 @@ export default function AllBill() {
                                         : value.status[value.status.length - 1].status
                                           .id === "8"
                                           ? "red"
-                                          : "#E74C3C",
-                        width: "150px",
-                        height: "80%",
-                        left: "50%",
-                        top: "50%",
-                        transform: "translate(-50%,-50%)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderRadius: "20px",
-                        color: "white",
-                        position: "absolute",
-                        fontSize: "14px"
+                                          : "#E74C3C"
                       }}
                       value={`${value.status}`}
+                      className={style.status}
                     >
                       {value?.status[value.status.length - 1]?.status.name}
-                      {/* {value.status[value.status.length - 1].status.id === "1"
-                        ? "Chờ Xác Nhận"
-                        : value.status[value.status.length - 1].status.id ===
-                          "2"
-                        ? "Đã Xác Nhận"
-                        : value.status[value.status.length - 1].status.id ===
-                          "3"
-                        ? "Chuẩn Bị Hàng"
-                        : value.status[value.status.length - 1].status.id ===
-                          "4"
-                        ? "Đang Giao"
-                        : value.status[value.status.length - 1].status.id ===
-                          "5"
-                        ? "Chờ Lấy Hàng"
-                        : value.status[value.status.length - 1].status.id ===
-                          "6"
-                        ? "Đã Nhận"
-                        : value.status[value.status.length - 1].status.id ===
-                          "7"
-                        ? "Trả Hàng"
-                        : value.status[value.status.length - 1].status.id ===
-                          "8"
-                        ? "Đã Hủy"
-                        : "Giao Thất Bại"} */}
                     </span>
-                  </td>
+                  </label>
                   
-                  <td
+                  <label
+                  className={style.column}
                     onClick={() => {
                       handleClickChiTiet(value);
                     }}
+                    style={{color:"blue",cursor:"pointer"}}
                   >
                     Xem Chi Tiết
-                  </td>
-                </tr>
+                  </label>
+          </div>
               ))}
-          </tbody>
         </table>
       </div>
       {isModalOpen && <ModelEdit data={modalData} closeModal={closeModal} listStatus={listStatus} isLoad={isload} />}

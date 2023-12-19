@@ -27,6 +27,7 @@ import {
 import LazyLoad from "react-lazy-load";
 import { GetDataLogin } from "../../service/DataLogin";
 import ChatApp from "../../chatApp/chatApp";
+import { callAPI } from "../../service/API";
 
 const API_BASE_URL = "http://localhost:8080";
 
@@ -86,6 +87,8 @@ function Shop() {
     if (accountLogin !== null) {
       try {
         setAccountLogin(accountLogin);
+
+        
       } catch (error) {
         console.log(error);
       }
@@ -95,7 +98,10 @@ function Shop() {
   };
   useEffect(() => {
     getAccountFromSession();
+
   }, []);
+
+
 
   const [localState, dispatch] = useReducer(productReducer, {
     value1: [0, 1000000],
@@ -404,7 +410,6 @@ function Shop() {
                       <label className={style.price}>
                         {formatCurrency(value[2], 0)}
                       </label>
-                      <label className={style.amount_sell}>Đã bán 999</label>
                     </div>
                     <div className={style.show_detail}>Xem chi tiết</div>
                   </Link>

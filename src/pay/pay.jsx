@@ -18,12 +18,9 @@ const VNPayBankSelection = () => {
     let id = localStorage.getItem('idA')
     const [orderSaved, setOrderSaved] = useState(false);
     useEffect(() => {
+        fetchData();
         const params = new URLSearchParams(location.search);
-        const idAccount = localStorage.getItem('idA');
-        if (id === null || id === '') {
-            navigate("/order")
-            return;
-        }
+
         const statusParam = params.get('status');
         const totalPrice = params.get('price');
         if (totalPrice !== null) {
@@ -31,71 +28,61 @@ const VNPayBankSelection = () => {
         }
         if (statusParam !== null) {
             if (statusParam === 'success') {
-                ThongBao('Thanh toán thành công', 'success')
                 saveOrder()
-                navigate('/order')
+                navigate('/pay')
+                ThongBao('Thanh toán thành công','success')
                 return;
             } else {
                 ThongBao('Thanh toán thất bại', 'error')
+                return;
             }
-
         } else {
+            console.log('vô')
             return;
         }
-    }, [location.search]);
-    let check = false;
-    console.log(check)
-    const saveOrder = async () => {
-        if (!check) {
-            const order = JSON.parse(localStorage.getItem('order'));
-            const accessToken = sessionStorage.getItem("accessToken");
-            console.log('order', order)
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            };
-            if (id !== null) {
-                let url = '';
-                if (idAccountOrder !== null) {
-                    url = `/api/auth/order/create/account/${id}`
-                } else {
-                    url = `/api/auth/order/create/account/${id}`
-                }
+    }, []);
 
-                const response = await callAPI(
-                    url,
-                    "POST",
-                    order,
-                    config
-                )
-                if (response.status === "SUCCESS") {
-                    dispatch(cartSilce.actions.removeAll());
-                    localStorage.removeItem("order")
-                    localStorage.removeItem("idA")
-                    check = true;
-                    alert('a')
-                    navigate('/order')
-                    return;
-                }
+    const saveOrder = async () => {
+        console.log('s')
+        const order = JSON.parse(localStorage.getItem('order'));
+        const accessToken = sessionStorage.getItem("accessToken");
+        console.log('order', order)
+        const config = {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
             }
+        };
+        let url = '';
+        if (idAccountOrder !== null) {
+            url = `/api/auth/order/create/account/${id}`
+        } else {
+            url = `/api/auth/order/create/account/${id}`
+        }
+        let orderNew = { ...order, pay: true }
+        const response = await callAPI(
+            url,
+            "POST",
+            orderNew,
+            config
+        )
+        if (response && response.status === "SUCCESS") {
+            dispatch(cartSilce.actions.removeAll());
+            localStorage.removeItem("order")
+            localStorage.removeItem("idA")
+            return;
         }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('https://api.vietqr.io/v2/banks?utm_source=j2team&utm_medium=url_shortener&utm_campaign=bank-list-api');
-                if (response.data && response.data.data) {
-                    setBankList(response.data.data);
-                }
-            } catch (error) {
-                console.error('Error fetching bank list:', error);
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('https://api.vietqr.io/v2/banks?utm_source=j2team&utm_medium=url_shortener&utm_campaign=bank-list-api');
+            if (response.data && response.data.data) {
+                setBankList(response.data.data);
             }
-        };
-        fetchData();
-    }, []);
-
+        } catch (error) {
+            console.error('Error fetching bank list:', error);
+        }
+    };
     const Pay = async (bank) => {
         if (bank.code !== 'NCB') {
             ThongBao("Đọc kĩ hướng dẫn.", "error")

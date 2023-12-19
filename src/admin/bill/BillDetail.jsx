@@ -52,6 +52,11 @@ function BillDetail() {
     fetchAPI()
   }, []);
 
+  const uniqueArray = Array.from(new Set(shop.map(item => item.id)))
+    .map(id => {
+      return shop.find(item => item.id === id);
+    });
+
   return (
     <React.Fragment>
       <div className={style.header}>
@@ -101,7 +106,7 @@ function BillDetail() {
             </Link>
           </div>
         </div>
-        {shop?.map((item) => (
+        {uniqueArray?.map((item) => (
           <div key={item.id}>
             <div className={style.cardContent}>
 
@@ -115,54 +120,60 @@ function BillDetail() {
                   {item?.shop_name}
                 </label>
               </div>
-              {item?.listOrder?.map((valueProduct, indexProduct) =>
-                <div>
-                  <div className={style.listProduct}>
-                    <div key={indexProduct} className={style.product}>
-                      <img
-                        className={style.image}
-                        src={valueProduct.productOrder.image_product[0].url}
-                        alt="Hình Ảnh"
-                      />
-                      <div className={style.detail}>
-                        <label className={style.heading}>Chi tiết sản phẩm</label>
-                        <label className={style.productName}>
-                          Tên sản phẩm: {valueProduct.productOrder.product_name}
-                        </label>
-                        <label className={style.price}>
-                          Giá:  {formatCurrency(valueProduct.productOrder.price, 0)}
-                        </label>
-                        <label className={style.price}>
-                          Số lượng: {valueProduct?.quantity}
-                        </label>
+              {item?.products?.map((valueProduct, indexProduct) => (
+                order.orderDetails.map((valueOrder, index) => (
+                  valueProduct.id === valueOrder.productOrder.id ?
+                    (
+                      <>
+                        <div className={style.listProduct}>
+                          <div key={indexProduct} className={style.product}>
+                            <img
+                              className={style.image}
+                              src={valueOrder.productOrder.image_product[0].url}
+                              alt="Hình Ảnh"
+                            />
+                            <div className={style.detail}>
+                              <label className={style.heading}>Chi tiết sản phẩm</label>
+                              <label className={style.productName}>
+                                Tên sản phẩm: {valueOrder.productOrder.product_name}
+                              </label>
+                              <label className={style.price}>
+                                Giá:  {formatCurrency(valueOrder.productOrder.price, 0)}
+                              </label>
+                              <label className={style.price}>
+                                Số lượng: {valueOrder?.quantity}
+                              </label>
 
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={style.totalAllProduct}>
-                    <label> Tổng giá trị sản phẩm</label>
-                    <label>
-                      {formatCurrency(valueProduct.productOrder.price * valueProduct.quantity, 0)}
-                    </label>
-                  </div>
-                  <div className={style.ship}>
-                    <label> Chi phí vận chuyển</label>
-                    <label>
-                      {formatCurrency(24000, 0)}
-                    </label>
-                  </div>
-                  <div className={style.total}>
-                    <label>Tổng cộng</label>
-                    <label>
-                      {formatCurrency(order?.total, 0)}
-                    </label>
-                  </div>
-                </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`${style.totalAllProduct} mb-2`}>
+                          <label> Tổng giá trị sản phẩm</label>
+                          <label>
+                            {formatCurrency(valueOrder.productOrder.price * valueOrder.quantity, 0)}
+                          </label>
+                        </div>
+                      </>
+                    ) : null
+                )
+                )
+              )
               )}
             </div>
           </div>
         ))}
+        <div className={`${style.ship} mt-4 d-flex justify-content-between`}>
+          <label> Chi phí vận chuyển</label>
+          <label>
+            {formatCurrency(0, 0)}
+          </label>
+        </div>
+        <div className={`${style.total} d-flex justify-content-between`}>
+          <label>Tổng cộng</label>
+          <label>
+            {formatCurrency(order?.total, 0)}
+          </label>
+        </div>
       </div>
       <div className={style.other}>
         <div className={style.cardShip}>
@@ -180,23 +191,23 @@ function BillDetail() {
         <div className={style.cardAddress}>
           <label className={style.heading}>Thông tin nhận hàng</label>
           <label className={style.detailAddress}>
-          {
-                    listDataAddress.map((valueCity, index) =>
-                      valueCity.codename === address?.city
-                        ? valueCity.districts.map((valueDistrict, index) =>
-                          valueDistrict.codename === address?.district
-                            ? valueDistrict.wards.map((valueWard, index) =>
-                              valueWard.codename === address?.ward ? (
-                              
-                                  <div className={style.value}>
-                                    {valueCity.name}, {valueDistrict.name},{" "}
-                                    {valueWard.name}, {address.address}
-                                  </div>
-                              ):null
-                              ) : null
-                            )
-                            : null
-                  )}
+            {
+              listDataAddress.map((valueCity, index) =>
+                valueCity.codename === address?.city
+                  ? valueCity.districts.map((valueDistrict, index) =>
+                    valueDistrict.codename === address?.district
+                      ? valueDistrict.wards.map((valueWard, index) =>
+                        valueWard.codename === address?.ward ? (
+
+                          <div className={style.value}>
+                            {address.phone} - {address.name}, {valueCity.name}, {valueDistrict.name},{" "}
+                            {valueWard.name}, {address.address}
+                          </div>
+                        ) : null
+                      ) : null
+                  )
+                  : null
+              )}
           </label>
 
         </div>

@@ -289,7 +289,7 @@ function Home() {
                 onChange={(e) => {
                   setYearTotal(e.target.value);
                 }}
-                className={`optionSelect mt-3`}
+                className={`optionSelect mt-3 timer`}
               >
                 {listTotalMonth.map((value, index) => (
                   <>

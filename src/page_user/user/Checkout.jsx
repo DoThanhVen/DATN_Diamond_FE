@@ -14,7 +14,6 @@ import { callAPI } from "../../service/API";
 import { ThongBao } from "../../service/ThongBao";
 import style from "../css/user/checkout.module.css";
 import listDataAddress from "../../service/AddressVietNam.json"
-
 function formatCurrency(price, promotion) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",

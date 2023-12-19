@@ -57,7 +57,7 @@ function App() {
         <Route path='/not-found' element={<NotFoundPage />} />
 
         <Route path="/admin/*" element={<AdminDashBoard />} />
-        <Route path="/admin/bills/:id" element={<BillDetail />} /> 
+        {/* <Route path="/admin/bills/:id" element={<BillDetail />} />  */}
          <Route path="/business/*" element={<BusinessDashBoard />} />
         <Route path="/pay" element={<VNPayBankSelection />} /> 
 

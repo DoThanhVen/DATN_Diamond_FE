@@ -297,9 +297,6 @@ function Shop() {
           <button className={style.button} onClick={handleSubmit}>
             <i className="bi bi-pencil-square"></i> SỬA
           </button>
-          <button className={style.button}>
-            <i className="bi bi-arrow-clockwise"></i> LÀM MỚI
-          </button>
         </div>
       </div>
       <LoadingOverlay isLoading={isLoading} />

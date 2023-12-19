@@ -9,6 +9,8 @@ import { GetDataLogin } from '../../service/DataLogin';
 import { callAPI } from '../../service/API';
 import moment from 'moment';
 import { formatCurrency } from '../../service/format'
+import listDataAddress from "../../service/AddressVietNam.json"
+
 function formatDate(date) {
   return moment(date).format("DD-MM-YYYY HH:mm:ss");
 }
@@ -83,7 +85,6 @@ function OrderReceipt() {
                               </div>
                               <div className="flex-lg-grow-1 ms-3">
                                 <h6 className="small mb-0 text-start">{item.productOrder.product_name}</h6>
-                                {/* <h6 className="small mt-2 text-start">Màu: Black</h6> */}
                                 <h6 className="small mt-2 text-start">Số lượng: {item.quantity}</h6>
                               </div>
                             </div>
@@ -93,18 +94,9 @@ function OrderReceipt() {
 
                       </tbody>
                       <tfoot>
-
-                        {/* <tr>
-                        <td colSpan="2" className='text-start'>Phí vận chuyển</td>
-                        <td className="text-end">$20.00</td>
-                      </tr> 
-                      <tr>
-                        <td colSpan="2" className='text-start'>Giảm giá</td>
-                        <td className="text-danger text-end">-$10.00</td>
-                      </tr>*/}
                         <tr className="fw-bold">
                           <td colSpan="2" className='text-start'>Tổng cộng</td>
-                          <td className="text-end">${formatCurrency(item.quantity * item.productOrder.price, 0)}</td>
+                          <td className="text-end">{formatCurrency(item.quantity * item.productOrder.price, 0)}</td>
                         </tr>
                       </tfoot>
                     </table>
@@ -123,12 +115,22 @@ function OrderReceipt() {
                     <div className="col-lg-6">
                       <h3 className="h6">Địa chỉ thanh toán</h3>
                       <address>
-                        {
-                          order?.address_order
-                        /* <strong>{order?.address.name}</strong><br />
-                        {order?.address.address}, {order?.address.ward}, {order?.address.district},<br />
-                        {order?.address.city}<br /> */}
-                        {/* <abbr title="Phone">P:</abbr> {order?.address.phone} */}
+                      {order ? (listDataAddress.map((valueCity, index) =>
+                        valueCity.codename === JSON.parse(order?.address_order.replace(/\\/g, '')).city
+                          ? valueCity.districts.map((valueDistrict, index) =>
+                            valueDistrict.codename === JSON.parse(order?.address_order.replace(/\\/g, '')).district
+                              ? valueDistrict.wards.map((valueWard, index) =>
+                                valueWard.codename === JSON.parse(order?.address_order.replace(/\\/g, '')).ward ? (
+                                  <>
+                                  {JSON.parse(order?.address_order.replace(/\\/g, '')).phone} - {JSON.parse(order?.address_order.replace(/\\/g, '')).name}, {valueCity?.name}, {valueDistrict?.name},{" "}
+                                    {valueWard?.name}, {JSON.parse(order?.address_order.replace(/\\/g, '')).address}
+                                  </>
+                                ) : null
+                              )
+                              : null
+                          )
+                          : null
+                      )):null}
                       </address>
                     </div>
                   </div>
@@ -138,18 +140,9 @@ function OrderReceipt() {
             <div className="col-lg-4">
               {/* Customer Notes */}
               <div className="card mb-4">
-                <div className="card-body">
-                  <h3 className="h6">Ghi chú</h3>
-                  <p></p>
-                </div>
-              </div>
-              <div className="card mb-4">
                 {/* Shipping information */}
                 <div className="card-body">
-                  <h3 className="h6">Thông tin vận chuyển</h3>
-                  <strong>FedEx</strong>
-                  <span><a href="#" className="text-decoration-underline" target="_blank">FF1234567890</a> <i className="bi bi-box-arrow-up-right"></i> </span>
-                  <hr />
+
                   <h3 className="h6">Trạng thái</h3>
                   {order?.status.map((item) => (
                     <address>

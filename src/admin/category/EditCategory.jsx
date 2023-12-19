@@ -60,7 +60,7 @@ function EditCategory() {
     () => {
       getdataCategory();
     },
-    []
+    [reload]
   );
   useEffect(
     () => {
@@ -155,6 +155,7 @@ function EditCategory() {
             setSelectedImage(null);
             setimage("");
             setcategory({})
+            setreload(reload + 1);
           }
         } catch (error) {
           ThongBao("Thêm loại sản phẩm thất bại!", "error");
@@ -194,6 +195,7 @@ function EditCategory() {
               setSelectedImage(null);
               setimage("")
               setcategory({})
+              setreload(reload + 1);
             }
           } else {
             setIsLoading(true);
@@ -214,6 +216,7 @@ function EditCategory() {
               setSelectedImage(null);
               setimage("")
               setcategory({})
+              setreload(reload + 1);
             }
           }
         } catch (error) {
@@ -239,6 +242,7 @@ function EditCategory() {
           setSelectedImage(null);
           setimage("")
           setcategory({})
+          setreload(reload + 1);
         } else {
           ThongBao(reponse.message, reponse.status);
         }

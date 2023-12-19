@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import cartSilce from "../../Reducer/cartSilce";
 import { useDispatch } from "react-redux";
 import { formatCurrency } from '../../service/format'
-
+import SearchBar from "./searchBar";
 const MainNavbar = () => {
   const cart = useSelector(cartSelector);
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ const MainNavbar = () => {
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [accountLogin, setAccountLogin] = useState(null);
-
+  const [keyword, setkeyword] = useState('');
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
 
@@ -111,7 +111,7 @@ const MainNavbar = () => {
                     </li>
                     <li>
                       {accountLogin !== null ? (
-                        accountLogin.username
+                        accountLogin?.infoAccount?.fullname ? accountLogin.infoAccount.fullname : accountLogin.username
                       ) : (
                         <div>
                           <i className="ti-power-off"></i>
@@ -184,14 +184,13 @@ const MainNavbar = () => {
                   <div className="input-group">
                     <FormControl
                       type="search"
-                      placeholder="Tìm kiếm sản phẩm của bạn"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Tìm kiếm sản phẩm và cửa hàng"
+                      value={keyword}
+                      onChange={(e) => setkeyword(e.target.value)}
                     />
-
-                    <Button variant="light" type="submit">
-                      <i className="fa fa-search"></i>
-                    </Button>
+                    {keyword !== '' ? (
+                      <SearchBar keyword={keyword} />
+                    ) : null}
                   </div>
                 </Form>
                 <Navbar expand="lg">
@@ -217,20 +216,7 @@ const MainNavbar = () => {
                         <Nav.Link href="/order" style={{ fontSize: "14px" }}>
                           Đơn hàng của tôi
                         </Nav.Link>
-                        <Nav.Link
-                          href="/likeProduct"
-                          style={{ fontSize: "14px" }}
-                        >
-                          Danh sách yêu thích
-                        </Nav.Link>
-                        {accountLogin ? (
-                          <Nav.Link
-                            href="/chatPage"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Tin nhắn
-                          </Nav.Link>
-                        ) : (null)}
+
                         <Nav.Link href="/policy" style={{ fontSize: "14px" }}>
                           Chính sách
                         </Nav.Link>
@@ -245,11 +231,6 @@ const MainNavbar = () => {
               <div className="col-lg-2 col-md-3 col-12">
                 <div className="right-bar">
                   {/* Search Form */}
-                  <div className="sinlge-bar">
-                    <a href="/likeProduct" className="single-icon">
-                      <i className="fa-regular fa-heart"></i>
-                    </a>
-                  </div>
                   <div className="sinlge-bar">
                     <a href="/profile" className="single-icon">
                       <i className="fa-solid fa-user"></i>
@@ -266,7 +247,7 @@ const MainNavbar = () => {
                         <span>{total} sản phẩm</span>
                         <a href="/cart">Xem giỏ hàng</a>
                       </div>
-                      <ul className="shopping-list">
+                      <ul className="shopping-list" style={{ maxHeight: "350px", overflow: "auto" }}>
                         {cart?.map((item, index) => (
                           <li key={index}>
                             <a

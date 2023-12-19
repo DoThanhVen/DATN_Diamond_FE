@@ -4,6 +4,7 @@ import { useState } from "react";
 import { callAPI } from "../../service/API";
 import { GetDataLogin } from "../../service/DataLogin";
 import { ThongBao } from "../../service/ThongBao";
+import moment from "moment";
 
 //CHUYỂN ĐỔI TIỀN TỆ
 function formatCurrency(price, promotion) {
@@ -14,6 +15,9 @@ function formatCurrency(price, promotion) {
     minimumFractionDigits: 0
   });
   return formatter.format(price - price * (promotion / 100));
+}
+function formatDate(date) {
+  return moment(date).format("DD-MM-YYYY HH:mm:ss");
 }
 export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
 
@@ -38,13 +42,13 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
 
     return total
   }
-
+  console.log(listStatus)
   const handleChangeStatus = async (id) => {
     const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${status}`, 'PUT', {}, config);
     if (response.status == 'SUCCESS') {
       const res = await callAPI(`/api/auth/getEmailByOderId/${id}`, 'GET', {}, config);
       if (res) {
-        await callAPI(`/api/auth/sendEmail/${res.data[0]}?content=Đơn hàng có mã ${id} đã được ${response.data.status.name}`, 'GET', {}, config);
+        await callAPI(`/api/auth/sendEmail/${res.data[0]}?content=Đơn hàng có mã ${id} đã được ${listStatus[data?.status.length].name}`, 'GET', {}, config);
       }
       isLoad = !isLoad;
       ThongBao("Duyệt đơn thành công!", "success")
@@ -70,13 +74,13 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
             {/* Người đặt: <b>Đỗ Thanh Vẹn</b> */}
           </div>
           <div className={`mb-3`}>
-            Ngày đặt: <b>{data.create_date}</b>
+            Ngày đặt: <b>{formatDate(data.create_date)}</b>
           </div>
           <div>
             <ul>
               {
                 data.status.map(item => (
-                  <li>{item.create_date}: {item.status.name}</li>
+                  <li>{formatDate(item.create_date)}: {item.status.name}</li>
                 ))
               }
               <li>
