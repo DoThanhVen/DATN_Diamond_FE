@@ -30,6 +30,10 @@ function Profile_User() {
   const [isLoading, setIsLoading] = useState(false);
   const [token, settoken] = useState(null);
   const [reload, setreload] = useState(0)
+
+  const [phoneAddress, setPhoneAddress] = useState(null);
+  const [nameAddress, setNameAddress] = useState(null);
+  const [checked, setchecked] = useState(false)
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
     const tokenac = sessionStorage.getItem('accessToken');
@@ -48,8 +52,8 @@ function Profile_User() {
 
   const setDataLogin = (data) => {
     if (data !== null) {
+      console.log('data',data)
       try {
-        console.log(data)
         setUsername(data.username);
         if (data?.infoAccount?.fullname) {
           setFullname(data?.infoAccount?.fullname);
@@ -75,6 +79,8 @@ function Profile_User() {
               setWard(value?.ward);
               setAddress(value?.address);
               setIdAddressUse(value?.id);
+              setNameAddress(value?.name)
+              setPhoneAddress(value?.phone)
             }
           });
         }
@@ -253,8 +259,9 @@ function Profile_User() {
 
   const handleCreateAddress = async () => {
     try {
-      if (city === "" || address === "" || district === "" || ward === "") {
-        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+      const phoneRegex = /^(0\d{9,10})$/;
+      if (!phoneAddress || !nameAddress || city === "" || address === "" || district === "" || ward === "") {
+        ThongBao("Vui lòng nhập đầy đủ thông tin hoặc số điện thoại không hợp lệ!", "error");
       } else {
         const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
         if (isConfirmed) {
@@ -266,7 +273,7 @@ function Profile_User() {
           const response = await callAPI(
             `/api/auth/account/createAddress/${username}`,
             "POST",
-            { city, district, ward, address }, config
+            { name: nameAddress, phone: phoneAddress, city, district, ward, address }, config
           );
           if (response.status === "success") {
             ThongBao(response.message, "success");
@@ -285,15 +292,16 @@ function Profile_User() {
 
   const handleUpdateAddress = async () => {
     try {
+      const phoneRegex = /^(0\d{9,10})$/;
       if (idAddressUse === 0) {
         ThongBao("Vui lòng chọn địa chỉ cần cập nhật!", "info");
-      } else if (
+      } else if (!phoneAddress || !nameAddress ||
         city === "" ||
         address === "" ||
         district === "" ||
-        ward === ""
+        ward === ""||!phoneRegex.test(phoneAddress)
       ) {
-        ThongBao("Vui lòng nhập đầy đủ thông tin!", "error");
+        ThongBao("Vui lòng nhập đầy đủ thông tin hoặc số điện thoại không hợp lệ!", "error");
       } else {
         const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
         if (isConfirmed) {
@@ -305,10 +313,11 @@ function Profile_User() {
           const response = await callAPI(
             `/api/auth/account/updateAddress/${username}/${idAddressUse}`,
             "POST",
-            { city, district, ward, address }, config
+            { name: nameAddress, phone: phoneAddress, city, district, ward, address }, config
           );
           if (response.status === "success") {
             ThongBao(response.message, "success");
+            console.log(response.data)
             accountLogin.address_account = response.data;
             const base64String = utf8_to_b64(accountLogin);
             sessionStorage.setItem("accountLogin", base64String);
@@ -344,6 +353,7 @@ function Profile_User() {
             accountLogin.address_account = response.data;
             const base64String = utf8_to_b64(accountLogin);
             sessionStorage.setItem("accountLogin", base64String);
+            setchecked(true)
             setreload(reload + 1)
           } else {
             ThongBao("Lỗi!", "error");
@@ -667,8 +677,8 @@ function Profile_User() {
                       type="text"
                       className="form-control"
                       id="phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      value={phoneAddress}
+                      onChange={(e) => setPhoneAddress(e.target.value)}
                     />
                   </div>
                 </div>
@@ -679,8 +689,8 @@ function Profile_User() {
                       type="text"
                       className="form-control"
                       id="phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      value={nameAddress}
+                      onChange={(e) => setNameAddress(e.target.value)}
                     />
                   </div>
                 </div>

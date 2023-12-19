@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const domain = process.env.REACT_APP_API || "http://localhost:8080";
+const domain = "http://localhost:8080";
 
 export const callAPI = async (path, method, data = {}, config = {}) => {
   try {

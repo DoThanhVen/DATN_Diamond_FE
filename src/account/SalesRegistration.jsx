@@ -15,8 +15,10 @@ import { uploadImageToFirebaseStorage } from "../service/firebase";
 import LoadingOverlay from "../service/loadingOverlay";
 import ModalAction from "../service/ModalAction";
 
-function utf8_to_b64(str) {
-  return window.btoa(unescape(encodeURIComponent(str)));
+function encodeObjectToBase64(obj) {
+  const jsonString = JSON.stringify(obj);
+  const base64String = btoa(unescape(encodeURIComponent(jsonString)));
+  return base64String;
 }
 
 export default function SalesRegistration() {
@@ -116,16 +118,17 @@ export default function SalesRegistration() {
           };
           setIsLoading(true);
           const imageUrl = await uploadImageToFirebaseStorage(image);
-          const res = await callAPI(`/api/auth/account/saleregis/${accountLogin.username}/${shop_name}?image=${imageUrl}`, 'POST', {
-            city,
-            district,
-            ward,
-            address
-          }, config);
+          const formData = new FormData();
+          formData.append('image', imageUrl);
+          formData.append('city', city);
+          formData.append('district', district);
+          formData.append('ward', ward);
+          formData.append('address', address);
+          const res = await callAPI(`/api/auth/account/saleregis/${accountLogin.username}/${shop_name}`, 'POST', formData, config);
           setIsLoading(false);
           ThongBao(res.message, res.status);
           accountLogin.shop = res.data;
-          const base64String = utf8_to_b64(JSON.stringify(accountLogin));
+          const base64String = encodeObjectToBase64(accountLogin);
           sessionStorage.setItem("accountLogin", base64String);
           setreload(reload + 1);
         }

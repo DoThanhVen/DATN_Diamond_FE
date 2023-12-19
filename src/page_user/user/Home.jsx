@@ -53,6 +53,7 @@ function Home() {
   useEffect(() => {
     getDataLogin()
   }, [])
+  
   const getDataLogin = () => {
     const accountLogin = GetDataLogin();
     if (accountLogin) {

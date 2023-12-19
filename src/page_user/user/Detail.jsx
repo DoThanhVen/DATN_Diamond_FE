@@ -57,9 +57,9 @@ function ProductPage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [file, setfile] = useState(null);
   const [totalBuy, setTotalBuy] = useState(0);
-  const [isCheck, setIsCheck] = useState(false);
+  const [isCheck, setIsCheck] = useState(true);
   const [disSableTruBtn, setDisableTruBtn] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [previousStarValue, setpreviousStarValue] = useState(0);
   const [ratings, setRatings] = useState([
     { name: 'Tất Cả', code: 0, quantity: 0 },
     { name: '5 Sao', code: 5, quantity: 0 },
@@ -93,6 +93,24 @@ function ProductPage() {
       navigate("/login");
     }
   };
+
+  useEffect(() => {
+    getAllRatings()
+  }, [reload])
+  const getAllRatings = async () => {
+    const res = await callAPI(`/api/ratings/${productId}`, 'GET');
+    const updatedRatings = ratings?.map((rating) => {
+      if (rating.code === 0) {
+        return { ...rating, quantity: res.length };
+      }
+      const foundItems = res.filter((item) => item.star === rating.code);
+      if (foundItems.length > 0) {
+        return { ...rating, quantity: foundItems.length };
+      }
+      return rating;
+    });
+    setRatings(updatedRatings)
+  }
   const handleImageChange = e => {
     const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
@@ -251,6 +269,25 @@ function ProductPage() {
   const isValidDescription = (description) => {
     return description.trim() !== "";
   };
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/api/ratings/findByStar/${productId}/${selectedRating}`)
+      .then((response) => {
+        console.log(response);
+        setReviews(response.data.data);
+        if (response.data.data.length > 0) {
+          const data = response.data.data.filter((review) => review.account_rate.id === accountLogin.id);
+          if (data && data.length > 0) {
+            setUserReviews(data);
+            setIsCheck(false);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy đánh giá:", error);
+      });
+  }, [productId, accountLogin, reload, selectedRating, isCheck]);
+
 
   const handlePostRating = async () => {
     if (accountLogin && accountLogin.id) {
@@ -271,6 +308,7 @@ function ProductPage() {
           .post(`${API_BASE_URL}/api/ratings/add/${parseInt(accountLogin.id)}`, ratingData)
           .then((response) => {
             setreload(reload + 1)
+            setIsCheck(false)
           })
           .catch((error) => {
             swal("Lỗi", "Có lỗi xảy ra khi đánh giá sản phẩm.", "error");
@@ -288,60 +326,16 @@ function ProductPage() {
     }
   };
 
-  useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/ratings/findByStar/${productId}/${selectedRating}`)
-      .then((response) => {
-
-        setReviews(response.data.data);
-        if (response.data.data.length > 1) {
-          console.log(response.data.data)
-          if (selectedRating === 0) {
-            const updatedRatings = ratings.map((rating) => {
-              if (rating.code === 0) {
-                return { ...rating, quantity: response.data.data.length };
-              }
-              const foundItems = response.data.data.filter((item) => item.star === rating.code);
-              if (foundItems.length > 0) {
-                return { ...rating, quantity: foundItems.length };
-              }
-              return rating;
-            });
-            setRatings(updatedRatings);
-          }
-          try {
-            const data = response.data.data.filter(
-              (review) => review.account_rate.id === accountLogin.id
-            );
-            if (data && data.length > 0) {
-              setUserReviews(
-                data
-              );
-              setIsCheck(true)
-            }
-          } catch (error) {
-          }
-        } else {
-          const resetData = ratings.map(item => ({ ...item, quantity: 0 }));
-          setRatings(resetData);
-        }
-      })
-      .catch((error) => {
-        console.error("Lỗi khi lấy đánh giá:", error);
-      });
-  }, [productId, accountLogin, reload, selectedRating]);
 
   const handleUpdateRating = async () => {
     if (file === null) {
-      console.log(newRating.description.length)
       if (newRating.description.length > 250) {
         swal("Lỗi", "Mô tả tối đa 250 kí tự", "error");
       } else {
         axios
           .put(`${API_BASE_URL}/api/ratings/update/${ratingId}`, newRating)
           .then((response) => {
-            setreload(reload + 1)
-            setIsEditing(false);
+
 
             const updatedReviews = reviews.map((review) =>
               review.id === ratingId
@@ -372,6 +366,8 @@ function ProductPage() {
 
             // Chuyển về nút "Chỉnh sửa"
             navigate(`/product/${productId}#edit`);
+            setreload(reload + 1)
+            setIsEditing(false);
           })
           .catch((error) => {
             console.error("Lỗi khi cập nhật đánh giá:", error);
@@ -389,8 +385,6 @@ function ProductPage() {
         axios
           .put(`${API_BASE_URL}/api/ratings/update/${ratingId}`, newData)
           .then((response) => {
-            setreload(reload + 1)
-            setIsEditing(false);
 
             const updatedReviews = reviews.map((review) =>
               review.id === ratingId
@@ -416,7 +410,8 @@ function ProductPage() {
             );
 
             setUserReviews(updatedUserReviews);
-
+            setreload(reload + 1)
+            setIsEditing(false);
             // Chuyển về nút "Chỉnh sửa"
             navigate(`/product/${productId}#edit`);
           })
@@ -427,7 +422,17 @@ function ProductPage() {
         console.log("Cập nhật đánh giá. ID đánh giá:", ratingId);
       }
     }
-
+    getAllRatings();
+    const previousRating = ratings.find((rating) => rating.code === previousStarValue);
+    if (previousRating) {
+      const updatedPreviousRating = { ...previousRating };
+      updatedPreviousRating.quantity -= 1; // Decrease the count of the previous rating
+      setRatings((prevRatings) =>
+        prevRatings.map((rating) =>
+          rating.code === previousStarValue ? updatedPreviousRating : rating
+        )
+      );
+    }
   };
 
 
@@ -435,6 +440,11 @@ function ProductPage() {
   const [quantity, setQuantity] = useState(1);
 
   const handleAddCart = async () => {
+    const quantityFind=await callAPI(`/api/storage/${productId}`,'GET')
+    if(quantity>quantityFind.data){
+        ThongBao('Số lượng mặt hàng này không đủ','error');
+        return;
+    }
     let newProduct = null;
     let shop;
     const response = await callAPI(
@@ -835,7 +845,7 @@ function ProductPage() {
                       </b>
                       <div className={style.content}>
                         {accountLogin &&
-                          userReviews.length === 0 && !isCheck
+                          isCheck
                           ? (
                             <>
                               <Rating
@@ -988,6 +998,7 @@ function ProductPage() {
                                           onClick={() => {
                                             setIsEditing(!isEditing);
                                             setRatingId(review.id);
+                                            setpreviousStarValue(review.star)
                                             setNewRating({
                                               star: review.star,
                                               description: review.description,

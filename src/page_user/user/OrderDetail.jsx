@@ -7,10 +7,16 @@ import { useParams } from 'react-router';
 import { useEffect } from 'react';
 import { GetDataLogin } from '../../service/DataLogin';
 import { callAPI } from '../../service/API';
+import moment from 'moment';
+import { formatCurrency } from '../../service/format'
+function formatDate(date) {
+  return moment(date).format("DD-MM-YYYY HH:mm:ss");
+}
+
 function OrderReceipt() {
   const { id } = useParams();
   const [order, setOrder] = useState();
-  
+
   const accountLogin = GetDataLogin();
   const accessToken = sessionStorage.getItem('accessToken')
 
@@ -20,7 +26,7 @@ function OrderReceipt() {
     }
   };
   const fectAPI = async () => {
-    const response = await callAPI(`/api/auth/order/find/${id}`, 'GET', {}, config);
+    const response = await callAPI(`/api/auth/order/id/${id}`, 'GET', {}, config);
     setOrder(response.data)
   }
   useEffect(() => {
@@ -47,7 +53,7 @@ function OrderReceipt() {
                 <div className="card-body">
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
-                      <span className="me-3">{order?.create_date}</span>
+                      <span className="me-3">{formatDate(order?.create_date)}</span>
                       <span className="me-3">HD23{order?.id}</span>
                       {/* <span className="me-3">Visa -1234</span> */}
                       {/* <span className="badge rounded-pill bg-info">{order.status[order.status.length - 1].status.name}</span> */}
@@ -65,9 +71,10 @@ function OrderReceipt() {
                       </div>
                     </div>
                   </div>
-                  <table className="table table-borderless">
-                    <tbody>
-                      {order?.orderDetails?.map((item, index) => (
+                  {order?.orderDetails?.map((item, index) => (
+                    <table className="table table-borderless">
+                      <tbody>
+
                         <tr key={index}>
                           <td>
                             <div className="d-flex mb-2">
@@ -81,13 +88,13 @@ function OrderReceipt() {
                               </div>
                             </div>
                           </td>
-                          <td className="text-end">Giá : ${item.productOrder.price}</td>
+                          <td className="text-end">Giá : {formatCurrency(item.productOrder.price, 0)}</td>
                         </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
 
-                      {/* <tr>
+                      </tbody>
+                      <tfoot>
+
+                        {/* <tr>
                         <td colSpan="2" className='text-start'>Phí vận chuyển</td>
                         <td className="text-end">$20.00</td>
                       </tr> 
@@ -95,12 +102,13 @@ function OrderReceipt() {
                         <td colSpan="2" className='text-start'>Giảm giá</td>
                         <td className="text-danger text-end">-$10.00</td>
                       </tr>*/}
-                      <tr className="fw-bold">
-                        <td colSpan="2" className='text-start'>Tổng cộng</td>
-                        <td className="text-end">${order?.total}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                        <tr className="fw-bold">
+                          <td colSpan="2" className='text-start'>Tổng cộng</td>
+                          <td className="text-end">${formatCurrency(item.quantity * item.productOrder.price, 0)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  ))}
                 </div>
               </div>
               {/* Payment */}
@@ -110,13 +118,13 @@ function OrderReceipt() {
                     <div className="col-lg-6">
                       <h3 className="h6">Thông tin thanh toán</h3>
                       <p><br />
-                        Tổng cộng: $ {order?.total} <span className="badge bg-success rounded-pill">Thanh toán tiền mặt</span></p>
+                        Tổng cộng: {formatCurrency(Number(order?.total), 0)} <span className="badge bg-success rounded-pill">Thanh toán tiền mặt</span></p>
                     </div>
                     <div className="col-lg-6">
                       <h3 className="h6">Địa chỉ thanh toán</h3>
                       <address>
                         {
-                        order?.address_order
+                          order?.address_order
                         /* <strong>{order?.address.name}</strong><br />
                         {order?.address.address}, {order?.address.ward}, {order?.address.district},<br />
                         {order?.address.city}<br /> */}
@@ -142,11 +150,11 @@ function OrderReceipt() {
                   <strong>FedEx</strong>
                   <span><a href="#" className="text-decoration-underline" target="_blank">FF1234567890</a> <i className="bi bi-box-arrow-up-right"></i> </span>
                   <hr />
-                  <h3 className="h6">Chi tiết</h3>
+                  <h3 className="h6">Trạng thái</h3>
                   {order?.status.map((item) => (
-                  <address>
-                    {item.create_date} : {item.status.name}
-                  </address>
+                    <address>
+                      {formatDate(item.create_date)} : {item.status.name}
+                    </address>
                   ))}
                 </div>
               </div>

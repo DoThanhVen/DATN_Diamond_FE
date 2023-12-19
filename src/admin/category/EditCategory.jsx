@@ -11,8 +11,9 @@ import { ThongBao } from "../../service/ThongBao";
 import { useNavigate } from "react-router";
 import { GetDataLogin } from "../../service/DataLogin";
 import ModalAction from "../../service/ModalAction";
-import { deleteImageFromFirebaseStorage, uploadImageToFirebaseStorage } from "../../service/firebase";
+import { uploadImageToFirebaseStorage } from "../../service/firebase";
 import LoadingOverlay from "../../service/loadingOverlay";
+import { callAPI } from "../../service/API";
 
 function EditCategory() {
   const [accountLogin, setAccountLogin] = useState(null);
@@ -55,33 +56,38 @@ function EditCategory() {
   const idCategory = useSelector(state => state.idCategoryUpdate);
   const idCategoryItem = useSelector(state => state.idCategoryItemUpdate);
   const reloadold = useSelector(state => state.getreloadPage);
-
   useEffect(
-
     () => {
-      if (Array.isArray(data)) {
-        setListcategory(data);
-        if (listCategory !== null && idCategory !== 0 && idCategoryItem === 0) {
-          getCategoryId();
-        } else if (
-          listCategory !== null &&
-          idCategory === 0 &&
-          idCategoryItem !== 0
-        ) {
-          getCategoryItemId();
-        } else if (
-          idCategory !== 0 &&
-          idCategoryItem !== 0 &&
-          listCategory !== null
-        ) {
-          getCategoryId();
-          getCategoryItemId();
-        }
+      getdataCategory();
+    },
+    []
+  );
+  useEffect(
+    () => {
+      if (listCategory !== null && idCategory !== 0 && idCategoryItem === 0) {
+        getCategoryId();
+      } else if (
+        listCategory !== null &&
+        idCategory === 0 &&
+        idCategoryItem !== 0
+      ) {
+        getCategoryItemId();
+      } else if (
+        idCategory !== 0 &&
+        idCategoryItem !== 0 &&
+        listCategory !== null
+      ) {
+        getCategoryId();
+        getCategoryItemId();
       }
+
     },
     [reload, data, idCategory, idCategoryItem, listCategory]
   );
-
+  const getdataCategory = async () => {
+    const response = await callAPI(`/api/category?key=&keyword=&offset=0&sizePage=10000`, "GET");
+    setListcategory(response.content);
+  }
   const handleImageChange = e => {
     const allowedFormats = ['image/jpeg', 'image/png'];
     const files = e.target.files;
@@ -192,7 +198,6 @@ function EditCategory() {
           } else {
             setIsLoading(true);
             const downloadURL = await uploadImageToFirebaseStorage(imageNew);
-            await deleteImageFromFirebaseStorage(image);
             const result = await CategoryService.updateCategory(
               idCategory,
               type_category,
@@ -223,7 +228,6 @@ function EditCategory() {
     if (isConfirmed) {
       try {
         setIsLoading(true);
-        await deleteImageFromFirebaseStorage(image);
         const reponse = await CategoryService.deleteCategory(idCategory, token);
         setIsLoading(false);
         if (reponse.status === "success") {
@@ -409,7 +413,7 @@ function EditCategory() {
                   TẢI ẢNH
                 </label>
                 <label className={style.title}>
-                  Được phép JPG, GIF hoặc PNG. Kích thước tối đa 800KB
+                  Được phép JPG hoặc PNG. Kích thước tối đa 800KB
                 </label>
               </div>
             </div>

@@ -11,7 +11,6 @@ import ModalAction from "../../service/ModalAction";
 import { ThongBao } from "../../service/ThongBao";
 import axios from "axios";
 import LoadingOverlay from "../../service/loadingOverlay";
-import { deleteImageFromFirebaseStorage } from "../../service/firebase";
 import ProductService from "../../service/ProductService";
 
 const numberPage = 10;
@@ -147,9 +146,9 @@ export default function ListProduct() {
       };
       setIsLoading(true);
       const reponse = await ProductService.getProductbyId(id);
-      reponse.image_product?.map(async (item) => {
-        await deleteImageFromFirebaseStorage(item.url)
-      })
+      // reponse.image_product?.map(async (item) => {
+      //   await deleteImageFromFirebaseStorage(item.url)
+      // })
       const res = await callAPI(`/api/auth/product/delete/${id}`, "DELETE", {}, config);
       setIsLoading(false);
       if (res) {

@@ -7,6 +7,7 @@ import { callAPI } from "../../service/API";
 import DataAddress from "../../service/AddressVietNam.json";
 import LoadingOverlay from "../../service/loadingOverlay";
 import { deleteImageFromFirebaseStorage, uploadImageToFirebaseStorage } from "../../service/firebase";
+import ModalAction from "../../service/ModalAction";
 function Shop() {
   //SELECT IMAGE
   const [selectedImage, setSelectedImage] = useState(null);
@@ -17,13 +18,14 @@ function Shop() {
   const [district, setDistrict] = useState("");
   const [ward, setWard] = useState("");
   const [address, setAddress] = useState("");
-  const [image, setimage] = useState()
+  const [image, setimage] = useState(null)
   const navigate = new useNavigate();
   const listDataAddress = DataAddress;
   const [reload, setreload] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [imgLoad, setimgLoad] = useState(null);
   const [imgOld, setImgOld] = useState(null);
+  const [token, settoken] = useState();
   useEffect(() => {
     getData();
   }, [reload]);
@@ -31,6 +33,8 @@ function Shop() {
   const getData = async () => {
     try {
       const accountData = await getAccountFromCookie();
+      const accessToken = sessionStorage.getItem('accessToken');
+      settoken(accessToken)
       if (accountData !== null) {
         setAccountLogin(accountData)
         getDataShop(accountData.shop.id)
@@ -99,44 +103,52 @@ function Shop() {
         ThongBao("Phường/Xã/Trị Trấn không hợp lệ.", 'error');
         return;
       }
-      if (selectedImage === null) {
-        setIsLoading(true)
-        const formData = new FormData();
-        formData.append('shop_name', shopName);
-        formData.append('image', imgLoad);
-        formData.append('city', city);
-        formData.append('district', district);
-        formData.append('ward', ward);
-        formData.append('address', address);
+      const isConfirmed = await ModalAction("Bạn có chắc muốn thực hiện hành động này?", "warning");
+      if (isConfirmed) {
+        const config = {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        };
+        if (image === null) {
+          setIsLoading(true)
+          const formData = new FormData();
+          formData.append('shop_name', shopName);
+          formData.append('image', imgLoad);
+          formData.append('city', city);
+          formData.append('district', district);
+          formData.append('ward', ward);
+          formData.append('address', address);
 
-        const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
-        setIsLoading(false)
-        if (res.status === 'success') {
-          ThongBao(res.message, res.status);
-          setreload(reload + 1);
+          const res = await callAPI(`/api/auth/bussiness/updateInfShop/${shop.id}`, 'PUT', formData, config);
+          setIsLoading(false)
+          if (res.status === 'success') {
+            ThongBao(res.message, res.status);
+            setreload(reload + 1);
+          } else {
+            ThongBao("Đã xảy ra lỗi.", 'error');
+          }
         } else {
-          ThongBao("Đã xảy ra lỗi.", 'error');
+          setIsLoading(true)
+          const downloadURL = await uploadImageToFirebaseStorage(image);
+          const formData = new FormData();
+          formData.append('shop_name', shopName);
+          formData.append('image', downloadURL);
+          formData.append('city', city);
+          formData.append('district', district);
+          formData.append('ward', ward);
+          formData.append('address', address);
+          const res = await callAPI(`/api/auth/bussiness/updateInfShop/${shop.id}`, 'PUT', formData,config);
+          setIsLoading(false)
+          if (res.status === 'success') {
+            ThongBao(res.message, res.status);
+            setreload(reload + 1);
+          } else {
+            ThongBao("Đã xảy ra lỗi.", 'error');
+          }
         }
       } else {
-        setIsLoading(true)
-        await deleteImageFromFirebaseStorage(imgOld);
-        const downloadURL = await uploadImageToFirebaseStorage(image);
-        const formData = new FormData();
-        formData.append('shop_name', shopName);
-        formData.append('image', downloadURL);
-        formData.append('city', city);
-        formData.append('district', district);
-        formData.append('ward', ward);
-        formData.append('address', address);
-
-        const res = await callAPI(`/api/bussiness/updateInfShop/${shop.id}`, 'PUT', formData);
-        setIsLoading(false)
-        if (res.status === 'success') {
-          ThongBao(res.message, res.status);
-          setreload(reload + 1);
-        } else {
-          ThongBao("Đã xảy ra lỗi.", 'error');
-        }
+        return;
       }
     } catch (error) {
       console.log(error);

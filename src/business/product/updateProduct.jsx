@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { reloadPage } from "../../service/Actions";
 import { ThongBao } from "../../service/ThongBao";
 import ModalAction from "../../service/ModalAction";
-import { deleteImageFromFirebaseStorage } from "../../service/firebase";
 import LoadingOverlay from "../../service/loadingOverlay";
 
 export default function ModelEdit({ onReload, data, closeModal }) {
@@ -78,7 +77,6 @@ export default function ModelEdit({ onReload, data, closeModal }) {
   const handleDeleteImageById = async (id,path) => {
     setIsLoading(true);
     await callAPI(`/api/uploadImageProduct/${id}`, 'DELETE')
-    await deleteImageFromFirebaseStorage(path);
     setIsLoading(false);
     getdataproductbyid()
   };

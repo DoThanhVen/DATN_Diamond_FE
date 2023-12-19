@@ -11,10 +11,14 @@ import { useNavigate } from "react-router-dom";
 import { GetDataLogin } from "../../service/DataLogin";
 import { cartSelector } from '../../actions/actions';
 import { useSelector } from 'react-redux';
-import SearchBar from "./searchBar";
+import cartSilce from "../../Reducer/cartSilce";
+import { useDispatch } from "react-redux";
+import { formatCurrency } from '../../service/format'
 
 const MainNavbar = () => {
   const cart = useSelector(cartSelector);
+  const dispatch = useDispatch();
+
   let total = 0;
   let totalMoney = 0;
   cart && cart.map((item, index) => {
@@ -23,11 +27,9 @@ const MainNavbar = () => {
   })
 
   const searchParams = new URLSearchParams();
-  searchParams.append('keyword', "s")
-  searchParams.append('keyword', "s")
+
   const [isAdmin, setIsAdmin] = useState(false)
   const [accountLogin, setAccountLogin] = useState(null);
-  const [keyword, setkeyword] = useState('');
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
@@ -57,10 +59,7 @@ const MainNavbar = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("accountLogin");
-    const delay = setTimeout(() => {
-      navigate("/");
-    }, 800);
-    return () => clearTimeout(delay);
+    navigate("/");
   };
 
   return (
@@ -112,7 +111,7 @@ const MainNavbar = () => {
                     </li>
                     <li>
                       {accountLogin !== null ? (
-                        accountLogin.infoAccount.fullname ? accountLogin.infoAccount.fullname : accountLogin.username
+                        accountLogin.username
                       ) : (
                         <div>
                           <i className="ti-power-off"></i>
@@ -185,13 +184,14 @@ const MainNavbar = () => {
                   <div className="input-group">
                     <FormControl
                       type="search"
-                      placeholder="Tìm kiếm sản phẩm và cửa hàng"
-                      value={keyword}
-                      onChange={(e) => setkeyword(e.target.value)}
+                      placeholder="Tìm kiếm sản phẩm của bạn"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    {keyword !== '' ? (
-                      <SearchBar keyword={keyword} />
-                    ) : null}
+
+                    <Button variant="light" type="submit">
+                      <i className="fa fa-search"></i>
+                    </Button>
                   </div>
                 </Form>
                 <Navbar expand="lg">
@@ -223,6 +223,14 @@ const MainNavbar = () => {
                         >
                           Danh sách yêu thích
                         </Nav.Link>
+                        {accountLogin ? (
+                          <Nav.Link
+                            href="/chatPage"
+                            style={{ fontSize: "14px" }}
+                          >
+                            Tin nhắn
+                          </Nav.Link>
+                        ) : (null)}
                         <Nav.Link href="/policy" style={{ fontSize: "14px" }}>
                           Chính sách
                         </Nav.Link>
@@ -265,6 +273,13 @@ const MainNavbar = () => {
                               href="#"
                               className="remove"
                               title="Remove this item"
+                              onClick={() => {
+                                dispatch(
+                                  cartSilce.actions.removeItemToCart({
+                                    index: index
+                                  })
+                                );
+                              }}
                             >
                               <i className="fa fa-remove"></i>
                             </a>
@@ -278,7 +293,7 @@ const MainNavbar = () => {
                               <a href="#">{item.product.product_name}</a>
                             </h4>
                             <p className="quantity">
-                              {item.product.price} - <span className="amount">{item.quantity}</span>
+                              {formatCurrency(item.product.price, 0)} - <span className="amount">{item.quantity}</span>
                             </p>
                           </li>
                         ))}
@@ -288,7 +303,7 @@ const MainNavbar = () => {
                       <div className="bottom">
                         <div className="total">
                           <span>Tổng</span>
-                          <span className="total-amount">{totalMoney}</span>
+                          <span className="total-amount">{formatCurrency(totalMoney, 0)}</span>
                         </div>
                         <a href="/checkout" className="btn animate">
                           Thanh toán
@@ -302,7 +317,6 @@ const MainNavbar = () => {
             </div>
           </div>
         </div>
-
       </header>
     </>
   );

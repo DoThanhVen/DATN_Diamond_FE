@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
 import style from "../../css/business/bill.module.css";
 import { useState } from "react";
-import axios from "axios";
 import { callAPI } from "../../service/API";
 import { GetDataLogin } from "../../service/DataLogin";
 import { ThongBao } from "../../service/ThongBao";
-import { DataArray } from "@mui/icons-material";
 
 //CHUYỂN ĐỔI TIỀN TỆ
 function formatCurrency(price, promotion) {
@@ -44,6 +42,10 @@ export default function ModelEdit({ data, closeModal, listStatus, isLoad }) {
   const handleChangeStatus = async (id) => {
     const response = await callAPI(`/api/auth/order/update/${id}/account/${accountLogin.id}?status=${status}`, 'PUT', {}, config);
     if (response.status == 'SUCCESS') {
+      const res = await callAPI(`/api/auth/getEmailByOderId/${id}`, 'GET', {}, config);
+      if (res) {
+        await callAPI(`/api/auth/sendEmail/${res.data[0]}?content=Đơn hàng có mã ${id} đã được ${response.data.status.name}`, 'GET', {}, config);
+      }
       isLoad = !isLoad;
       ThongBao("Duyệt đơn thành công!", "success")
       closeModal()

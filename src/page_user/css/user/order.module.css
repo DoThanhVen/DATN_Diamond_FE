@@ -1,0 +1,32 @@
+.list_status {
+    display: flex;
+
+    .status {
+        position: relative;
+        min-width: 130px;
+        padding: 7px 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        &::after {
+            content: "";
+            position: absolute;
+            background-color: blue;
+            width: 0;
+            height: 2px;
+            left: 0;
+            bottom: 0;
+            transition: all .3s ease-in-out;
+        }
+
+        &:hover {
+            color: blue;
+        }
+
+        &:hover::after {
+            width: 100%;
+        }
+    }
+}

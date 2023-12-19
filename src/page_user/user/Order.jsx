@@ -11,6 +11,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import listDataAddress from "../../service/AddressVietNam.json"
+import { formatCurrency } from "../../service/format";
+import style from "../css/user/order.module.css"
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -63,9 +66,8 @@ function OrderList() {
     const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}`, 'GET', {}, config);
     const responseStatus = await callAPI(`/api/get/status`, 'GET');
     setListStatus(responseStatus.data)
+    console.log(response.data)
     setOrders(response.data)
-
-
   };
   const handleFindOrders = async (status) => {
     const response = await callAPI(`/api/auth/order/find/account/${accountLogin.id}?status=1`, 'GET', {}, config);
@@ -123,11 +125,11 @@ function OrderList() {
               <div className="card-body">
                 <h5 className="header-title pb-3 mt-0">Đơn hàng của tôi</h5>
                 <div>
-                  <ul>
+                  <ul className={style.list_status}>
                     {listStatus.map((item) => (
                     <li onClick={() => {
                       handleChange(item.id)
-                    }}>
+                    }} className={style.status}>
                       {item.name}
                     </li>
                      ))}
@@ -138,7 +140,7 @@ function OrderList() {
                     <thead>
                       <tr className="align-self-center">
                         <th>Mã hóa đơn</th>
-                        <th>Địa chỉ nhận hàng</th>
+                        <th>Thông tin người nhận</th>
                         <th> Ngày lập</th>
                         <th> Tổng tiền</th>
                         <th>Trang thái</th>
@@ -150,12 +152,27 @@ function OrderList() {
                         <tr key={item.id}>
                           <td className="text-start">HD23{item.id}</td>
                           <td className="text-start">
-                            {item?.address_order}
+                          {listDataAddress.map((valueCity, index) =>
+                                            valueCity.codename === JSON.parse(item.address_order.replace(/\\/g, '')).city
+                                              ? valueCity.districts.map((valueDistrict, index) =>
+                                                valueDistrict.codename === JSON.parse(item.address_order.replace(/\\/g, '')).district
+                                                  ? valueDistrict.wards.map((valueWard, index) =>
+                                                    valueWard.codename === JSON.parse(item.address_order.replace(/\\/g, '')).ward ? (
+                                                      <>
+                                                      {JSON.parse(item.address_order.replace(/\\/g, '')).phone} - {JSON.parse(item.address_order.replace(/\\/g, '')).name}, {valueCity?.name}, {valueDistrict?.name},{" "}
+                                                        {valueWard?.name}, {JSON.parse(item.address_order.replace(/\\/g, '')).address}
+                                                      </>
+                                                    ) : null
+                                                  )
+                                                  : null
+                                              )
+                                              : null
+                                          )}
                           </td>
                           <td className="text-start">
                             {convertDate(item.create_date)}
                           </td>
-                          <td className="text-start">{item.total}</td>
+                          <td className="text-start">{formatCurrency(item.total,0)}</td>
                           <td className="text-start">
                             <span className="badge badge-boxed bg-warning text-dark">
                               {item.status[item.status.length - 1].status.name}

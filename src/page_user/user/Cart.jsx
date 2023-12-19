@@ -6,6 +6,9 @@ import { cartSelector } from "../../actions/actions";
 import cartSilce from "../../Reducer/cartSilce";
 import "../css/user/cart.css";
 import "../css/user/home.css";
+import { callAPI } from "../../service/API";
+import listDataAddress from "../../service/AddressVietNam.json"
+import { formatCurrency } from '../../service/format'
 
 function Cart() {
   const cart = useSelector(cartSelector);
@@ -46,8 +49,16 @@ function Cart() {
     amount += item.product.price * item.quantity
   })
 
+  const getQuantities = async (productId) => {
+    try {
+      const quantities = await callAPI(`/api/storage/${productId}`, 'GET');
+      return quantities;
+    } catch (error) {
+      console.error('Error fetching quantities:', error);
+    }
+  };
 
-
+  console.log(cart)
   return (
     <>
       <nav>
@@ -60,152 +71,147 @@ function Cart() {
             <div className="card border shadow-none mb-4">
               {cart &&
                 cart?.map((item, index) => (
-                  <div key={item.product.id} className="card-body">
-                    <div className="col-lg-8 mb-4 d-flex">
-                      <img
-                        src={item?.product?.shop?.image}
-                        className="rounded-circle shop-image"
-                        alt="Diamond_Fashion"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          borderRadius: "50%"
-                        }}
-                      />
-                      <div className="shop-name ms-4 ">
-                        <b>Tên shop : {item?.product?.shop?.shop_name}</b>
-                        <br />
-                        <span>Địa chỉ shop :
-                          {item?.product?.shop?.addressShop?.address && + ','}
-                          {item?.product?.shop?.addressShop?.ward && + ','}
-                          {item?.product?.shop?.addressShop?.district && + ','}
-                          {item?.product?.shop?.addressShop?.city}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="d-flex align-items-start border-bottom pb-3">
-                      <div className="me-4">
-                        <img
-                          src={item.product.image_product[0].url}
-                          style={{ width: "80px", height: "80px" }}
-                          alt=""
-                          className="avatar-lg rounded"
-                        />
-                      </div>
-                      <div className="flex-grow-1 align-self-center overflow-hidden">
-                        <div>
-                          <h5 className="text-truncate font-size-18">
-                            <a href={"#"} className="text-dark">
-                              {item.product.product_name}{" "}
-                            </a>
-                          </h5>
-                          <p className="text-muted mb-0">
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star-half text-warning"></i>
-                          </p>
-                          <p className="mb-0 mt-1">
-                            Color : <span className="fw-medium">Gray</span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex-shrink-0 ms-2">
-                        <ul className="list-inline mb-0 font-size-16">
-                          <li className="list-inline-item">
-                            <button
-                              onClick={() => {
-                                
-                                dispatch(
-                                  cartSilce.actions.removeItemToCart({
-                                    index: index
-                                  })
-                                );
+                  <>
+                    {
+                      item.quantity < getQuantities(item.product.id) ? (
+                        <p>hết hàng</p>) : (
+                        <div key={item.product.id} className="card-body">
+                          <div className="col-lg-8 mb-4 d-flex">
+                            <img
+                              src={item?.product?.shop?.image}
+                              className="rounded-circle shop-image"
+                              alt="Diamond_Fashion"
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                borderRadius: "50%"
                               }}
-                              className="text-muted px-1"
-                            >
-                              <i className="fa-regular fa-trash-can"></i>
-                            </button>
-                          </li>
-                          <li className="list-inline-item">
-                            <a href="#" className="text-muted px-1">
-                              <i className="fa-regular fa-heart"></i>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="row">
-                        <div className="col-md-4">
-                          <div className="mt-3">
-                            <p className="text-muted mb-2">Giá</p>
-                            <h5 className="mb-0 mt-2">
-                              <span className="text-muted me-2">
-                                <del className="font-size-16 fw-normal">
-                                  $500
-                                </del>
+                            />
+                            <div className="shop-name ms-4 ">
+                              <b>Tên shop : {item?.product?.shop?.shop_name}</b>
+                              <br />
+                              <span>Địa chỉ shop:
+                                {listDataAddress.map((valueCity, index) =>
+                                  valueCity.codename === item?.product?.shop?.addressShop?.city
+                                    ? valueCity.districts.map((valueDistrict, index) =>
+                                      valueDistrict.codename === item?.product?.shop?.addressShop?.district
+                                        ? valueDistrict.wards.map((valueWard, index) =>
+                                          valueWard.codename === item?.product?.shop?.addressShop?.ward ? (
+                                            <>
+                                              {valueCity?.name}, {valueDistrict?.name},{" "}
+                                              {valueWard?.name}, {item?.product?.shop?.addressShop?.address}
+                                            </>
+                                          ) : null
+                                        )
+                                        : null
+                                    )
+                                    : null
+                                )}
                               </span>
-                              ${item.product.price}
-                            </h5>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-md-5">
-                          <div className="mt-3">
-                            <p className="text-muted mb-2 ml-4">Số lượng</p>
-                            <div className="d-inline-flex">
-                              <div
-                                className="input-group mb-3"
-                                style={{ width: "170px" }}
-                              >
-                                <button
-                                  className="btn btn-white border border-secondary px-3"
-                                  type="button"
-                                  id="button-addon1"
-                                  data-mdb-ripple-color="dark"
-                                  onClick={() => {
-                                    decreaseCount(index);
-                                  }} // Gọi hàm giảm số khi nhấn vào nút "Giảm"
-                                >
-                                  <i className="bi bi-dash"></i>
-                                </button>
-                                <input
-                                  type="number"
-                                  value={item.quantity}
-                                  onChange={(e) => { }}
-                                  className="form-control text-center border border-secondary"
-                                  // placeholder={count}
-                                  aria-label="Example text with button addon"
-                                  aria-describedby="button-addon1"
-                                />
-                                <button
-                                  className="btn btn-white border border-secondary px-3"
-                                  type="button"
-                                  id="button-addon2"
-                                  data-mdb-ripple-color="dark"
-                                  onClick={() => {
-                                    increaseCount(index);
-                                  }}
-                                // Gọi hàm tăng số khi nhấn vào nút "Tăng"
-                                >
-                                  <i className="bi bi-plus-lg"></i>
-                                </button>
+
+                          <div className="d-flex align-items-start border-bottom pb-3">
+                            <div className="me-4">
+                              <img
+                                src={item.product.image_product[0].url}
+                                style={{ width: "80px", height: "80px" }}
+                                alt=""
+                                className="avatar-lg rounded"
+                              />
+                            </div>
+                            <div className="flex-grow-1 align-self-center overflow-hidden">
+                              <div>
+                                <h5 className="text-truncate font-size-18">
+                                  <a href={"#"} className="text-dark">
+                                    {item.product.product_name}{" "}
+                                  </a>
+                                </h5>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 ms-2">
+                              <ul className="list-inline mb-0 font-size-16">
+                                <li className="list-inline-item">
+                                  <i className="fa-regular fa-trash-can" style={{ fontSize: "28px", color: "red", cursor: "pointer" }} onClick={() => {
+
+                                    dispatch(
+                                      cartSilce.actions.removeItemToCart({
+                                        index: index
+                                      })
+                                    );
+                                  }}></i>
+
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="row">
+                              <div className="col-md-4">
+                                <div className="mt-3">
+                                  <p className="text-muted mb-2">Giá</p>
+                                  <h5 className="mb-0 mt-2">
+                                    {formatCurrency(item.product.price, 0)}
+                                  </h5>
+                                </div>
+                              </div>
+                              <div className="col-md-5">
+                                <div className="mt-3">
+                                  <p className="text-muted mb-2 ml-4">Số lượng</p>
+                                  <div className="d-inline-flex">
+                                    <div
+                                      className="input-group mb-3"
+                                      style={{ width: "170px" }}
+                                    >
+                                      <button
+                                        className="btn btn-white border border-secondary px-3"
+                                        type="button"
+                                        id="button-addon1"
+                                        data-mdb-ripple-color="dark"
+                                        onClick={() => {
+                                          decreaseCount(index);
+                                        }} // Gọi hàm giảm số khi nhấn vào nút "Giảm"
+                                      >
+                                        <i className="bi bi-dash"></i>
+                                      </button>
+                                      <input
+                                        type="number"
+                                        value={item.quantity}
+                                        onChange={(e) => { }}
+                                        className="form-control text-center border border-secondary"
+                                        // placeholder={count}
+                                        aria-label="Example text with button addon"
+                                        aria-describedby="button-addon1"
+                                      />
+                                      <button
+                                        className="btn btn-white border border-secondary px-3"
+                                        type="button"
+                                        id="button-addon2"
+                                        data-mdb-ripple-color="dark"
+                                        onClick={() => {
+                                          increaseCount(index);
+                                        }}
+                                      // Gọi hàm tăng số khi nhấn vào nút "Tăng"
+                                      >
+                                        <i className="bi bi-plus-lg"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="col-md-3">
+                                <div className="mt-3">
+                                  <p className="text-muted mb-2">Thành tiền</p>
+                                  <h5>{formatCurrency(item.product.price * item.quantity, 0)}</h5>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="col-md-3">
-                          <div className="mt-3">
-                            <p className="text-muted mb-2">Thành tiền</p>
-                            <h5>${item.product.price * item.quantity}</h5>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      )
+                    }</>
+
                 ))}
             </div>
 
@@ -254,17 +260,13 @@ function Cart() {
                     <table className="table mb-0">
                       <tbody>
                         <tr>
-                          <td className="text-start">Giảm giá : </td>
-                          <td className="text-end">- $0</td>
-                        </tr>
-                        <tr>
                           <td className="text-start">Chi phí vận chuyển :</td>
-                          <td className="text-end">$ 0</td>
+                          <td className="text-end">{formatCurrency(0, 0)}</td>
                         </tr>
                         <tr className="bg-light">
                           <th>Tổng cộng :</th>
                           <td className="text-end">
-                            <span className="fw-bold">$ {amount}</span>
+                            <span className="fw-bold">{formatCurrency(amount, 0)}</span>
                           </td>
                         </tr>
                       </tbody>

@@ -8,6 +8,7 @@ import { Navigate, useNavigate } from "react-router";
 import { callAPI } from "../../service/API";
 import moment from "moment";
 import { TypeSpecimenSharp } from "@mui/icons-material";
+import listDataAddress from "../../service/AddressVietNam.json"
 
 const numberProductPage = 10;
 
@@ -200,7 +201,22 @@ export default function AllBill() {
                   <td
                         width={200}
                   
-                  >{JSON.parse(value.address_order.replace(/\\/g, '')).city}</td>
+                  > {listDataAddress.map((valueCity, index) =>
+                    valueCity.codename === JSON.parse(value.address_order.replace(/\\/g, '')).city
+                      ? valueCity.districts.map((valueDistrict, index) =>
+                        valueDistrict.codename === JSON.parse(value.address_order.replace(/\\/g, '')).district
+                          ? valueDistrict.wards.map((valueWard, index) =>
+                            valueWard.codename === JSON.parse(value.address_order.replace(/\\/g, '')).ward ? (
+                              <>
+                              {JSON.parse(value.address_order.replace(/\\/g, '')).phone} - {JSON.parse(value.address_order.replace(/\\/g, '')).name}, {valueCity?.name}, {valueDistrict?.name},{" "}
+                                {valueWard?.name}, {JSON.parse(value.address_order.replace(/\\/g, '')).address}
+                              </>
+                            ) : null
+                          )
+                          : null
+                      )
+                      : null
+                  )}</td>
                   <td style={{ position: "relative" }}>
                     <span
                       style={{

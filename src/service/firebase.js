@@ -49,19 +49,19 @@ const uploadImageToFirebaseStorage = async (file) => {
     }
 };
 
-const deleteImageFromFirebaseStorage = async (imagePath) => {
-    try {
-        const pathSegments = imagePath.split('/o/');
-        const encodedPath = pathSegments[1].split('?')[0];
-        const decodedPath = decodeURIComponent(encodedPath);
-        const imageRef = ref(storage, decodedPath);
-        await deleteObject(imageRef);
-        console.log("Image deleted successfully!");
-    } catch (error) {
-        console.error("Error deleting image: ", error);
-        throw error;
-    }
-};
+// const deleteImageFromFirebaseStorage = async (imagePath) => {
+//     try {
+//         const pathSegments = imagePath.split('/o/');
+//         const encodedPath = pathSegments[1].split('?')[0];
+//         const decodedPath = decodeURIComponent(encodedPath);
+//         const imageRef = ref(storage, decodedPath);
+//         await deleteObject(imageRef);
+//         console.log("Image deleted successfully!");
+//     } catch (error) {
+//         console.error("Error deleting image: ", error);
+//         throw error;
+//     }
+// };
 
 
 const logout = () => {
@@ -72,5 +72,5 @@ export {
     db,
     storage,
     signInWithGoogle,
-    logout, uploadImageToFirebaseStorage, deleteImageFromFirebaseStorage
+    logout, uploadImageToFirebaseStorage,
 };

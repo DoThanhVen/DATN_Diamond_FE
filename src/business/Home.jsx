@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { GetDataLogin } from "../service/DataLogin";
 import { CChart } from "@coreui/react-chartjs";
-
+import { Bar } from "react-chartjs-2";
 import "../css/business/home.css";
 
 const numberPage = 10;
@@ -27,14 +27,18 @@ function Home() {
   const [stockingProduct, setStockingProduct] = useState(0);
   const [listTotal, setListTotal] = useState([]);
   const [listStatistical, setListStatistical] = useState([]);
-  const [year, setYear] = useState('');
-  const [month, setMonth] = useState('');
-  const [day, setDay] = useState('');
+  const [year, setYear] = useState("");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [listTotalMonth, setListTotalMonth] = useState([]);
 
-  const moment = require('moment-timezone');
+  const moment = require("moment-timezone");
 
-  const currentDate = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD');
-  const [selectedDate, setSelectedDate] = useState(currentDate);
+  const currentDate = moment().tz("Asia/Ho_Chi_Minh");
+  const [selectedDate, setSelectedDate] = useState(
+    currentDate.format("YYYY-MM-DD")
+  );
+  const [yearTotal, setYearTotal] = useState(currentDate.year());
 
   const getAccountFromSession = () => {
     const accountLogin = GetDataLogin();
@@ -42,6 +46,7 @@ function Home() {
     if (accountLogin !== undefined) {
       try {
         getAllBill(accountLogin.shop.id);
+        getTotalMonth(accountLogin.shop.id);
       } catch (error) {
         console.log(error);
       }
@@ -52,7 +57,9 @@ function Home() {
 
   useEffect(() => {
     getAccountFromSession();
-  }, [day, month, year]);
+  }, [day, month, year, yearTotal]);
+
+  console.log(listTotalMonth);
   //LOADING
   const [loading, setLoading] = useState(true);
   //STATUS BILL
@@ -87,6 +94,20 @@ function Home() {
           setListStatistical(response.data[3]);
         }
         setLoading(false);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const getTotalMonth = async (idShop) => {
+    await callAPI(
+      `/api/business/thongke/month/${idShop}?year=${yearTotal}`,
+      "GET"
+    )
+      .then((response) => {
+        if (response) {
+          setListTotalMonth(response.data);
+        }
+        console.log(response);
       })
       .catch((error) => console.log(error));
   };
@@ -201,200 +222,127 @@ function Home() {
         </div>
       </div>
       <div className={`${style.card} mt-3`}>
-        <input
-          type="date"
-          id="datePicker"
-          value={selectedDate}
-          onChange={handleDateChange}
-        />
-        {listStatistical ? (
-          <CChart
-            type="bar"
-            data={{
-              labels: listStatistical?.map((data) => data[0]),
-              datasets: [
-                {
-                  label: "Sản Phẩm",
-                  backgroundColor: "#f87979",
-                  data: listStatistical?.map((data) => data[2])
-                },
-                {
-                  label: "Đơn Hàng",
-                  backgroundColor: "red",
-                  data: listStatistical?.map((data) => data[1])
-                }
-              ]
-            }}
-            labels="months"
-            options={{
-              plugins: {
-                legend: {
-                  labels: {
-                    color: "red"
-                  }
-                }
-              },
-              scales: {
-                x: {
-                  grid: {
-                    color: "green"
-                  },
-                  ticks: {
-                    color: "blue"
-                  }
-                },
-                y: {
-                  grid: {
-                    color: "green"
-                  },
-                  ticks: {
-                    color: "blue"
-                  }
-                }
-              }
-            }}
-          />
-        ) : null}
         <div>
           <div className={style.heading}>Phân Tích Bán Hàng</div>
           <div className={style.title}>
             Tổng quan dữ liệu của shop đối với đơn hàng
           </div>
-        </div>
-        <div className={`${style.filterStatus}`}>
-          <select
-            value={valueBillOption}
-            onChange={(event) => handleChangeStatusBill(event.target.value)}
-            className={`${style.optionSelect}`}
-          >
-            {statusBill.map((value, index) => (
-              <option key={index} value={value.id}>
-                {value.value}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={`${style.listProduct}`}>
-          <div className={style.table}>
-            <div className={style.tableHeading}>
-              <label className={style.column}>STT</label>
-              <label className={style.column}>Mã Đơn Hàng</label>
-              <label className={style.column}>Thanh Toán</label>
-              <label className={style.column}>Trạng Thái Đơn</label>
-              <label className={style.column}>Ngày Cập Nhật</label>
-              <label className={style.column}>Thành Tiền</label>
-            </div>
-            {listPage.map((value, index) => (
-              <div key={index} className={style.tableBody}>
-                <label className={style.column}>{index + 1}</label>
-                <label className={style.column}>{value[0].id}</label>
-                <label
-                  className={style.column}
-                  style={{ color: value[0].pay === true ? "green" : "red" }}
-                >
-                  {value[0].pay === true ? "Đã Thanh Toán" : "Chưa Thanh Toán"}
-                </label>
-                <label className={style.column}>
-                  <label
-                    className={style.status}
-                    style={{
-                      backgroundColor:
-                        value[0].status[value[0].status.length - 1].status
-                          .id === 1
-                          ? "#34219E"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 2
-                          ? "#34219E"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 3
-                          ? "#34219E"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 4
-                          ? "#2ECC71"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 5
-                          ? "#2ECC71"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 6
-                          ? "#2ECC71"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 7
-                          ? "orange"
-                          : value[0].status[value[0].status.length - 1].status
-                              .id === 8
-                          ? "red"
-                          : "#E74C3C"
-                    }}
-                    value={`${
-                      value[0].status[value[0].status.length - 1].status.id
-                    }`}
-                  >
-                    {value[0].status[value[0].status.length - 1].status.id === 1
-                      ? "Chờ Xác Nhận"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 2
-                      ? "Đã Xác Nhận"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 3
-                      ? "Chuẩn Bị Hàng"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 4
-                      ? "Đang Giao"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 5
-                      ? "Chờ Lấy Hàng"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 6
-                      ? "Đã Nhận"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 7
-                      ? "Trả Hàng/Hoàn Tiền"
-                      : value[0].status[value[0].status.length - 1].status
-                          .id === 8
-                      ? "Đã Hủy"
-                      : "Giao Thất Bại"}
-                  </label>
-                </label>
-                <label className={style.column}>{value[1].create_date}</label>
-                <label className={style.column}>
-                  {formatCurrency(value[1].quantity * value[2].price, 0)}
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className={`${style.buttonPage}`}>
-            <Nav.Link
-              className={style.button}
-              onClick={() => handlePageChange(1)}
-            >
-              <i className="bi bi-chevron-bar-left" />
-            </Nav.Link>
-            {currentPage - 1 > 0 ? (
-              <Nav.Link
-                className={style.button}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                {currentPage - 1}
-              </Nav.Link>
+          <div className="container">
+            <input
+              type="date"
+              id="datePicker"
+              value={selectedDate}
+              className={`mt-3 timer`}
+              onChange={handleDateChange}
+            />
+            {listStatistical ? (
+              <CChart
+                type="bar"
+                data={{
+                  labels: listStatistical?.map((data) => data[0]),
+                  datasets: [
+                    {
+                      label: "Sản Phẩm",
+                      backgroundColor: "#f87979",
+                      data: listStatistical?.map((data) => data[1])
+                    },
+                    {
+                      label: "Đơn Hàng",
+                      backgroundColor: "red",
+                      data: listStatistical?.map((data) => data[2])
+                    }
+                  ]
+                }}
+                labels="months"
+                options={{
+                  plugins: {
+                    legend: {
+                      labels: {
+                        color: "red"
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        color: "green"
+                      },
+                      ticks: {
+                        color: "blue"
+                      }
+                    },
+                    y: {
+                      grid: {
+                        color: "green"
+                      },
+                      ticks: {
+                        color: "blue"
+                      }
+                    }
+                  }
+                }}
+              />
             ) : null}
-
-            <Nav.Link className={`${style.button} ${style.btnActivePage}`}>
-              {currentPage}
-            </Nav.Link>
-            {currentPage + 1 <= totalPages ? (
-              <Nav.Link
-                className={style.button}
-                onClick={() => handlePageChange(currentPage + 1)}
+            {listTotalMonth ? (
+              <select
+                value={yearTotal}
+                onChange={(e) => {
+                  setYearTotal(e.target.value);
+                }}
+                className={`optionSelect mt-3`}
               >
-                {currentPage + 1}
-              </Nav.Link>
+                {listTotalMonth.map((value, index) => (
+                  <>
+                    <option key={index} value={value[1]}>
+                      {value[1]}
+                    </option>
+                  </>
+                ))}
+              </select>
             ) : null}
-            <Nav.Link
-              className={style.button}
-              onClick={() => handlePageChange(totalPages)}
-            >
-              <i className="bi bi-chevron-bar-right" />
-            </Nav.Link>
+            {listTotalMonth ? (
+              <CChart
+                type="bar"
+                data={{
+                  labels: listTotalMonth?.map((data) => data[2]),
+                  datasets: [
+                    {
+                      label: "Doanh Thu Tháng",
+                      backgroundColor: "#f87979",
+                      data: listTotalMonth?.map((data) => data[0])
+                    }
+                  ]
+                }}
+                labels="months"
+                options={{
+                  plugins: {
+                    legend: {
+                      labels: {
+                        color: "red"
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        color: "green"
+                      },
+                      ticks: {
+                        color: "blue"
+                      }
+                    },
+                    y: {
+                      grid: {
+                        color: "green"
+                      },
+                      ticks: {
+                        color: "blue"
+                      }
+                    }
+                  }
+                }}
+              />
+            ) : null}
           </div>
         </div>
       </div>
